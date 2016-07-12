@@ -4,9 +4,6 @@ import ch.gaps.slasher.database.driver.Driver;
 import javafx.scene.control.TreeItem;
 
 
-/**
- * Created by leroy on 12.07.2016.
- */
 public class DriverTreeItem extends TreeItem {
     private Driver driver;
 
@@ -16,9 +13,10 @@ public class DriverTreeItem extends TreeItem {
 
     public DriverTreeItem(){}
 
+    @Override
     public String toString()
     {
-        return driver.type();
+        return "naom";
     }
 
 

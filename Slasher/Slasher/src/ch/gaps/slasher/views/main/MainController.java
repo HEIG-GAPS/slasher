@@ -25,6 +25,7 @@ package ch.gaps.slasher.views.main;
 
 import ch.gaps.slasher.Slasher;
 import ch.gaps.slasher.database.driver.Driver;
+import ch.gaps.slasher.models.DriverTreeCell;
 import ch.gaps.slasher.models.DriverTreeItem;
 import ch.gaps.slasher.views.editor.EditorController;
 import ch.gaps.slasher.views.openDB.OpenDBController;
@@ -50,8 +51,8 @@ public class MainController {
     @FXML private MenuBar menu;
     @FXML private BorderPane borderPane;
     @FXML private TabPane tabPane;
-    @FXML private TreeView treeView;
-    private DriverTreeItem rootTreeItem = new DriverTreeItem();
+    @FXML private TreeView<DriverTreeItem> treeView;
+    private TreeItem<DriverTreeItem> rootTreeItem = new TreeItem<>();
 
     private Driver driver;
     
@@ -60,6 +61,8 @@ public class MainController {
         menu.setUseSystemMenuBar(true);
         treeView.setRoot(rootTreeItem);
         treeView.setShowRoot(false);
+        rootTreeItem.setExpanded(true);
+        treeView.setCellFactory(param -> new DriverTreeCell());
     }
     
     @FXML
@@ -87,7 +90,9 @@ public class MainController {
         stage.setScene(new Scene(pane));
         stage.showAndWait();
         driver.test();
-        rootTreeItem.getChildren().add(new DriverTreeItem(driver));
+        TreeItem<DriverTreeItem> item = new TreeItem<>(new DriverTreeItem(driver));
+
+        rootTreeItem.getChildren().add(item);
 
     }
 
