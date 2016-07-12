@@ -5,22 +5,33 @@
  */
 package ch.gaps.slasher.database.driver;
 
+import java.sql.SQLException;
+
 /**
  *
- * @author jvarani
+ * @author leory
  */
-public class PostgreSQL94 implements Driver {
-  
-  // <editor-fold desc="Driver Overrides" defaultstate="collapsed">
-  @Override
-  public String id() { return PostgreSQL94.class.getName().toLowerCase(); }
+public class MySql implements Driver {
   
   @Override
-  public String toString() { return "PostgresQL 9.4.*"; }
+  public String id() { return MySql.class.getName().toLowerCase(); }
+  
+  @Override
+  public String toString() { return "MySql"; }
 
   @Override
   public String type() {
     return "server";
   }
-  // </editor-fold>
+
+  @Override
+  public void connect(String... connectionInfo){
+
+  }
+
+  @Override
+  public void test() {
+
+  }
+
 }

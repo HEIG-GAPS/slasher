@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 jvarani.
+ * Copyright 2016 leroy.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,33 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package ch.gaps.slasher.database.driver;
+package ch.gaps.slasher.views.openDB;
 
-import java.sql.SQLException;
+import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
+import javafx.stage.FileChooser;
 
-/**
- *
- * @author jvarani
- */
-public interface Driver {
-  
-  // <editor-fold desc="Properties" defaultstate="collapsed">
-  /**
-   * @return the id of this driver. Can be the lower case name of the main class.
-   */
-  public String id();
-  
-  /**
-   * @return the human readable name of this driver.
-   */
-  public String toString();
-  // </editor-fold>
+import java.io.File;
 
-  public String type();
+public class FileDBController implements DBController {
+    @FXML private Pane mainPane;
+    @FXML private TextField path;
+    private File file;
+    String [] connectionData = new String[1];
 
-  public void connect(String ... connectionInfo);
+    @FXML
+    private void browse(){
+        FileChooser fileChooser = new FileChooser();
+        file = fileChooser.showOpenDialog(mainPane.getScene().getWindow());
+        if (file != null) {
+            path.setText(file.getPath());
+            connectionData[0] = file.getPath();
+        }
+    }
 
-  public void test();
-  
-  
+    @Override
+    public String[] getConnectionData() {
+        return  connectionData;
+    }
 }

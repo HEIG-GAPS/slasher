@@ -19,3 +19,7 @@ build.xml
 nblibraries.properties
 .DS_Store
 netbeans-config.zip
+
+.idea/
+out/
+*.iml

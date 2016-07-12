@@ -24,16 +24,17 @@
 package ch.gaps.slasher.views.main;
 
 import ch.gaps.slasher.Slasher;
+import ch.gaps.slasher.database.driver.Driver;
+import ch.gaps.slasher.models.DriverTreeItem;
 import ch.gaps.slasher.views.editor.EditorController;
 import ch.gaps.slasher.views.openDB.OpenDBController;
 import java.io.IOException;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
@@ -49,12 +50,16 @@ public class MainController {
     @FXML private MenuBar menu;
     @FXML private BorderPane borderPane;
     @FXML private TabPane tabPane;
+    @FXML private TreeView treeView;
+    private DriverTreeItem rootTreeItem = new DriverTreeItem();
+
+    private Driver driver;
     
     @FXML
     private void initialize(){
         menu.setUseSystemMenuBar(true);
-        
-        
+        treeView.setRoot(rootTreeItem);
+        treeView.setShowRoot(false);
     }
     
     @FXML
@@ -77,10 +82,16 @@ public class MainController {
         FXMLLoader loader = new FXMLLoader(OpenDBController.class.getResource("OpenDBView.fxml"));
         stage.setTitle("Open a database");
         Pane pane = loader.load();
+        ((OpenDBController)loader.getController()).setController(this);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(new Scene(pane));
         stage.showAndWait();
-        
-        
+        driver.test();
+        rootTreeItem.getChildren().add(new DriverTreeItem(driver));
+
+    }
+
+    public void setDriver(Driver driver){
+        this.driver = driver;
     }
 }

@@ -16,6 +16,8 @@ public class PostgreSQL93 implements Driver {
   public String id() { return PostgreSQL93.class.getName().toLowerCase(); }
   
   @Override
-  public String name() { return "PostgresQL 9.3.*"; }
+  public String toString() { return "PostgresQL 9.3.*"; }
   // </editor-fold>
+
+  public String type(){return "server";}
 }
