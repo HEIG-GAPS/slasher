@@ -12,10 +12,10 @@
 hs_err_pid*
 
 #Build files
-*/build/
-*/dist/
-*/lib/
-*/nbproject/
-build
-
-
+build/
+dist/
+nbproject/
+build.xml
+nblibraries.properties
+.DS_Store
+netbeans-config.zip
