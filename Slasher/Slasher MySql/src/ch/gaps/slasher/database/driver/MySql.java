@@ -5,6 +5,8 @@
  */
 package ch.gaps.slasher.database.driver;
 
+import ch.gaps.slasher.database.driver.database.Table;
+
 import java.sql.SQLException;
 
 /**
@@ -35,7 +37,7 @@ public class MySql implements Driver {
   }
 
   @Override
-  public String[] tables() {
+  public Table[] tables() {
     return null;
   }
 

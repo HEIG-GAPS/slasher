@@ -78,21 +78,21 @@ public class Sqlite implements Driver {
   }
 
   public Table[] tables(){
-    LinkedList<String> tables = new LinkedList<>();
+    LinkedList<Table> tables = new LinkedList<>();
     try {
       Statement statement = connection.createStatement();
       ResultSet rs = statement.executeQuery("SELECT name FROM sqlite_master WHERE type = 'table'");
 
       while(rs.next())
       {
-        tables.add(rs.getString("name"));
+        tables.add(new Table(rs.getString("name")));
       }
 
     } catch (SQLException e) {
       e.printStackTrace();
     }
 
-    return tables.toArray(new String[tables.size()]);
+    return tables.toArray(new Table[tables.size()]);
   }
 
 

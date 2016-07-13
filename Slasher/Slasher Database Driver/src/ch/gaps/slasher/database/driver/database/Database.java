@@ -8,9 +8,11 @@ import ch.gaps.slasher.database.driver.Driver;
 public class Database extends DbObject {
 
     private Driver driver;
+    private String name;
 
-    public Database(Driver driver){
+    public Database(Driver driver, String name){
         this.driver = driver;
+        this.name = name;
     }
     public String toString(){
         return driver.toString();

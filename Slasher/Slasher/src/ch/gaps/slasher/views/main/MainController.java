@@ -32,6 +32,7 @@ import ch.gaps.slasher.models.treeItem.DbObjectTreeItem;
 import ch.gaps.slasher.views.editor.EditorController;
 import ch.gaps.slasher.views.openDB.OpenDBController;
 import java.io.IOException;
+import java.net.DatagramSocket;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -56,7 +57,7 @@ public class MainController {
     @FXML private TreeView<DbObject> treeView;
     private TreeItem<DbObject> rootTreeItem = new DbObjectTreeItem();
 
-    private Driver driver;
+    private Database database;
     
     @FXML
     private void initialize(){
@@ -92,21 +93,15 @@ public class MainController {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(new Scene(pane));
         stage.showAndWait();
-        driver.test();
-        Database db = new Database(driver);
 
-        DatabaseTreeItem item = new DatabaseTreeItem(db);
-
-        rootTreeItem.getChildren().add(item);
-
-
-
-
-
+        if (database != null){
+            DatabaseTreeItem item = new DatabaseTreeItem(database);
+            rootTreeItem.getChildren().add(item);
+        }
 
     }
 
-    public void setDriver(Driver driver){
-        this.driver = driver;
+    public void addDatabase(Database database){
+        this.database = database;
     }
 }
