@@ -23,10 +23,12 @@
  */
 package ch.gaps.slasher.views.main;
 
-import ch.gaps.slasher.Slasher;
 import ch.gaps.slasher.database.driver.Driver;
-import ch.gaps.slasher.models.DriverTreeCell;
-import ch.gaps.slasher.models.DriverTreeItem;
+import ch.gaps.slasher.database.driver.database.Database;
+import ch.gaps.slasher.database.driver.database.DbObject;
+import ch.gaps.slasher.models.treeItem.DatabaseTreeItem;
+import ch.gaps.slasher.models.treeItem.DbObjectTreeCell;
+import ch.gaps.slasher.models.treeItem.DbObjectTreeItem;
 import ch.gaps.slasher.views.editor.EditorController;
 import ch.gaps.slasher.views.openDB.OpenDBController;
 import java.io.IOException;
@@ -51,8 +53,8 @@ public class MainController {
     @FXML private MenuBar menu;
     @FXML private BorderPane borderPane;
     @FXML private TabPane tabPane;
-    @FXML private TreeView<DriverTreeItem> treeView;
-    private TreeItem<DriverTreeItem> rootTreeItem = new TreeItem<>();
+    @FXML private TreeView<DbObject> treeView;
+    private TreeItem<DbObject> rootTreeItem = new DbObjectTreeItem();
 
     private Driver driver;
     
@@ -62,7 +64,7 @@ public class MainController {
         treeView.setRoot(rootTreeItem);
         treeView.setShowRoot(false);
         rootTreeItem.setExpanded(true);
-        treeView.setCellFactory(param -> new DriverTreeCell());
+        treeView.setCellFactory(param -> new DbObjectTreeCell());
     }
     
     @FXML
@@ -76,6 +78,7 @@ public class MainController {
         Pane newPane = loader.load();
         Tab newTab = new Tab("Editor", newPane);
         tabPane.getTabs().add(newTab);
+
       
     }
     
@@ -90,9 +93,16 @@ public class MainController {
         stage.setScene(new Scene(pane));
         stage.showAndWait();
         driver.test();
-        TreeItem<DriverTreeItem> item = new TreeItem<>(new DriverTreeItem(driver));
+        Database db = new Database(driver);
+
+        DatabaseTreeItem item = new DatabaseTreeItem(db);
 
         rootTreeItem.getChildren().add(item);
+
+
+
+
+
 
     }
 

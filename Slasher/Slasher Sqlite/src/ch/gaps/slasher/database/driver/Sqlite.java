@@ -5,7 +5,10 @@
  */
 package ch.gaps.slasher.database.driver;
 
+import ch.gaps.slasher.database.driver.database.Table;
+
 import java.sql.*;
+import java.util.LinkedList;
 
 /**
  *
@@ -72,6 +75,24 @@ public class Sqlite implements Driver {
       e.printStackTrace();
     }
 
+  }
+
+  public Table[] tables(){
+    LinkedList<String> tables = new LinkedList<>();
+    try {
+      Statement statement = connection.createStatement();
+      ResultSet rs = statement.executeQuery("SELECT name FROM sqlite_master WHERE type = 'table'");
+
+      while(rs.next())
+      {
+        tables.add(rs.getString("name"));
+      }
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return tables.toArray(new String[tables.size()]);
   }
 
 

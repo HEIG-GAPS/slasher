@@ -34,4 +34,9 @@ public class MySql implements Driver {
 
   }
 
+  @Override
+  public String[] tables() {
+    return null;
+  }
+
 }

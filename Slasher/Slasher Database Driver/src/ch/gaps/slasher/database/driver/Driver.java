@@ -23,7 +23,7 @@
  */
 package ch.gaps.slasher.database.driver;
 
-import java.sql.SQLException;
+import ch.gaps.slasher.database.driver.database.Table;
 
 /**
  *
@@ -48,6 +48,8 @@ public interface Driver {
   public void connect(String ... connectionInfo);
 
   public void test();
+
+  public Table[] tables();
   
   
 }
