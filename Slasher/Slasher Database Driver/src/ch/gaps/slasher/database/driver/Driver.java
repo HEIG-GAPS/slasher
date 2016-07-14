@@ -50,6 +50,8 @@ public interface Driver {
   public void test();
 
   public Table[] tables();
+
+  public boolean hasShema();
   
   
 }

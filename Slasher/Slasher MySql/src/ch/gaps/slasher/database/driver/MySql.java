@@ -41,4 +41,9 @@ public class MySql implements Driver {
     return null;
   }
 
+  @Override
+  public boolean hasShema() {
+    return true;
+  }
+
 }

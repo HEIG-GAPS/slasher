@@ -95,5 +95,10 @@ public class Sqlite implements Driver {
     return tables.toArray(new Table[tables.size()]);
   }
 
+  @Override
+  public boolean hasShema() {
+    return false;
+  }
+
 
 }

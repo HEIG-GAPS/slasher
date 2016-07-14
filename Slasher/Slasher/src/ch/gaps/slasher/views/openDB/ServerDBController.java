@@ -25,5 +25,33 @@
 package ch.gaps.slasher.views.openDB;
 
 
-public class ServerDBController {
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
+
+public class ServerDBController implements DBController {
+    @FXML private TextField host;
+    @FXML private TextField username
+
+    private String [] connectionData = new String[1];
+    private BooleanProperty filedOk = new SimpleBooleanProperty(false);
+
+
+    @FXML
+    public void initialize(){
+
+
+    }
+
+
+    @Override
+    public String[] getConnectionData() {
+        return connectionData;
+    }
+
+    @Override
+    public BooleanProperty getFieldValidation() {
+        return filedOk;
+    }
 }

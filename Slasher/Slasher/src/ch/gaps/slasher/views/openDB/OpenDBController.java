@@ -33,10 +33,10 @@ import java.util.Optional;
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.views.main.MainController;
 import javafx.beans.Observable;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableListValue;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -61,34 +61,36 @@ public class OpenDBController {
     private DBController dbController;
     private MainController mainController;
 
+    private BooleanProperty nameOk = new SimpleBooleanProperty(false);
+    private BooleanProperty driverOk = new SimpleBooleanProperty(false);
+    private BooleanProperty otherDataOk = new SimpleBooleanProperty(false);
+
     private Driver driver;
-    private ObservableValue<Valide> test;
-    private Valide valide;
 
     @FXML
     private void initialize(){
-        test = new SimpleObjectProperty<>(new Valide());
-        valide  = new Valide();
-        dbName.textProperty().addListener((observable, oldValue, newValue) -> {
+
+
+       dbName.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null || newValue.isEmpty())
-                test.getValue().name.set(false);
+                nameOk.set(false);
             else
-                test.getValue().name.set(true);
+                nameOk.set(true);
         });
 
-        test.addListener((observable, oldValue, newValue) -> {
-            newValue.driver.get();
-        });
+        validateButton.disableProperty().bind(nameOk.not().or(driverOk.not()).or(otherDataOk.not()));
+
 
         driversListCB.getItems().addAll(DriverService.instance().getAll());
         driversListCB.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             dbSelectionPane.getChildren().clear();
-            valide.driver.set(true);
+            driverOk.set(true);
             if (newValue.type().equals("server")){
                 try {
                     FXMLLoader loader = new FXMLLoader(OpenDBController.class.getResource("ServerDB.fxml"));
                     dbSelectionPane.getChildren().add(loader.load());
                     dbController = loader.getController();
+                    otherDataOk.bind(dbController.getFieldValidation());
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -100,6 +102,8 @@ public class OpenDBController {
                     FXMLLoader loader = new FXMLLoader(OpenDBController.class.getResource("FileDB.fxml"));
                     dbSelectionPane.getChildren().add(loader.load());
                     dbController = loader.getController();
+                    otherDataOk.bind(dbController.getFieldValidation());
+
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -135,44 +139,4 @@ public class OpenDBController {
     public void setController(MainController mainController){
         this.mainController = mainController;
     }
-
-    class Valide{
-        BooleanProperty driver = new SimpleBooleanProperty(false);
-        BooleanProperty name = new SimpleBooleanProperty(false);
-        BooleanProperty otherdata = new SimpleBooleanProperty(true);
-
-        BooleanProperty allOk = new SimpleBooleanProperty(false);
-
-        Valide(){
-
-            validateButton.disableProperty().bind(allOk.not());
-
-            driver.addListener((observable, oldValue, newValue) -> {
-                if (newValue && name.get() && otherdata.get())
-                    allOk.set(true);
-                else
-                    allOk.set(false);
-            });
-
-            name.addListener((observable, oldValue, newValue) -> {
-                if (newValue && driver.get() && otherdata.get())
-                    allOk.set(true);
-                else
-                    allOk.set(false);
-
-            });
-
-            otherdata.addListener((observable, oldValue, newValue) -> {
-                if (newValue && driver.get() && name.get())
-                    allOk.set(false);
-                else
-                    allOk.set(false);
-            });
-        }
-
-
-
-    }
-    
-    
 }

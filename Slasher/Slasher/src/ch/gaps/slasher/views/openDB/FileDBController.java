@@ -23,6 +23,8 @@
  */
 package ch.gaps.slasher.views.openDB;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
@@ -34,7 +36,18 @@ public class FileDBController implements DBController {
     @FXML private Pane mainPane;
     @FXML private TextField path;
     private File file;
-    String [] connectionData = new String[1];
+    private String [] connectionData = new String[1];
+    private BooleanProperty filedOk = new SimpleBooleanProperty(false);
+
+    @FXML
+    private void initialize(){
+        path.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null || newValue.isEmpty())
+                filedOk.set(false);
+            else
+                filedOk.set(true);
+        });
+    }
 
     @FXML
     private void browse(){
@@ -50,4 +63,11 @@ public class FileDBController implements DBController {
     public String[] getConnectionData() {
         return  connectionData;
     }
+
+    @Override
+    public BooleanProperty getFieldValidation() {
+        return filedOk;
+    }
+
+
 }
