@@ -22,7 +22,8 @@
             </Menu>
           <Menu mnemonicParsing="false" text="Database">
                <items>
-                  <MenuItem mnemonicParsing="false" onAction="#connectDB" text="Open Database" />
+                  <MenuItem mnemonicParsing="false" onAction="#connectDB" text="Open database" />
+                  <MenuItem fx:id="closeDatabase" mnemonicParsing="false" text="Close database" />
                </items></Menu>
             <Menu fx:id="modulsMenu" mnemonicParsing="false" text="Moduls">
                <items>

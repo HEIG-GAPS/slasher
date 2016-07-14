@@ -5,6 +5,8 @@
  */
 package ch.gaps.slasher.database.driver;
 
+import ch.gaps.slasher.database.driver.database.Database;
+import ch.gaps.slasher.database.driver.database.Schema;
 import ch.gaps.slasher.database.driver.database.Table;
 
 import java.sql.*;
@@ -77,7 +79,7 @@ public class Sqlite implements Driver {
 
   }
 
-  public Table[] tables(){
+  public Table[] getTables(){
     LinkedList<Table> tables = new LinkedList<>();
     try {
       Statement statement = connection.createStatement();
@@ -96,7 +98,12 @@ public class Sqlite implements Driver {
   }
 
   @Override
-  public boolean hasShema() {
+  public Schema[] getSchemas(Database database) {
+    return null;
+  }
+
+  @Override
+  public boolean hasSchema() {
     return false;
   }
 

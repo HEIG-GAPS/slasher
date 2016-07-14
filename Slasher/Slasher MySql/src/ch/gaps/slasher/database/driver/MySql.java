@@ -5,15 +5,21 @@
  */
 package ch.gaps.slasher.database.driver;
 
+import ch.gaps.slasher.database.driver.database.Database;
+import ch.gaps.slasher.database.driver.database.Schema;
 import ch.gaps.slasher.database.driver.database.Table;
 
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.LinkedList;
+import java.util.Properties;
 
 /**
  *
  * @author leory
  */
 public class MySql implements Driver {
+
+  Connection connection;
   
   @Override
   public String id() { return MySql.class.getName().toLowerCase(); }
@@ -29,6 +35,29 @@ public class MySql implements Driver {
   @Override
   public void connect(String... connectionInfo){
 
+
+
+
+
+    try {
+      Class.forName("com.mysql.jdbc.Driver");
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+
+    Properties info = new Properties();
+    info.setProperty("user",  connectionInfo[1]);
+    info.setProperty("password", connectionInfo[2]);
+    info.setProperty("useSSL", "true");
+
+    try {
+      String url = "jdbc:mysql://" + connectionInfo[0] + ":3306";
+      connection = DriverManager.getConnection(url, info);
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
   }
 
   @Override
@@ -37,12 +66,30 @@ public class MySql implements Driver {
   }
 
   @Override
-  public Table[] tables() {
+  public Table[] getTables() {
     return null;
   }
 
   @Override
-  public boolean hasShema() {
+  public Schema[] getSchemas(Database database) {
+    LinkedList<Schema> schemas = new LinkedList<>();
+
+    Statement statement = null;
+
+    try {
+      ResultSet rs = connection.getMetaData().getCatalogs();
+      while (rs.next()) {
+        schemas.add(new Schema(database, rs.getString("TABLE_CAT")));
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return schemas.toArray(new Schema[schemas.size()]);
+  }
+
+  @Override
+  public boolean hasSchema() {
     return true;
   }
 

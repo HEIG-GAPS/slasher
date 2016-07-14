@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 jvarani.
+ * Copyright 2016 leroy.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,44 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package ch.gaps.slasher.database.driver;
+package ch.gaps.slasher.models.treeItem;
 
-import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.database.driver.database.Schema;
-import ch.gaps.slasher.database.driver.database.Table;
-
-/**
- *
- * @author jvarani
- */
-public interface Driver {
-  
-  // <editor-fold desc="Properties" defaultstate="collapsed">
-  /**
-   * @return the id of this driver. Can be the lower case name of the main class.
-   */
-  public String id();
-  
-  /**
-   * @return the human readable name of this driver.
-   */
-  public String toString();
-  // </editor-fold>
-
-  public String type();
-
-  public void connect(String ... connectionInfo);
-
-  public void test();
-
-  public boolean hasSchema();
-
-  public Table[] getTables();
-
-  public Schema[] getSchemas(Database database);
 
 
-
-  
-  
+public class SchemaTreeItem extends DbObjectTreeItem {
+    public SchemaTreeItem(Schema schema){
+        super(schema);
+    }
 }

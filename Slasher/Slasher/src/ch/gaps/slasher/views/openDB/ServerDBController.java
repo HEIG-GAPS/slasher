@@ -39,7 +39,7 @@ public class ServerDBController implements DBController {
     private BooleanProperty usernameOk = new SimpleBooleanProperty(false);
     private BooleanProperty passwordOk = new SimpleBooleanProperty(false);
 
-    private String [] connectionData = new String[1];
+    private String [] connectionData = new String[3];
     private BooleanProperty filedOk = new SimpleBooleanProperty(false);
 
 
@@ -49,6 +49,7 @@ public class ServerDBController implements DBController {
         filedOk.bind(hostOk.and(usernameOk).and(passwordOk));
 
         host.textProperty().addListener((observable, oldValue, newValue) -> {
+            connectionData[0] = newValue;
             if (newValue == null || newValue.isEmpty())
                 hostOk.set(false);
             else
@@ -56,6 +57,7 @@ public class ServerDBController implements DBController {
         });
 
         username.textProperty().addListener((observable, oldValue, newValue) -> {
+            connectionData[1] = newValue;
             if (newValue == null || newValue.isEmpty())
                 usernameOk.set(false);
             else
@@ -63,11 +65,14 @@ public class ServerDBController implements DBController {
         });
 
         password.textProperty().addListener((observable, oldValue, newValue) -> {
+            connectionData[2] = newValue;
             if (newValue == null || newValue.isEmpty())
                 passwordOk.set(false);
             else
                 passwordOk.set(true);
         });
+
+
     }
 
     @Override
