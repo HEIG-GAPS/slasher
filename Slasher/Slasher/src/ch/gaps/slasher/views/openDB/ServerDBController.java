@@ -24,15 +24,20 @@
 
 package ch.gaps.slasher.views.openDB;
 
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 public class ServerDBController implements DBController {
     @FXML private TextField host;
-    @FXML private TextField username
+    @FXML private TextField username;
+    @FXML private PasswordField password;
+
+    private BooleanProperty hostOk = new SimpleBooleanProperty(false);
+    private BooleanProperty usernameOk = new SimpleBooleanProperty(false);
+    private BooleanProperty passwordOk = new SimpleBooleanProperty(false);
 
     private String [] connectionData = new String[1];
     private BooleanProperty filedOk = new SimpleBooleanProperty(false);
@@ -41,9 +46,29 @@ public class ServerDBController implements DBController {
     @FXML
     public void initialize(){
 
+        filedOk.bind(hostOk.and(usernameOk).and(passwordOk));
 
+        host.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null || newValue.isEmpty())
+                hostOk.set(false);
+            else
+                hostOk.set(true);
+        });
+
+        username.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null || newValue.isEmpty())
+                usernameOk.set(false);
+            else
+                usernameOk.set(true);
+        });
+
+        password.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null || newValue.isEmpty())
+                passwordOk.set(false);
+            else
+                passwordOk.set(true);
+        });
     }
-
 
     @Override
     public String[] getConnectionData() {
