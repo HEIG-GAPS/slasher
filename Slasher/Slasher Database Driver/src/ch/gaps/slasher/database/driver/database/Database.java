@@ -50,7 +50,5 @@ public class Database extends DbObject {
         return driver.hasSchema();
     }
 
-    public void close(){
-
-    }
+    public void close(){ driver.close(); }
 }

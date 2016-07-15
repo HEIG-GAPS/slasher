@@ -108,6 +108,15 @@ public class MySql implements Driver {
   }
 
   @Override
+  public void close() {
+    try {
+      connection.close();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
   public boolean hasSchema() {
     return true;
   }

@@ -23,12 +23,6 @@ public class DbCloseItem extends MenuItem {
         addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
 
         });
-
-        setOnAction(event -> {
-            System.out.println("Test ok");
-            databaseTreeItem.close();
-            getParentMenu().getItems().remove(this);
-        });
     }
 
 }
