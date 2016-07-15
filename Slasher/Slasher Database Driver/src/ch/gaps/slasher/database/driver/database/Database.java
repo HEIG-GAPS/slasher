@@ -38,8 +38,8 @@ public class Database extends DbObject {
         return name + " - " + driver.toString();
     }
 
-    public Table[] getTables(){
-        return driver.getTables();
+    public Table[] getTables(Schema schema){
+        return driver.getTables(schema);
     }
 
     public Schema[] getSchemas(){
@@ -48,5 +48,9 @@ public class Database extends DbObject {
 
     public boolean hasSchemas(){
         return driver.hasSchema();
+    }
+
+    public void close(){
+
     }
 }

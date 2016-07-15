@@ -79,7 +79,7 @@ public class Sqlite implements Driver {
 
   }
 
-  public Table[] getTables(){
+  public Table[] getTables(Schema schema){
     LinkedList<Table> tables = new LinkedList<>();
     try {
       Statement statement = connection.createStatement();
@@ -99,7 +99,11 @@ public class Sqlite implements Driver {
 
   @Override
   public Schema[] getSchemas(Database database) {
-    return null;
+
+    Schema[] schemas = new Schema[1];
+    schemas[0] = new Schema(database, "main");
+
+    return schemas;
   }
 
   @Override

@@ -41,24 +41,21 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
                 DbObjectTreeItem schemaItem = new SchemaTreeItem(schema);
                 Table[] tables = schema.getTables();
 
-             /*   for (Table table: tables){
+                for (Table table: tables){
                     schemaItem.getChildren().add(new TableTreeItem(table));
                 }
-*/
+
                 getChildren().add(schemaItem);
             }
 
         }
-        else {
-            for (Table table : db.getTables()) {
-                getChildren().add(new TableTreeItem(table));
-            }
-        }
+
 
 
     }
 
-    public String toString(){
-        return "yolo2";
+    public void close(){
+        this.getParent().getChildren().remove(this);
+        ((Database)getValue()).close();
     }
 }

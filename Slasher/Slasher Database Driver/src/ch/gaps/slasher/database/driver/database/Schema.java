@@ -33,13 +33,12 @@ public class Schema extends DbObject {
     }
 
     public Table[] getTables(){
-        return database.getTables();
+        return database.getTables(this);
     }
 
     public String toString()
     {
         return name;
     }
-
 
 }

@@ -23,22 +23,24 @@
  */
 package ch.gaps.slasher.views.main;
 
-import ch.gaps.slasher.database.driver.Driver;
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.database.driver.database.DbObject;
+import ch.gaps.slasher.models.buttons.DbCloseItem;
 import ch.gaps.slasher.models.treeItem.DatabaseTreeItem;
 import ch.gaps.slasher.models.treeItem.DbObjectTreeCell;
 import ch.gaps.slasher.models.treeItem.DbObjectTreeItem;
 import ch.gaps.slasher.views.editor.EditorController;
 import ch.gaps.slasher.views.openDB.OpenDBController;
 import java.io.IOException;
-import java.net.DatagramSocket;
+import java.util.LinkedList;
 
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
@@ -55,9 +57,11 @@ public class MainController {
     @FXML private BorderPane borderPane;
     @FXML private TabPane tabPane;
     @FXML private TreeView<DbObject> treeView;
+    @FXML private Menu closeDbMenu;
     private TreeItem<DbObject> rootTreeItem = new DbObjectTreeItem();
 
-    private Database database;
+
+    private LinkedList<Database> databases = new LinkedList<>();
     
     @FXML
     private void initialize(){
@@ -94,14 +98,22 @@ public class MainController {
         stage.setScene(new Scene(pane));
         stage.showAndWait();
 
-        if (database != null){
-            DatabaseTreeItem item = new DatabaseTreeItem(database);
+        if (databases.getLast() != null){
+            DatabaseTreeItem item = new DatabaseTreeItem(databases.getLast());
             rootTreeItem.getChildren().add(item);
+            DbCloseItem dbCloseItem = new DbCloseItem(item);
+            closeDbMenu.getItems().add(dbCloseItem);
         }
+    }
+
+    @FXML
+    private void closeDB(){
 
     }
 
     public void addDatabase(Database database){
-        this.database = database;
+        databases.add(database);
     }
+
+
 }

@@ -66,8 +66,27 @@ public class MySql implements Driver {
   }
 
   @Override
-  public Table[] getTables() {
-    return null;
+  public Table[] getTables(Schema schema) {
+
+    LinkedList<Table> tables = new LinkedList<>();
+
+    try {
+      DatabaseMetaData meta = connection.getMetaData();
+      Statement statement = connection.createStatement();
+      ResultSet rs2 = meta.getTables(null, schema.toString(),"%", null);
+      ResultSet rs = statement.executeQuery("SELECT DISTINCT TABLE_NAME\n" +
+              "      FROM INFORMATION_SCHEMA.COLUMNS\n" +
+              "      WHERE TABLE_SCHEMA='" + schema.toString() + "'");
+
+      while(rs.next())
+      {
+        System.out.println(rs.getString(1));
+        tables.add(new Table(rs.getString(1)));
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return tables.toArray(new Table[tables.size()]);
   }
 
   @Override
