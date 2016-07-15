@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 
-<AnchorPane id="AnchorPane" prefHeight="302.0" prefWidth="583.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.gaps.slasher.views.openDB.OpenDBController">
+<AnchorPane id="AnchorPane" prefHeight="302.0" prefWidth="583.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.gaps.slasher.views.connectServer.ConnectServerController">
    <children>
       <ButtonBar layoutY="109.0" prefHeight="40.0" prefWidth="268.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
         <buttons>

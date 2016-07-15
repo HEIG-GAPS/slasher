@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package ch.gaps.slasher.views.openDB;
+package ch.gaps.slasher.views.connectServer;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -32,7 +32,7 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 
-public class FileDBController implements DBController {
+public class FileServerController implements ServerController {
     @FXML private Pane mainPane;
     @FXML private TextField path;
     private File file;

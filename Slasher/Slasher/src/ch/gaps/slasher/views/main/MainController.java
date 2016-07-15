@@ -23,25 +23,22 @@
  */
 package ch.gaps.slasher.views.main;
 
-import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.database.driver.database.DbObject;
-import ch.gaps.slasher.models.buttons.DbCloseItem;
-import ch.gaps.slasher.models.treeItem.DatabaseTreeItem;
+import ch.gaps.slasher.database.driver.database.Server;
+import ch.gaps.slasher.models.buttons.ServerDisconnectItem;
 import ch.gaps.slasher.models.treeItem.DbObjectTreeCell;
 import ch.gaps.slasher.models.treeItem.DbObjectTreeItem;
+import ch.gaps.slasher.models.treeItem.ServerTreeItem;
 import ch.gaps.slasher.views.editor.EditorController;
-import ch.gaps.slasher.views.openDB.OpenDBController;
+import ch.gaps.slasher.views.connectServer.ConnectServerController;
 import java.io.IOException;
 import java.util.LinkedList;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
@@ -58,11 +55,11 @@ public class MainController {
     @FXML private BorderPane borderPane;
     @FXML private TabPane tabPane;
     @FXML private TreeView<DbObject> treeView;
-    @FXML private Menu closeDbMenu;
+    @FXML private Menu closeServerButton;
     private TreeItem<DbObject> rootTreeItem = new DbObjectTreeItem();
 
 
-    private LinkedList<Database> databases = new LinkedList<>();
+    private LinkedList<Server> servers = new LinkedList<>();
     
     @FXML
     private void initialize(){
@@ -84,42 +81,36 @@ public class MainController {
         Pane newPane = loader.load();
         Tab newTab = new Tab("Editor", newPane);
         tabPane.getTabs().add(newTab);
-
-      
     }
     
     @FXML
     private void connectDB() throws IOException{
         Stage stage = new Stage();
-        FXMLLoader loader = new FXMLLoader(OpenDBController.class.getResource("OpenDBView.fxml"));
+        FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("ConnectServerView.fxml"));
         stage.setTitle("Open a database");
         Pane pane = loader.load();
-        ((OpenDBController)loader.getController()).setController(this);
+        ((ConnectServerController)loader.getController()).setController(this);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(new Scene(pane));
-        int prevSize = databases.size();
+        int prevSize = servers.size();
         stage.showAndWait();
 
-        if (prevSize < databases.size()){
-            DatabaseTreeItem item = new DatabaseTreeItem(databases.getLast());
+        if (prevSize < servers.size()){
+            ServerTreeItem item = new ServerTreeItem(servers.getLast());
             rootTreeItem.getChildren().add(item);
-            DbCloseItem dbCloseItem = new DbCloseItem(item);
-            closeDbMenu.getItems().add(dbCloseItem);
-            dbCloseItem.setOnAction(event -> {
-                item.close();
-                closeDbMenu.getItems().remove(dbCloseItem);
-                databases.remove(item.getValue()); //TODO check le cast
+            ServerDisconnectItem serverDisconnectItem = new ServerDisconnectItem(item);
+            closeServerButton.getItems().add(serverDisconnectItem);
+            serverDisconnectItem.setOnAction(event -> {
+                item.disconnect();
+                closeServerButton.getItems().remove(serverDisconnectItem);
+                servers.remove(item.getValue()); //TODO check le cast
             });
         }
     }
 
-    @FXML
-    private void closeDB(){
 
-    }
-
-    public void addDatabase(Database database){
-        databases.add(database);
+    public void addServer(Server server){
+        servers.add(server);
     }
 
 

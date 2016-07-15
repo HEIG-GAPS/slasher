@@ -21,44 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package ch.gaps.slasher.views.openDB;
+package ch.gaps.slasher.views.connectServer;
 
 import ch.gaps.slasher.DriverService;
 import ch.gaps.slasher.database.driver.Driver;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Optional;
 
-import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.views.main.MainController;
-import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableListValue;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-
-import javax.swing.text.StyledEditorKit;
 
 /**
  *
  * @author leroy
  */
-public class OpenDBController {
+public class ConnectServerController {
     @FXML private ChoiceBox<Driver> driversListCB;
     @FXML private Pane dbSelectionPane;
     @FXML private TextField dbName;
     @FXML private Button validateButton;
-    private DBController dbController;
+    private ServerController serverController;
     private MainController mainController;
 
     private BooleanProperty nameOk = new SimpleBooleanProperty(false);
@@ -87,10 +77,10 @@ public class OpenDBController {
             driverOk.set(true);
             if (newValue.type().equals("server")){
                 try {
-                    FXMLLoader loader = new FXMLLoader(OpenDBController.class.getResource("ServerDB.fxml"));
+                    FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("ServerServer.fxml"));
                     dbSelectionPane.getChildren().add(loader.load());
-                    dbController = loader.getController();
-                    otherDataOk.bind(dbController.getFieldValidation());
+                    serverController = loader.getController();
+                    otherDataOk.bind(serverController.getFieldValidation());
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -99,10 +89,10 @@ public class OpenDBController {
 
             else if (newValue.type().equals("file")){
                 try {
-                    FXMLLoader loader = new FXMLLoader(OpenDBController.class.getResource("FileDB.fxml"));
+                    FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("FileServer.fxml"));
                     dbSelectionPane.getChildren().add(loader.load());
-                    dbController = loader.getController();
-                    otherDataOk.bind(dbController.getFieldValidation());
+                    serverController = loader.getController();
+                    otherDataOk.bind(serverController.getFieldValidation());
 
 
                 } catch (IOException e) {
@@ -123,16 +113,8 @@ public class OpenDBController {
 
     @FXML
     private void validate() throws SQLException, ClassNotFoundException {
-       String [] tmp = dbController.getConnectionData();
-        Optional<Database> db;
+       String [] tmp = serverController.getConnectionData();
 
-            driver.connect(tmp);
-            db = Optional.of(new Database(driver, dbName.getText()));
-
-
-        if (db.isPresent()){
-            mainController.addDatabase(db.get());
-        }
         ((Stage)dbSelectionPane.getScene().getWindow()).close();
     }
 

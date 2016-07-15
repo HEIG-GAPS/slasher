@@ -23,7 +23,7 @@
  */
 package ch.gaps.slasher.database.driver.database;
 
-public class Schema extends DbObject {
+public class Schema extends DbComponent {
     private Database database;
     private String name;
 

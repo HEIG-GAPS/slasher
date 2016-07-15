@@ -32,8 +32,7 @@ import ch.gaps.slasher.database.driver.database.Table;
  * @author jvarani
  */
 public interface Driver {
-  
-  // <editor-fold desc="Properties" defaultstate="collapsed">
+
   /**
    * @return the id of this driver. Can be the lower case name of the main class.
    */
@@ -43,7 +42,6 @@ public interface Driver {
    * @return the human readable name of this driver.
    */
   public String toString();
-  // </editor-fold>
 
   public String type();
 

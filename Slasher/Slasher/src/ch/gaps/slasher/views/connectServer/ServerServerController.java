@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package ch.gaps.slasher.views.openDB;
+package ch.gaps.slasher.views.connectServer;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -30,7 +30,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
-public class ServerDBController implements DBController {
+public class ServerServerController implements ServerController {
     @FXML private TextField host;
     @FXML private TextField username;
     @FXML private PasswordField password;

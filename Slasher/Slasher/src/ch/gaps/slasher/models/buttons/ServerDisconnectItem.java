@@ -2,6 +2,7 @@ package ch.gaps.slasher.models.buttons;
 
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.models.treeItem.DatabaseTreeItem;
+import ch.gaps.slasher.models.treeItem.ServerTreeItem;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -15,11 +16,11 @@ import javafx.scene.input.MouseEvent;
 /**
  * Created by leroy on 15.07.2016.
  */
-public class DbCloseItem extends MenuItem {
+public class ServerDisconnectItem extends MenuItem {
     private DatabaseTreeItem databaseTreeItem;
-    public DbCloseItem(DatabaseTreeItem databaseTreeItem){
+    public ServerDisconnectItem(ServerTreeItem serverTreeItem){
         super();
-        setText(databaseTreeItem.getValue().toString());
+        setText(serverTreeItem.getValue().toString());
         addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
 
         });

@@ -24,7 +24,7 @@
 package ch.gaps.slasher.database.driver.database;
 
 
-public class Table extends DbObject {
+public class Table extends DbComponent {
     private String name;
 
     public Table(String name){

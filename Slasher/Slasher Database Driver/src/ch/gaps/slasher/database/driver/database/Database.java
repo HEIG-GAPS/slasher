@@ -28,6 +28,7 @@ import ch.gaps.slasher.database.driver.Driver;
 public class Database extends DbObject {
 
     private Driver driver;
+    private Server server;
     private String name;
 
     public Database(Driver driver, String name){
