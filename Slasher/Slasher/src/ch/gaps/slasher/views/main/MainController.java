@@ -97,19 +97,18 @@ public class MainController {
         ((OpenDBController)loader.getController()).setController(this);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(new Scene(pane));
+        int prevSize = databases.size();
         stage.showAndWait();
 
-        if (databases.getLast() != null){
+        if (prevSize < databases.size()){
             DatabaseTreeItem item = new DatabaseTreeItem(databases.getLast());
             rootTreeItem.getChildren().add(item);
             DbCloseItem dbCloseItem = new DbCloseItem(item);
             closeDbMenu.getItems().add(dbCloseItem);
             dbCloseItem.setOnAction(event -> {
-                System.out.println("Test ok");
                 item.close();
                 closeDbMenu.getItems().remove(dbCloseItem);
-                databases.remove(item.getValue());
-                int i = 2;
+                databases.remove(item.getValue()); //TODO check le cast
             });
         }
     }
