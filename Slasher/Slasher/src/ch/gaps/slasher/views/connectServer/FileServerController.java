@@ -23,6 +23,7 @@
  */
 package ch.gaps.slasher.views.connectServer;
 
+import ch.gaps.slasher.database.driver.Driver;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
@@ -36,6 +37,7 @@ public class FileServerController implements ServerController {
     @FXML private Pane mainPane;
     @FXML private TextField path;
     private File file;
+    private Driver driver;
     private String [] connectionData = new String[1];
     private BooleanProperty filedOk = new SimpleBooleanProperty(false);
 
@@ -59,6 +61,10 @@ public class FileServerController implements ServerController {
         }
     }
 
+    @FXML void connect(){
+
+    }
+
     @Override
     public String[] getConnectionData() {
         return  connectionData;
@@ -67,6 +73,11 @@ public class FileServerController implements ServerController {
     @Override
     public BooleanProperty getFieldValidation() {
         return filedOk;
+    }
+
+    @Override
+    public void setDriver(Driver driver) {
+        this.driver = driver;
     }
 
 

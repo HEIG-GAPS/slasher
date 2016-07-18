@@ -31,11 +31,14 @@ import java.sql.SQLException;
 
 import ch.gaps.slasher.views.main.MainController;
 import javafx.beans.property.*;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -45,11 +48,14 @@ import javafx.stage.Stage;
  */
 public class ConnectServerController {
     @FXML private ChoiceBox<Driver> driversListCB;
-    @FXML private Pane dbSelectionPane;
     @FXML private TextField dbName;
     @FXML private Button validateButton;
+    @FXML private AnchorPane mainPane;
     private ServerController serverController;
     private MainController mainController;
+    private boolean serverDatabase;
+    private AnchorPane connectionPane;
+
 
     private BooleanProperty nameOk = new SimpleBooleanProperty(false);
     private BooleanProperty driverOk = new SimpleBooleanProperty(false);
@@ -73,15 +79,20 @@ public class ConnectServerController {
 
         driversListCB.getItems().addAll(DriverService.instance().getAll());
         driversListCB.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            dbSelectionPane.getChildren().clear();
+            mainPane.getChildren().remove(connectionPane);
             driverOk.set(true);
             if (newValue.type().equals("server")){
                 try {
                     FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("ServerServer.fxml"));
-                    dbSelectionPane.getChildren().add(loader.load());
+                    connectionPane = loader.load();
+                    AnchorPane.setTopAnchor(connectionPane, 75.0);
+                    AnchorPane.setLeftAnchor(connectionPane, 10.0);
+                    AnchorPane.setRightAnchor(connectionPane, 10.0);
+                    AnchorPane.setBottomAnchor(connectionPane, 10.0);
+                    mainPane.getChildren().add(connectionPane);
                     serverController = loader.getController();
                     otherDataOk.bind(serverController.getFieldValidation());
-
+                    serverDatabase = true;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -90,9 +101,16 @@ public class ConnectServerController {
             else if (newValue.type().equals("file")){
                 try {
                     FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("FileServer.fxml"));
-                    dbSelectionPane.getChildren().add(loader.load());
+                    connectionPane = loader.load();
+                    AnchorPane.setTopAnchor(connectionPane, 75.0);
+                    AnchorPane.setLeftAnchor(connectionPane, 0.0);
+                    AnchorPane.setRightAnchor(connectionPane, 0.0);
+                    AnchorPane.setBottomAnchor(connectionPane, 0.0);
+                    mainPane.getChildren().add(connectionPane);
                     serverController = loader.getController();
+                    serverController.setDriver(newValue);
                     otherDataOk.bind(serverController.getFieldValidation());
+                    serverDatabase = false;
 
 
                 } catch (IOException e) {
@@ -101,21 +119,24 @@ public class ConnectServerController {
             }
 
             driver = newValue;
-
         });
+
+    }
+
+    private void databaseToOpen(){
 
     }
 
     @FXML
     private void cancel(){
-        ((Stage)dbSelectionPane.getScene().getWindow()).close();
+        ((Stage)mainPane.getScene().getWindow()).close();
     }
 
     @FXML
     private void validate() throws SQLException, ClassNotFoundException {
        String [] tmp = serverController.getConnectionData();
 
-        ((Stage)dbSelectionPane.getScene().getWindow()).close();
+        ((Stage)mainPane.getScene().getWindow()).close();
     }
 
     public void setController(MainController mainController){

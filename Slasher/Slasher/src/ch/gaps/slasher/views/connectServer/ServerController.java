@@ -1,5 +1,6 @@
 package ch.gaps.slasher.views.connectServer;
 
+import ch.gaps.slasher.database.driver.Driver;
 import javafx.beans.property.BooleanProperty;
 
 /**
@@ -10,4 +11,6 @@ public interface ServerController {
     public String[] getConnectionData();
 
     public BooleanProperty getFieldValidation();
+
+    public void setDriver(Driver driver);
 }

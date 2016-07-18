@@ -30,6 +30,14 @@ public class Server extends DbObject {
         driver.close();
     }
 
+    public void connect(){
+        String[] connectionInfo = new String[3];
+        connectionInfo[0] = host;
+        connectionInfo[1] = "root";
+        connectionInfo[2] = "";
+        driver.connect(host);
+    }
+
 
 
 
