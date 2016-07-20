@@ -45,8 +45,8 @@ public class Database extends DbObject {
         return name;
     }
 
-    public Table[] getTables(Schema schema){
-        return driver.getTables(schema);
+    public Table[] getTables(){
+        return driver.getTables(name);
     }
 
     public Schema[] getSchemas(){

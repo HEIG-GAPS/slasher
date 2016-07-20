@@ -27,10 +27,7 @@ package ch.gaps.slasher.views.connectServer;
 import ch.gaps.slasher.database.driver.Driver;
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.database.driver.database.Server;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -59,14 +56,18 @@ public class ServerServerController implements ServerController {
 
     private String [] connectionData = new String[3];
     private BooleanProperty filedOk = new SimpleBooleanProperty(false);
+    private BooleanProperty allOk = new SimpleBooleanProperty(false);
 
     private Driver driver;
     private Server server;
+
+    IntegerProperty dbCount = new SimpleIntegerProperty(0);
 
 
     @FXML
     public void initialize(){
         filedOk.bind(hostOk.and(usernameOk).and(passwordOk));
+        allOk.bind(dbCount.isNotEqualTo(0));
 
         host.textProperty().addListener((observable, oldValue, newValue) -> {
             connectionData[0] = newValue;
@@ -100,16 +101,30 @@ public class ServerServerController implements ServerController {
         }));
 
         connect.disableProperty().bind(filedOk.not());
+
     }
 
     @FXML
     public void connect(){
         server = new Server(driver, host.getText());
-        server.connect();
+        server.connect(username.getText(), password.getText());
         Database[] databases = server.getAllDatabases();
 
-        for (Database database : databases)
-            listView.getItems().add(new Item(database));
+        for (Database database : databases) {
+            Item item = new Item(database);
+            item.onProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue){
+                    server.addDatabase(item.database);
+                    dbCount.set(dbCount.get() + 1);
+                }
+                else {
+                    server.removeDatabase(item.database);
+                    dbCount.set(dbCount.get() - 1);
+                }
+
+            });
+            listView.getItems().add(item);
+        }
     }
 
     @Override
@@ -124,7 +139,7 @@ public class ServerServerController implements ServerController {
 
     @Override
     public BooleanProperty getFieldValidation() {
-        return filedOk;
+        return allOk;
     }
 
     @Override

@@ -45,15 +45,13 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
                 }
                 getChildren().add(schemaItem);
             }
-
         }
         else{
-           Table[] tables = db.getTables(null);
+           Table[] tables = db.getTables();
             for (Table table : tables){
                 this.getChildren().add(new TableTreeItem(table));
             }
         }
-
 }
 
     public void close() {

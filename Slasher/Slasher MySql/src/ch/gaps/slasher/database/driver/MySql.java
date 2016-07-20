@@ -62,17 +62,17 @@ public class MySql implements Driver {
   }
 
   @Override
-  public Table[] getTables(Schema schema) {
+  public Table[] getTables(String name) {
 
     LinkedList<Table> tables = new LinkedList<>();
 
     try {
       DatabaseMetaData meta = connection.getMetaData();
       Statement statement = connection.createStatement();
-      ResultSet rs2 = meta.getTables(null, schema.toString(),"%", null);
+      ResultSet rs2 = meta.getTables(null, name,"%", null);
       ResultSet rs = statement.executeQuery("SELECT DISTINCT TABLE_NAME\n" +
               "      FROM INFORMATION_SCHEMA.COLUMNS\n" +
-              "      WHERE TABLE_SCHEMA='" + schema.toString() + "'");
+              "      WHERE TABLE_SCHEMA='" + name + "'");
 
       while(rs.next())
       {
@@ -106,9 +106,6 @@ public class MySql implements Driver {
   @Override
   public Database[] getDatabases() {
     LinkedList<Database> databases = new LinkedList<>();
-
-    Statement statement = null;
-
     try {
       ResultSet rs = connection.getMetaData().getCatalogs();
       while (rs.next()) {
@@ -132,7 +129,7 @@ public class MySql implements Driver {
 
   @Override
   public boolean hasSchema() {
-    return true;
+    return false;
   }
 
 }

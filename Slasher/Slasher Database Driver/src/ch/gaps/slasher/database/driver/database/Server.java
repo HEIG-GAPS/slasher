@@ -31,6 +31,8 @@ public class Server extends DbObject {
         openedDatabase.add(database);
     }
 
+    public void removeDatabase(Database database){ openedDatabase.remove(database); }
+
     public String toString(){
         return name + " - " + driver;
     }
@@ -43,11 +45,11 @@ public class Server extends DbObject {
         driver.close();
     }
 
-    public void connect(){
+    public void connect(String username, String password){
         String[] connectionInfo = new String[3];
         connectionInfo[0] = host;
-        connectionInfo[1] = "root";
-        connectionInfo[2] = "";
+        connectionInfo[1] = username;
+        connectionInfo[2] = password;
         driver.connect(connectionInfo);
     }
 

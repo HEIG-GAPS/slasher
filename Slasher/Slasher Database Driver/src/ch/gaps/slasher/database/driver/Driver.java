@@ -51,7 +51,7 @@ public interface Driver {
 
   public boolean hasSchema();
 
-  public Table[] getTables(Schema schema);
+  public Table[] getTables(String name);
 
   public Schema[] getSchemas(Database database);
 

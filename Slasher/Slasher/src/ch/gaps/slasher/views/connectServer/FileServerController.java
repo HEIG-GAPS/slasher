@@ -72,7 +72,7 @@ public class FileServerController implements ServerController {
     @Override
     public Server getServer() {
         Server server = new Server(driver, path.getText());
-        server.connect();
+        server.connect(null, null);
         server.addDatabase(new Database(driver, "main"));
         return server;
     }

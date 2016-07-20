@@ -33,7 +33,7 @@ public class Schema extends DbComponent {
     }
 
     public Table[] getTables(){
-        return database.getTables(this);
+        return null;
     }
 
     public String toString()

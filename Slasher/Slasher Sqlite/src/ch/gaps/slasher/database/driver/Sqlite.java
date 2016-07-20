@@ -79,7 +79,7 @@ public class Sqlite implements Driver {
 
   }
 
-  public Table[] getTables(Schema schema){
+  public Table[] getTables(String name){
     LinkedList<Table> tables = new LinkedList<>();
     try {
       Statement statement = connection.createStatement();
