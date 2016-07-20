@@ -55,6 +55,8 @@ public interface Driver {
 
   public Schema[] getSchemas(Database database);
 
+  public Database[] getDatabases();
+
   public void close();
 
 

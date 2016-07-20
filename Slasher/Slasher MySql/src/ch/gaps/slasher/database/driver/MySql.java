@@ -35,10 +35,6 @@ public class MySql implements Driver {
   @Override
   public void connect(String... connectionInfo){
 
-
-
-
-
     try {
       Class.forName("com.mysql.jdbc.Driver");
     } catch (ClassNotFoundException e) {
@@ -105,6 +101,24 @@ public class MySql implements Driver {
     }
 
     return schemas.toArray(new Schema[schemas.size()]);
+  }
+
+  @Override
+  public Database[] getDatabases() {
+    LinkedList<Database> databases = new LinkedList<>();
+
+    Statement statement = null;
+
+    try {
+      ResultSet rs = connection.getMetaData().getCatalogs();
+      while (rs.next()) {
+        databases.add(new Database(this, rs.getString("TABLE_CAT")));
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return databases.toArray(new Database[databases.size()]);
   }
 
   @Override

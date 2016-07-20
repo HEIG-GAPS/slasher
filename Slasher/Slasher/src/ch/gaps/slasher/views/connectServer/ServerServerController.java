@@ -61,6 +61,7 @@ public class ServerServerController implements ServerController {
     private BooleanProperty filedOk = new SimpleBooleanProperty(false);
 
     private Driver driver;
+    private Server server;
 
 
     @FXML
@@ -99,22 +100,26 @@ public class ServerServerController implements ServerController {
         }));
 
         connect.disableProperty().bind(filedOk.not());
-
-
-        listView.getItems().add(new Item("Test", null));
     }
 
     @FXML
     public void connect(){
-        Server server = new Server(driver, host.getText());
+        server = new Server(driver, host.getText());
         server.connect();
-        server.getDatabase();
+        Database[] databases = server.getAllDatabases();
 
+        for (Database database : databases)
+            listView.getItems().add(new Item(database));
     }
 
     @Override
     public String[] getConnectionData() {
         return connectionData;
+    }
+
+    @Override
+    public Server getServer() {
+        return server;
     }
 
     @Override
@@ -132,8 +137,7 @@ public class ServerServerController implements ServerController {
         private BooleanProperty selected;
         private Database database;
 
-        Item(String name, Database database){
-            this.name = new SimpleStringProperty(name);
+        Item(Database database){
             this.selected = new SimpleBooleanProperty(false);
             this.database = database;
         }
@@ -141,5 +145,11 @@ public class ServerServerController implements ServerController {
         public BooleanProperty onProperty(){
             return selected;
         }
+
+        public String toString (){
+            return database.getName();
+        }
     }
+
+
 }

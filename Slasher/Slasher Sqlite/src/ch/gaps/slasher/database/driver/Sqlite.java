@@ -107,6 +107,11 @@ public class Sqlite implements Driver {
   }
 
   @Override
+  public Database[] getDatabases() {
+    return new Database[] {new Database(this, "main")} ;
+  }
+
+  @Override
   public void close() {
     try {
       connection.close();

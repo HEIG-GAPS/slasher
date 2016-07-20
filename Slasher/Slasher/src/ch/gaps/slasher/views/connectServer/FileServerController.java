@@ -24,6 +24,8 @@
 package ch.gaps.slasher.views.connectServer;
 
 import ch.gaps.slasher.database.driver.Driver;
+import ch.gaps.slasher.database.driver.database.Database;
+import ch.gaps.slasher.database.driver.database.Server;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
@@ -61,13 +63,18 @@ public class FileServerController implements ServerController {
         }
     }
 
-    @FXML void connect(){
-
-    }
 
     @Override
     public String[] getConnectionData() {
         return  connectionData;
+    }
+
+    @Override
+    public Server getServer() {
+        Server server = new Server(driver, path.getText());
+        server.connect();
+        server.addDatabase(new Database(driver, "main"));
+        return server;
     }
 
     @Override

@@ -29,6 +29,7 @@ import ch.gaps.slasher.database.driver.Driver;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import ch.gaps.slasher.database.driver.database.Server;
 import ch.gaps.slasher.views.main.MainController;
 import javafx.beans.property.*;
 import javafx.event.ActionEvent;
@@ -37,6 +38,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -51,6 +53,8 @@ public class ConnectServerController {
     @FXML private TextField dbName;
     @FXML private Button validateButton;
     @FXML private AnchorPane mainPane;
+    @FXML private Label displayLabel;
+
     private ServerController serverController;
     private MainController mainController;
     private boolean serverDatabase;
@@ -60,12 +64,10 @@ public class ConnectServerController {
     private BooleanProperty nameOk = new SimpleBooleanProperty(false);
     private BooleanProperty driverOk = new SimpleBooleanProperty(false);
     private BooleanProperty otherDataOk = new SimpleBooleanProperty(false);
-
-    private Driver driver;
+    private Server server;
 
     @FXML
     private void initialize(){
-
 
        dbName.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null || newValue.isEmpty())
@@ -74,8 +76,7 @@ public class ConnectServerController {
                 nameOk.set(true);
         });
 
-        validateButton.disableProperty().bind(nameOk.not().or(driverOk.not()).or(otherDataOk.not()));
-
+        validateButton.disableProperty().bind(driverOk.not().or(otherDataOk.not()));
 
         driversListCB.getItems().addAll(DriverService.instance().getAll());
         driversListCB.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -83,6 +84,7 @@ public class ConnectServerController {
             driverOk.set(true);
             if (newValue.type().equals("server")){
                 try {
+                    displayLabel.setText("(If leave blank the display name will be the host)");
                     FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("ServerServer.fxml"));
                     connectionPane = loader.load();
                     AnchorPane.setTopAnchor(connectionPane, 75.0);
@@ -91,6 +93,7 @@ public class ConnectServerController {
                     AnchorPane.setBottomAnchor(connectionPane, 10.0);
                     mainPane.getChildren().add(connectionPane);
                     serverController = loader.getController();
+                    serverController.setDriver(newValue);
                     otherDataOk.bind(serverController.getFieldValidation());
                     serverDatabase = true;
                 } catch (IOException e) {
@@ -100,6 +103,7 @@ public class ConnectServerController {
 
             else if (newValue.type().equals("file")){
                 try {
+                    displayLabel.setText("(If leave blank the display name will be the path)");
                     FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("FileServer.fxml"));
                     connectionPane = loader.load();
                     AnchorPane.setTopAnchor(connectionPane, 75.0);
@@ -111,14 +115,11 @@ public class ConnectServerController {
                     serverController.setDriver(newValue);
                     otherDataOk.bind(serverController.getFieldValidation());
                     serverDatabase = false;
-
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
 
-            driver = newValue;
         });
 
     }
@@ -135,7 +136,10 @@ public class ConnectServerController {
     @FXML
     private void validate() throws SQLException, ClassNotFoundException {
        String [] tmp = serverController.getConnectionData();
-
+        server = serverController.getServer();
+        if (!dbName.getText().isEmpty())
+            server.setName(dbName.getText());
+        mainController.addServer(server);
         ((Stage)mainPane.getScene().getWindow()).close();
     }
 

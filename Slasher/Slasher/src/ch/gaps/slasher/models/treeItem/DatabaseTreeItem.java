@@ -29,33 +29,35 @@ import ch.gaps.slasher.database.driver.database.Table;
 
 public class DatabaseTreeItem extends DbObjectTreeItem {
 
-    public DatabaseTreeItem (Database db){
+    public DatabaseTreeItem(Database db) {
         super(db);
 
         Schema[] schemas = db.getSchemas();
 
-        if (schemas != null)
-        {
-
-            for (Schema schema: schemas){
+        if (db.hasSchemas()) {
+            for (Schema schema : schemas) {
                 DbObjectTreeItem schemaItem = new SchemaTreeItem(schema);
                 Table[] tables = schema.getTables();
 
-                for (Table table: tables){
+                for (Table table : tables) {
                     schemaItem.getChildren().add(new TableTreeItem(table));
-                }
 
+                }
                 getChildren().add(schemaItem);
             }
 
         }
+        else{
+           Table[] tables = db.getTables(null);
+            for (Table table : tables){
+                this.getChildren().add(new TableTreeItem(table));
+            }
+        }
 
+}
 
-
-    }
-
-    public void close(){
+    public void close() {
         this.getParent().getChildren().remove(this);
-        ((Database)getValue()).close();
+        ((Database) getValue()).close();
     }
 }

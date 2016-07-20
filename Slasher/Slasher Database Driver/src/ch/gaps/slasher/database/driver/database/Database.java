@@ -35,8 +35,14 @@ public class Database extends DbObject {
         this.driver = driver;
         this.name = name;
     }
+
+    public Database(Server server, String name)
+    {
+        this.server = server;
+        this.name = name;
+    }
     public String toString(){
-        return name + " - " + driver.toString();
+        return name;
     }
 
     public Table[] getTables(Schema schema){
@@ -52,4 +58,8 @@ public class Database extends DbObject {
     }
 
     public void close(){ driver.close(); }
+
+    public String getName(){
+        return name;
+    }
 }

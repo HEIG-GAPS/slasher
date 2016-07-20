@@ -32,6 +32,6 @@
             <PasswordField fx:id="password" GridPane.columnIndex="1" GridPane.rowIndex="2" />
          </children>
       </GridPane>
-      <Button fx:id="connect" layoutX="332.0" layoutY="133.0" mnemonicParsing="false" text="Connect" AnchorPane.leftAnchor="332.0" AnchorPane.topAnchor="133.0" />
+      <Button fx:id="connect" layoutX="332.0" layoutY="133.0" mnemonicParsing="false" onAction="#connect" text="Connect" AnchorPane.leftAnchor="332.0" AnchorPane.topAnchor="133.0" />
    </children>
 </AnchorPane>

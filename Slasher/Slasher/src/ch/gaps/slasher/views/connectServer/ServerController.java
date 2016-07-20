@@ -1,6 +1,7 @@
 package ch.gaps.slasher.views.connectServer;
 
 import ch.gaps.slasher.database.driver.Driver;
+import ch.gaps.slasher.database.driver.database.Server;
 import javafx.beans.property.BooleanProperty;
 
 /**
@@ -8,7 +9,9 @@ import javafx.beans.property.BooleanProperty;
  */
 public interface ServerController {
 
-    public String[] getConnectionData();
+    public String[] getConnectionData();//TODO to remove !!!
+
+    public Server getServer();
 
     public BooleanProperty getFieldValidation();
 
