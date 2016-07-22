@@ -24,10 +24,20 @@
 package ch.gaps.slasher.models.treeItem;
 
 import ch.gaps.slasher.database.driver.database.Table;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 
 
 public class TableTreeItem extends DbObjectTreeItem {
     public TableTreeItem(Table table){
         super(table);
+    }
+
+    @Override
+    public ContextMenu getContextMenu(){
+        ContextMenu contextMenu = new ContextMenu();
+        contextMenu.getItems().add(new MenuItem("Test Table"));
+
+        return contextMenu;
     }
 }

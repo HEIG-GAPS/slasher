@@ -24,8 +24,8 @@
 package ch.gaps.slasher.models.treeItem;
 
 import ch.gaps.slasher.database.driver.database.DbObject;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TreeItem;
+import javafx.scene.control.*;
+import javafx.scene.effect.ColorInput;
 import javafx.scene.layout.Pane;
 
 import java.util.LinkedList;
@@ -46,5 +46,9 @@ public class DbObjectTreeItem extends TreeItem <DbObject> {
 
     public Tab[] getTabs(){
         return tabs.toArray(new Tab[tabs.size()]);
+    }
+
+    public ContextMenu getContextMenu(){
+        return null;
     }
 }

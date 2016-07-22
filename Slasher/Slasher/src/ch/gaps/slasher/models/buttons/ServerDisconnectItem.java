@@ -17,13 +17,17 @@ import javafx.scene.input.MouseEvent;
  * Created by leroy on 15.07.2016.
  */
 public class ServerDisconnectItem extends MenuItem {
-    private DatabaseTreeItem databaseTreeItem;
+    private ServerTreeItem serverTreeItem;
     public ServerDisconnectItem(ServerTreeItem serverTreeItem){
         super();
+        this.serverTreeItem = serverTreeItem;
         setText(serverTreeItem.getValue().toString());
         addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
-
         });
+    }
+
+    public ServerTreeItem getServerTreeItem(){
+        return serverTreeItem;
     }
 
 }

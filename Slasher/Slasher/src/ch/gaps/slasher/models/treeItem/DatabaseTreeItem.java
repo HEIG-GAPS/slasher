@@ -26,6 +26,8 @@ package ch.gaps.slasher.models.treeItem;
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.database.driver.database.Schema;
 import ch.gaps.slasher.database.driver.database.Table;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 
 public class DatabaseTreeItem extends DbObjectTreeItem {
 
@@ -58,4 +60,13 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
         this.getParent().getChildren().remove(this);
         ((Database) getValue()).close();
     }
+
+    @Override
+    public ContextMenu getContextMenu(){
+        ContextMenu contextMenu = new ContextMenu();
+        contextMenu.getItems().add(new MenuItem("Database Menu"));
+
+        return contextMenu;
+    }
+
 }

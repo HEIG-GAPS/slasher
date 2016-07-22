@@ -44,7 +44,7 @@ public class DbObjectTreeCell extends TreeCell<DbObject> {
         else{
             setText(getItem() == null ? "" : getItem().toString());
             setGraphic(getTreeItem().getGraphic());
-            setContextMenu(getContexmenu());
+            setContextMenu(((DbObjectTreeItem)getTreeItem()).getContextMenu());
         }
     }
 }

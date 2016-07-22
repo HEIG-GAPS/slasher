@@ -33,6 +33,7 @@ import ch.gaps.slasher.views.editor.EditorController;
 import ch.gaps.slasher.views.connectServer.ConnectServerController;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.function.Predicate;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -51,6 +52,8 @@ import javafx.stage.Stage;
  * @author leroy
  */
 public class MainController {
+
+    private static MainController instance;
     
     
     @FXML private MenuBar menu;
@@ -64,6 +67,15 @@ public class MainController {
 
 
     private LinkedList<Server> servers = new LinkedList<>();
+
+    public MainController(){
+        instance = this;
+    }
+
+    public static MainController getInstance(){
+        if (instance == null) instance = new MainController();
+        return instance;
+    }
     
     @FXML
     private void initialize(){
@@ -114,20 +126,30 @@ public class MainController {
         if (prevSize < servers.size()){
             ServerTreeItem item = new ServerTreeItem(servers.getLast());
             rootTreeItem.getChildren().add(item);
+
+
             ServerDisconnectItem serverDisconnectItem = new ServerDisconnectItem(item);
-            closeServerButton.getItems().add(serverDisconnectItem);
+
             serverDisconnectItem.setOnAction(event -> {
-                item.disconnect();
+                disconnectServer(item);
                 closeServerButton.getItems().remove(serverDisconnectItem);
-                servers.remove(item.getValue()); //TODO check le cast
             });
+
+            closeServerButton.getItems().add(serverDisconnectItem);
         }
     }
+
+
+    public  void disconnectServer(ServerTreeItem server){
+        servers.remove(server.getValue());
+        server.disconnect();
+        closeServerButton.getItems().removeIf(menuItem -> ((ServerDisconnectItem)menuItem).getServerTreeItem() == server);
+    }
+
 
 
     public void addServer(Server server){
         servers.add(server);
     }
-
 
 }
