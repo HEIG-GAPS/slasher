@@ -37,7 +37,7 @@
       </GridPane>
       <ButtonBar layoutX="516.0" layoutY="20.0" prefHeight="40.0" prefWidth="171.0" AnchorPane.rightAnchor="10.0">
         <buttons>
-          <Button fx:id="validateButton" disable="true" mnemonicParsing="false" onAction="#validate" text="Finish" />
+          <Button fx:id="validateButton" disable="true" mnemonicParsing="false" onAction="#validate" text="Connect" />
             <Button mnemonicParsing="false" onAction="#cancel" text="Cancel" />
         </buttons>
       </ButtonBar>

@@ -21,7 +21,7 @@ public class Server extends DbObject {
 
     public Database[] getAllDatabases(){
         return driver.getDatabases();
-    }
+    }//TODO retourne uniquement avec l'acces
 
     public Database[] getDatabases(){
         return openedDatabase.toArray(new Database[openedDatabase.size()]);

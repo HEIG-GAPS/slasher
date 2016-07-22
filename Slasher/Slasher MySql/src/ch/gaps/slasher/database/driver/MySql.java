@@ -50,6 +50,7 @@ public class MySql implements Driver {
       String url = "jdbc:mysql://" + connectionInfo[0] + ":3306";
       connection = DriverManager.getConnection(url, info);
 
+
     } catch (SQLException e) {
       e.printStackTrace();
     }
