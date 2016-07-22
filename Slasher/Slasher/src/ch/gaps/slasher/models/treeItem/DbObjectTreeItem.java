@@ -24,10 +24,27 @@
 package ch.gaps.slasher.models.treeItem;
 
 import ch.gaps.slasher.database.driver.database.DbObject;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TreeItem;
+import javafx.scene.layout.Pane;
+
+import java.util.LinkedList;
 
 public class DbObjectTreeItem extends TreeItem <DbObject> {
+    private LinkedList<Tab> tabs;
     public DbObjectTreeItem(){}
-    public DbObjectTreeItem(DbObject dbObject){super(dbObject);}
+    public DbObjectTreeItem(DbObject dbObject){
+        super(dbObject);
+        tabs = new LinkedList<>();
+    }
+    public void addTab(Tab tab){
+        tabs.add(tab);
+    }
+    public void removeTab(Tab tab){
+        tabs.remove(tab);
+    }
 
+    public Tab[] getTabs(){
+        return tabs.toArray(new Tab[tabs.size()]);
+    }
 }

@@ -27,7 +27,7 @@
                </items></Menu>
             <Menu fx:id="modulsMenu" mnemonicParsing="false" text="Moduls">
                <items>
-                  <MenuItem mnemonicParsing="false" onAction="#newEditorTab" text="New Editor Tab" />
+                  <MenuItem fx:id="newEditorTab" disable="true" mnemonicParsing="false" onAction="#newEditorTab" text="New Editor Tab" />
                </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Help">

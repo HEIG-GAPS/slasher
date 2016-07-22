@@ -10,6 +10,8 @@ public class ServerTreeItem extends DbObjectTreeItem {
     public ServerTreeItem (Server server){
         super(server);
 
+
+
         Database[] databases = server.getDatabases();
 
         if (databases != null)
@@ -26,4 +28,6 @@ public class ServerTreeItem extends DbObjectTreeItem {
         this.getParent().getChildren().remove(this);
         ((Server)getValue()).disconnect();
     }
+
+
 }

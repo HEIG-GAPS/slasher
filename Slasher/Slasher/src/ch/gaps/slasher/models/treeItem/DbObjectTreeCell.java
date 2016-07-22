@@ -24,9 +24,14 @@
 package ch.gaps.slasher.models.treeItem;
 
 import ch.gaps.slasher.database.driver.database.DbObject;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeCell;
 
 public class DbObjectTreeCell extends TreeCell<DbObject> {
+
+    public ContextMenu getContexmenu(){
+        return new ContextMenu();
+    }
 
     @Override
     public void updateItem(DbObject dbObject, boolean empty){
@@ -39,6 +44,7 @@ public class DbObjectTreeCell extends TreeCell<DbObject> {
         else{
             setText(getItem() == null ? "" : getItem().toString());
             setGraphic(getTreeItem().getGraphic());
+            setContextMenu(getContexmenu());
         }
     }
 }

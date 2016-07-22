@@ -35,6 +35,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -56,6 +58,8 @@ public class MainController {
     @FXML private TabPane tabPane;
     @FXML private TreeView<DbObject> treeView;
     @FXML private Menu closeServerButton;
+    @FXML private MenuItem newEditorTab;
+
     private TreeItem<DbObject> rootTreeItem = new DbObjectTreeItem();
 
 
@@ -68,6 +72,17 @@ public class MainController {
         treeView.setShowRoot(false);
         rootTreeItem.setExpanded(true);
         treeView.setCellFactory(param -> new DbObjectTreeCell());
+
+        treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null){
+                newEditorTab.setDisable(false);
+                tabPane.getTabs().clear();
+                tabPane.getTabs().addAll(((DbObjectTreeItem)newValue).getTabs());
+            }
+            else {
+                newEditorTab.setDisable(true);
+            }
+        });
     }
     
     @FXML
@@ -80,6 +95,7 @@ public class MainController {
         FXMLLoader loader = new FXMLLoader(EditorController.class.getResource("EditorView.fxml"));
         Pane newPane = loader.load();
         Tab newTab = new Tab("Editor", newPane);
+        ((DbObjectTreeItem)treeView.getSelectionModel().getSelectedItem()).addTab(newTab);
         tabPane.getTabs().add(newTab);
     }
     
