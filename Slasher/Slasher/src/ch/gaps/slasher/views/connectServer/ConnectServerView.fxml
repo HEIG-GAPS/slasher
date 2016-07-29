@@ -26,8 +26,8 @@
          <children>
             <Label text="Database driver:" />
             <ChoiceBox fx:id="driversListCB" prefHeight="25.0" prefWidth="140.0" GridPane.columnIndex="1" />
-            <Label text="Server display name:" GridPane.rowIndex="1" />
-            <TextField fx:id="dbName" maxHeight="25.0" maxWidth="140.0" prefHeight="25.0" prefWidth="140.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label text="Server description" GridPane.rowIndex="1" />
+            <TextField fx:id="serverDescription" maxHeight="25.0" maxWidth="140.0" prefHeight="25.0" prefWidth="140.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Label fx:id="displayLabel" GridPane.columnIndex="2" GridPane.rowIndex="1">
                <font>
                   <Font name="System Italic" size="10.0" />

@@ -23,13 +23,24 @@
  */
 package ch.gaps.slasher.models.treeItem;
 
+import ch.gaps.slasher.database.driver.Driver;
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.database.driver.database.Schema;
+import ch.gaps.slasher.database.driver.database.Server;
 import ch.gaps.slasher.database.driver.database.Table;
+import javafx.event.ActionEvent;
+import javafx.event.EventDispatchChain;
+import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 
 public class DatabaseTreeItem extends DbObjectTreeItem {
+
+    private ContextMenu contextMenu = new ContextMenu();
+    private MenuItem connect = new MenuItem("Connect");
+    private MenuItem disconnect = new MenuItem("Disconnect");
+    private MenuItem remove= new MenuItem("Remove");
+
 
     public DatabaseTreeItem(Database db) {
         super(db);
@@ -54,18 +65,45 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
                 this.getChildren().add(new TableTreeItem(table));
             }
         }
-}
 
-    public void close() {
-        this.getParent().getChildren().remove(this);
-        ((Database) getValue()).close();
+        //menu
+        if (((Database)getValue()).type() == Driver.ServerType.Server) {
+
+            connect.setOnAction(event -> {
+            });
+
+            disconnect.setOnAction(event -> {
+                disconnect();
+            });
+            contextMenu.getItems().add(disconnect);
+
+            remove.setOnAction(event -> {
+                ((Server) getParent().getValue()).removeDatabase((Database)getValue());
+                getParent().getChildren().remove(this);
+                disconnect();
+            });
+            contextMenu.getItems().add(remove);
+        }
+
+
+
     }
+
+    public void disconnect() {
+        ((Database) getValue()).close();
+        connect.setDisable(false);
+        disconnect.setDisable(true);
+        getChildren().clear();
+    }
+
+    public void connect(){
+
+    }
+
+
 
     @Override
     public ContextMenu getContextMenu(){
-        ContextMenu contextMenu = new ContextMenu();
-        contextMenu.getItems().add(new MenuItem("Database Menu"));
-
         return contextMenu;
     }
 

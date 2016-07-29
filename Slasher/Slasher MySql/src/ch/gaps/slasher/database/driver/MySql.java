@@ -29,8 +29,8 @@ public class MySql implements Driver {
   public String toString() { return "MySql"; }
 
   @Override
-  public String type() {
-    return "server";
+  public ServerType type() {
+    return ServerType.Server;
   }
 
   @Override
@@ -115,7 +115,7 @@ public class MySql implements Driver {
   }
 
   @Override
-  public Database[] getDatabases(Server server, String username, String password) {
+  public LinkedList<Database> getDatabases(Server server, String username, String password) {
     LinkedList<Database> databases = new LinkedList<>();
 
     try {
@@ -141,7 +141,7 @@ public class MySql implements Driver {
       e.printStackTrace();
     }
 
-    return databases.toArray(new Database [databases.size()]);
+    return databases;
   }
 
 

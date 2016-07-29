@@ -32,6 +32,7 @@ public class Database extends DbObject {
     private String name;
     private String username;
     private String description;
+    private boolean connected = false;
 
     public Database(Driver driver, String name){
         this.driver = driver;
@@ -78,18 +79,38 @@ public class Database extends DbObject {
         return driver.hasSchema();
     }
 
-    public void close(){ driver.close(); }
+    public void close(){
+        if (connected) {
+            driver.close();
+            connected = false;
+        }
+    }
 
     public String getName(){
         return name;
     }
 
     public void connect(String password){
-        driver.connect(server.getHost(), username, password);
+        if (!connected) {
+            driver.connect(server.getHost(), username, password);
+            connected = true;
+        }
     }
 
     public void setDescription(String newDescritpion){
         description = newDescritpion;
+    }
+
+    public String getDescritpion (){
+        return description;
+    }
+
+    public Driver.ServerType type(){
+        return driver.type();
+    }
+
+    public boolean disabled(){
+        return !connected;
     }
 
 }

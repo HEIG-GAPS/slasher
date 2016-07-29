@@ -33,6 +33,7 @@ import ch.gaps.slasher.views.editor.EditorController;
 import ch.gaps.slasher.views.connectServer.ConnectServerController;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javafx.application.Platform;
@@ -117,47 +118,48 @@ public class MainController {
         FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("ConnectServerView.fxml"));
         stage.setTitle("Open a database");
         Pane pane = loader.load();
-        ((ConnectServerController)loader.getController()).setController(this);
+        ConnectServerController connectServerController = loader.getController();
+        connectServerController.setController(this);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(new Scene(pane));
         int prevSize = servers.size();
         stage.showAndWait();
+        refreshTreeView();
+    }
 
-        if (prevSize < servers.size()){
-            ServerTreeItem item = new ServerTreeItem(servers.getLast());
-            rootTreeItem.getChildren().add(item);
-
-
-            ServerDisconnectItem serverDisconnectItem = new ServerDisconnectItem(item);
-
-            serverDisconnectItem.setOnAction(event -> {
-                disconnectServer(item);
-                closeServerButton.getItems().remove(serverDisconnectItem);
-            });
-
-            closeServerButton.getItems().add(serverDisconnectItem);
-        }
+    public void refreshTreeView(){
+        rootTreeItem.getChildren().forEach(dbObjectTreeItem -> {
+            ((ServerTreeItem)dbObjectTreeItem).refresh();
+        });
     }
 
 
-    public  void disconnectServer(ServerTreeItem server){
-        servers.remove(server.getValue());
-        server.disconnect();
-        closeServerButton.getItems().removeIf(menuItem -> ((ServerDisconnectItem)menuItem).getServerTreeItem() == server);
+    public  void disconnectServer(ServerTreeItem serverItem) {
+        servers.remove(serverItem.getValue());
+        serverItem.disconnect();
+        closeServerButton.getItems().removeIf(menuItem -> ((ServerDisconnectItem) menuItem).getServerTreeItem() == serverItem);
     }
-
 
 
     public void addServer(Server server){
+
         servers.add(server);
+
+        ServerTreeItem item = new ServerTreeItem(server);
+        rootTreeItem.getChildren().add(item);
+
+        ServerDisconnectItem serverDisconnectItem = new ServerDisconnectItem(item);
+
+        serverDisconnectItem.setOnAction(event -> {
+            disconnectServer(item);
+            closeServerButton.getItems().remove(serverDisconnectItem);
+        });
+
+        closeServerButton.getItems().add(serverDisconnectItem);
     }
 
-    public boolean checkServer(Server serverToCheck){
-        for (Server server : servers){
-            if (server.getDescription().equals(serverToCheck.getDescription()))
-                return false;
-        }
-        return true;
+    public LinkedList<Server> getServersList(){
+        return servers;
     }
 
 }

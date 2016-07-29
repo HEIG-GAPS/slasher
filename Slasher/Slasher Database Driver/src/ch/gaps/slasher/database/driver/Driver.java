@@ -28,6 +28,8 @@ import ch.gaps.slasher.database.driver.database.Schema;
 import ch.gaps.slasher.database.driver.database.Server;
 import ch.gaps.slasher.database.driver.database.Table;
 
+import java.util.LinkedList;
+
 /**
  *
  * @author jvarani
@@ -44,7 +46,7 @@ public interface Driver {
    */
   public String toString();
 
-  public String type();
+  public ServerType type();
 
   public void connect(String ... connectionInfo);
 
@@ -58,6 +60,8 @@ public interface Driver {
 
   public void close();
 
-  public Database[] getDatabases(Server server, String username, String password);
+  public LinkedList<Database> getDatabases(Server server, String username, String password);
+
+  public enum ServerType{Server, File};
   
 }

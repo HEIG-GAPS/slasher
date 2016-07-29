@@ -14,4 +14,8 @@ public interface ServerController {
     public BooleanProperty getFieldValidation();
 
     public void setDriver(Driver driver);
+
+    public void connect();
+
+    public boolean newServer();
 }

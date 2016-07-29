@@ -26,6 +26,7 @@ package ch.gaps.slasher.models.treeItem;
 import ch.gaps.slasher.database.driver.database.DbObject;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeCell;
+import javafx.scene.paint.Color;
 
 public class DbObjectTreeCell extends TreeCell<DbObject> {
 
@@ -45,6 +46,10 @@ public class DbObjectTreeCell extends TreeCell<DbObject> {
             setText(getItem() == null ? "" : getItem().toString());
             setGraphic(getTreeItem().getGraphic());
             setContextMenu(((DbObjectTreeItem)getTreeItem()).getContextMenu());
+
+            if (dbObject.disabled()){
+                setTextFill(Color.GREY);
+            }
         }
     }
 }

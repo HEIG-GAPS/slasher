@@ -27,17 +27,23 @@ package ch.gaps.slasher.views.connectServer;
 import ch.gaps.slasher.database.driver.Driver;
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.database.driver.database.Server;
+import ch.gaps.slasher.views.main.MainController;
 import javafx.beans.property.*;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 
 public class ServerServerController implements ServerController {
@@ -45,32 +51,33 @@ public class ServerServerController implements ServerController {
     @FXML private TextField username;
     @FXML private PasswordField password;
     @FXML private AnchorPane mainPane;
-    @FXML private ListView<Item> listView;
     @FXML private Button connect;
-
-    private GridPane serverInfos;
+    @FXML private TableView tableView;
+    @FXML private TableColumn<Item, TextField> databaseDescription;
+    @FXML private TableColumn<Item, CheckBox> databaseToOpen;
 
     private BooleanProperty hostOk = new SimpleBooleanProperty(false);
     private BooleanProperty usernameOk = new SimpleBooleanProperty(false);
     private BooleanProperty passwordOk = new SimpleBooleanProperty(false);
 
-    private String [] connectionData = new String[3];
     private BooleanProperty filedOk = new SimpleBooleanProperty(false);
     private BooleanProperty allOk = new SimpleBooleanProperty(false);
+    private boolean newServer = false;
 
     private Driver driver;
     private Server server;
 
-    IntegerProperty dbCount = new SimpleIntegerProperty(0);
+    private IntegerProperty dbCount = new SimpleIntegerProperty(0);
+    private MainController mainController;
 
 
     @FXML
     public void initialize(){
+        mainController = MainController.getInstance();
         filedOk.bind(hostOk.and(usernameOk).and(passwordOk));
         allOk.bind(dbCount.isNotEqualTo(0));
 
         host.textProperty().addListener((observable, oldValue, newValue) -> {
-            connectionData[0] = newValue;
             if (newValue == null || newValue.isEmpty())
                 hostOk.set(false);
             else
@@ -78,7 +85,6 @@ public class ServerServerController implements ServerController {
         });
 
         username.textProperty().addListener((observable, oldValue, newValue) -> {
-            connectionData[1] = newValue;
             if (newValue == null || newValue.isEmpty())
                 usernameOk.set(false);
             else
@@ -86,19 +92,23 @@ public class ServerServerController implements ServerController {
         });
 
         password.textProperty().addListener((observable, oldValue, newValue) -> {
-            connectionData[2] = newValue;
             if (newValue == null || newValue.isEmpty())
                 passwordOk.set(false);
             else
                 passwordOk.set(true);
         });
 
+        listView.setCellFactory(CheckBoxListCell.forListView(Item::onProperty));
+        listView.setCellFactory(listView -> {
+            final CheckBoxListCell<Item> cell = new CheckBoxListCell<>((Item i) -> i.selected);
 
-        //serverInfos = (GridPane)mainPane.getChildren().get(0);
-
-        listView.setCellFactory(CheckBoxListCell.forListView((Callback<Item, ObservableValue<Boolean>>) param -> {
-            return param.onProperty();
-        }));
+            if (cell.getItem() != null) {
+                if (cell.getItem().disable) {
+                    cell.setDisable(true);
+                }
+            }
+            return cell;
+        });
 
         connect.disableProperty().bind(filedOk.not());
 
@@ -110,24 +120,54 @@ public class ServerServerController implements ServerController {
      */
     @FXML
     public void loadDatabases(){
-        server = new Server(driver, host.getText());
-        Database[] databases = server.getDatabases(username.getText(), password.getText());
+        if (mainController.getServersList().stream()
+                .filter(server1 -> server1.getHost().equals(host.getText()))
+                .peek(server12 -> {server = server12;})
+                .count() == 0)
+        {
+            server = new Server(driver, host.getText(), null);
+            newServer = true;
 
-        for (Database database : databases) {
+        }
+        LinkedList<Database> databases = server.getDatabases();
+
+        // Look for the allready opened databases and add them with a checked checkbox
+        databases.forEach(database -> {
             Item item = new Item(database);
+            item.selected.set(true);
+            item.disable = true;
             item.onProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue){
+                if (newValue) {
                     server.addDatabase(item.database);
                     dbCount.set(dbCount.get() + 1);
-                }
-                else {
+                } else {
                     server.removeDatabase(item.database);
                     dbCount.set(dbCount.get() - 1);
                 }
 
             });
             listView.getItems().add(item);
-        }
+        });
+
+        LinkedList<Database> allDatabases = server.getAllDatabases(username.getText(), password.getText());
+
+        //Add all the other database (the ones on the server that are not opened
+        allDatabases.stream()
+                .filter(database -> databases.stream().noneMatch(database1 -> database1.getDescritpion().equals(database.getDescritpion())))
+                .forEach(database -> {
+                    Item item = new Item(database);
+                    item.onProperty().addListener((observable, oldValue, newValue) -> {
+                        if (newValue) {
+                            server.addDatabase(item.database);
+                            dbCount.set(dbCount.get() + 1);
+                        } else {
+                            server.removeDatabase(item.database);
+                            dbCount.set(dbCount.get() - 1);
+                        }
+
+                    });
+                    listView.getItems().add(item);
+                });
     }
 
     @Override
@@ -145,12 +185,19 @@ public class ServerServerController implements ServerController {
         this.driver = driver;
     }
 
+    @Override
+    public void connect() {
+        server.connectSelectedDatabases(password.getText());
+    }
+
     class Item{
         private Database database;
         private BooleanProperty selected;
+        private boolean disable;
 
         Item(Database database){
             this.selected = new SimpleBooleanProperty(false);
+            disable = false;
             this.database = database;
         }
 
@@ -163,5 +210,8 @@ public class ServerServerController implements ServerController {
         }
     }
 
+    public boolean newServer(){
+        return newServer;
+    }
 
 }

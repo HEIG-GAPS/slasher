@@ -28,8 +28,8 @@ public class Sqlite implements Driver {
   public String toString() { return "Sqlite"; }
 
   @Override
-  public String type() {
-    return "file";
+  public ServerType type() {
+    return ServerType.File;
   }
 
 
@@ -108,7 +108,7 @@ public class Sqlite implements Driver {
   }
 
   @Override
-  public Database[] getDatabases(Server server, String username, String password) {
+  public LinkedList<Database> getDatabases(Server server, String username, String password) {
     return null;
   }
 

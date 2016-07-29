@@ -26,6 +26,8 @@ package ch.gaps.slasher.database.driver.database;
 
 public class DbObject {
     public String toString(){
-        return "d";
+        return null;
     }
+
+    public boolean disabled(){return false;}
 }
