@@ -7,6 +7,7 @@ package ch.gaps.slasher.database.driver;
 
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.database.driver.database.Schema;
+import ch.gaps.slasher.database.driver.database.Server;
 import ch.gaps.slasher.database.driver.database.Table;
 
 import java.sql.*;
@@ -105,21 +106,6 @@ public class MySql implements Driver {
   }
 
   @Override
-  public Database[] getDatabases() {
-    LinkedList<Database> databases = new LinkedList<>();
-    try {
-      ResultSet rs = connection.getMetaData().getCatalogs();
-      while (rs.next()) {
-        databases.add(new Database(this, rs.getString("TABLE_CAT")));
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-
-    return databases.toArray(new Database[databases.size()]);
-  }
-
-  @Override
   public void close() {
     try {
       connection.close();
@@ -127,6 +113,37 @@ public class MySql implements Driver {
       e.printStackTrace();
     }
   }
+
+  @Override
+  public Database[] getDatabases(Server server, String username, String password) {
+    LinkedList<Database> databases = new LinkedList<>();
+
+    try {
+      Class.forName("com.mysql.jdbc.Driver");
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+
+    Properties info = new Properties();
+    info.setProperty("user",  username);
+    info.setProperty("password", password);
+    info.setProperty("useSSL", "true");
+
+    try {
+      String url = "jdbc:mysql://" + server.getHost() + ":3306";
+      connection = DriverManager.getConnection(url, info);
+      ResultSet rs = connection.getMetaData().getCatalogs();
+      while (rs.next()) {
+        databases.add(new Database(new MySql(), rs.getString("TABLE_CAT"), null, server, username));
+
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return databases.toArray(new Database [databases.size()]);
+  }
+
 
   @Override
   public boolean hasSchema() {

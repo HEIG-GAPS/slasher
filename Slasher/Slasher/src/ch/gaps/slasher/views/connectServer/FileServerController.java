@@ -63,17 +63,12 @@ public class FileServerController implements ServerController {
         }
     }
 
-
-    @Override
-    public String[] getConnectionData() {
-        return  connectionData;
-    }
-
     @Override
     public Server getServer() {
-        Server server = new Server(driver, path.getText());
-        server.connect(null, null);
-        server.addDatabase(new Database(driver, "main"));
+        Server server = new Server(null, path.getText(), file.getName());
+        Database mainDatabase = new Database(driver, "main", null, server, null);
+        server.addDatabase(mainDatabase);
+        server.connectSelectedDatabases(null);
         return server;
     }
 
@@ -86,6 +81,5 @@ public class FileServerController implements ServerController {
     public void setDriver(Driver driver) {
         this.driver = driver;
     }
-
 
 }

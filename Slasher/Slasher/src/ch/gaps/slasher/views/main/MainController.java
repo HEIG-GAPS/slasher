@@ -152,4 +152,12 @@ public class MainController {
         servers.add(server);
     }
 
+    public boolean checkServer(Server serverToCheck){
+        for (Server server : servers){
+            if (server.getDescription().equals(serverToCheck.getDescription()))
+                return false;
+        }
+        return true;
+    }
+
 }

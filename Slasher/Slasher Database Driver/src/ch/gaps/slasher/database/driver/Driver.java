@@ -25,6 +25,7 @@ package ch.gaps.slasher.database.driver;
 
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.database.driver.database.Schema;
+import ch.gaps.slasher.database.driver.database.Server;
 import ch.gaps.slasher.database.driver.database.Table;
 
 /**
@@ -55,12 +56,8 @@ public interface Driver {
 
   public Schema[] getSchemas(Database database);
 
-  public Database[] getDatabases();
-
   public void close();
 
-
-
-  
+  public Database[] getDatabases(Server server, String username, String password);
   
 }

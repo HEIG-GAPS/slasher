@@ -9,8 +9,6 @@ import javafx.beans.property.BooleanProperty;
  */
 public interface ServerController {
 
-    public String[] getConnectionData();//TODO to remove !!!
-
     public Server getServer();
 
     public BooleanProperty getFieldValidation();

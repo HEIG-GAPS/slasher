@@ -36,10 +36,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -135,10 +132,16 @@ public class ConnectServerController {
 
     @FXML
     private void validate() throws SQLException, ClassNotFoundException {
-       String [] tmp = serverController.getConnectionData();
         server = serverController.getServer();
+        if (!MainController.getInstance().checkServer(server)) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(null);
+            alert.setContentText("Allready a server with this description");
+            alert.showAndWait();
+            return;
+        }
         if (!dbName.getText().isEmpty())
-            server.setName(dbName.getText());
+            server.setDescription(dbName.getText());
         mainController.addServer(server);
         ((Stage)mainPane.getScene().getWindow()).close();
     }

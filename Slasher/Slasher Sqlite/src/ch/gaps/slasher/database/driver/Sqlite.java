@@ -7,6 +7,7 @@ package ch.gaps.slasher.database.driver;
 
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.database.driver.database.Schema;
+import ch.gaps.slasher.database.driver.database.Server;
 import ch.gaps.slasher.database.driver.database.Table;
 
 import java.sql.*;
@@ -58,7 +59,6 @@ public class Sqlite implements Driver {
       e.printStackTrace();
     }
 
-
   }
 
   @Override
@@ -99,26 +99,19 @@ public class Sqlite implements Driver {
 
   @Override
   public Schema[] getSchemas(Database database) {
-
-    Schema[] schemas = new Schema[1];
-    schemas[0] = new Schema(database, "main");
-
-    return schemas;
-  }
-
-  @Override
-  public Database[] getDatabases() {
-    return new Database[] {new Database(this, "main")} ;
+    return null;
   }
 
   @Override
   public void close() {
-    try {
-      connection.close();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
+
   }
+
+  @Override
+  public Database[] getDatabases(Server server, String username, String password) {
+    return null;
+  }
+
 
   @Override
   public boolean hasSchema() {

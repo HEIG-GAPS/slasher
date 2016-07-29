@@ -104,11 +104,14 @@ public class ServerServerController implements ServerController {
 
     }
 
+    /**
+     * Fonction appele par le GUI pour afficher la liste des bases de donnees disponibles
+     * sur le server avec le nom d'utilisateur saisi
+     */
     @FXML
-    public void connect(){
+    public void loadDatabases(){
         server = new Server(driver, host.getText());
-        server.connect(username.getText(), password.getText());
-        Database[] databases = server.getAllDatabases();
+        Database[] databases = server.getDatabases(username.getText(), password.getText());
 
         for (Database database : databases) {
             Item item = new Item(database);
@@ -128,11 +131,6 @@ public class ServerServerController implements ServerController {
     }
 
     @Override
-    public String[] getConnectionData() {
-        return connectionData;
-    }
-
-    @Override
     public Server getServer() {
         return server;
     }
@@ -148,9 +146,8 @@ public class ServerServerController implements ServerController {
     }
 
     class Item{
-        private StringProperty name;
-        private BooleanProperty selected;
         private Database database;
+        private BooleanProperty selected;
 
         Item(Database database){
             this.selected = new SimpleBooleanProperty(false);
@@ -162,7 +159,7 @@ public class ServerServerController implements ServerController {
         }
 
         public String toString (){
-            return database.getName();
+            return database.toString();
         }
     }
 

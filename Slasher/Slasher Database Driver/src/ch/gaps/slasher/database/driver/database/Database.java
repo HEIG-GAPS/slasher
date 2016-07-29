@@ -30,19 +30,40 @@ public class Database extends DbObject {
     private Driver driver;
     private Server server;
     private String name;
+    private String username;
+    private String description;
 
     public Database(Driver driver, String name){
         this.driver = driver;
         this.name = name;
     }
 
-    public Database(Server server, String name)
-    {
-        this.server = server;
+    public Database(Driver driver, String name, Server server){
+        this.driver = driver;
         this.name = name;
+        this.server = server;
     }
+
+    public Database(Driver driver, String name, Server server, String username){
+        this.driver = driver;
+        this.name = name;
+        this.server = server;
+        this.username = username;
+    }
+
+    public Database(Driver driver, String name, String description, Server server, String username){
+        this.driver = driver;
+        this.name = name;
+        this.server = server;
+        this.username = username;
+        if (description == null){
+            description = name;
+        }
+        this.description = description;
+    }
+
     public String toString(){
-        return name;
+        return description;
     }
 
     public Table[] getTables(){
@@ -62,4 +83,13 @@ public class Database extends DbObject {
     public String getName(){
         return name;
     }
+
+    public void connect(String password){
+        driver.connect(server.getHost(), username, password);
+    }
+
+    public void setDescription(String newDescritpion){
+        description = newDescritpion;
+    }
+
 }
