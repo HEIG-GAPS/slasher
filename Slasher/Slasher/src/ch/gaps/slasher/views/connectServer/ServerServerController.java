@@ -52,7 +52,7 @@ public class ServerServerController implements ServerController {
     @FXML private PasswordField password;
     @FXML private AnchorPane mainPane;
     @FXML private Button connect;
-    @FXML private TableView tableView;
+    @FXML private TableView<Item> tableView;
     @FXML private TableColumn<Item, TextField> databaseDescription;
     @FXML private TableColumn<Item, CheckBox> databaseToOpen;
 
@@ -98,20 +98,23 @@ public class ServerServerController implements ServerController {
                 passwordOk.set(true);
         });
 
-        listView.setCellFactory(CheckBoxListCell.forListView(Item::onProperty));
-        listView.setCellFactory(listView -> {
-            final CheckBoxListCell<Item> cell = new CheckBoxListCell<>((Item i) -> i.selected);
-
-            if (cell.getItem() != null) {
-                if (cell.getItem().disable) {
-                    cell.setDisable(true);
-                }
-            }
-            return cell;
-        });
-
         connect.disableProperty().bind(filedOk.not());
 
+        databaseDescription.setCellValueFactory(param -> {
+            ObservableValue<TextField> tf = new SimpleObjectProperty<TextField>(new TextField());
+            tf.getValue().disableProperty().bind(param.getValue().disable);
+            tf.getValue().textProperty().bindBidirectional(param.getValue().description);
+            return tf;
+        });
+
+        databaseToOpen.setCellValueFactory(param -> {
+            ObservableValue<CheckBox> cb = new SimpleObjectProperty<CheckBox>(new CheckBox());
+            cb.getValue().disableProperty().bind(param.getValue().disable);
+            cb.getValue().selectedProperty().bindBidirectional(param.getValue().selected);
+            return cb;
+        });
+
+        databaseDescription.prefWidthProperty().bind(tableView.widthProperty().subtract(databaseToOpen.widthProperty()).subtract(2));
     }
 
     /**
@@ -135,7 +138,7 @@ public class ServerServerController implements ServerController {
         databases.forEach(database -> {
             Item item = new Item(database);
             item.selected.set(true);
-            item.disable = true;
+            item.disable.setValue(true);
             item.onProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue) {
                     server.addDatabase(item.database);
@@ -146,7 +149,7 @@ public class ServerServerController implements ServerController {
                 }
 
             });
-            listView.getItems().add(item);
+            tableView.getItems().add(item);
         });
 
         LinkedList<Database> allDatabases = server.getAllDatabases(username.getText(), password.getText());
@@ -166,8 +169,9 @@ public class ServerServerController implements ServerController {
                         }
 
                     });
-                    listView.getItems().add(item);
+                    tableView.getItems().add(item);
                 });
+
     }
 
     @Override
@@ -193,12 +197,17 @@ public class ServerServerController implements ServerController {
     class Item{
         private Database database;
         private BooleanProperty selected;
-        private boolean disable;
+        private StringProperty description;
+        private BooleanProperty disable = new SimpleBooleanProperty(false);
 
         Item(Database database){
             this.selected = new SimpleBooleanProperty(false);
-            disable = false;
             this.database = database;
+            description = new SimpleStringProperty(database.getDescritpion());
+
+            description.addListener(observable -> {
+                database.setDescription(description.toString());
+            });
         }
 
         public BooleanProperty onProperty(){

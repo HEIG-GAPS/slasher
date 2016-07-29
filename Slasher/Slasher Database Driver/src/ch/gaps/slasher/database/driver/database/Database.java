@@ -34,22 +34,13 @@ public class Database extends DbObject {
     private String description;
     private boolean connected = false;
 
-    public Database(Driver driver, String name){
-        this.driver = driver;
-        this.name = name;
-    }
-
-    public Database(Driver driver, String name, Server server){
-        this.driver = driver;
-        this.name = name;
-        this.server = server;
-    }
 
     public Database(Driver driver, String name, Server server, String username){
         this.driver = driver;
         this.name = name;
         this.server = server;
         this.username = username;
+        description = name + " - " + username;
     }
 
     public Database(Driver driver, String name, String description, Server server, String username){
@@ -58,7 +49,7 @@ public class Database extends DbObject {
         this.server = server;
         this.username = username;
         if (description == null){
-            description = name;
+            description = name + " - " + username;
         }
         this.description = description;
     }

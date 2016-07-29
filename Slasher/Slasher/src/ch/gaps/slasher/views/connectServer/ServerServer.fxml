@@ -33,10 +33,10 @@
          </children>
       </GridPane>
       <Button fx:id="connect" layoutX="293.0" layoutY="133.0" mnemonicParsing="false" onAction="#loadDatabases" text="Load databases" AnchorPane.leftAnchor="293.0" AnchorPane.topAnchor="133.0" />
-      <TableView fx:id="tableView" layoutX="426.0" layoutY="86.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="403.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
+      <TableView fx:id="tableView" layoutX="426.0" layoutY="86.0" prefHeight="200.0" prefWidth="200.0" stylesheets="@tableView.css" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="403.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
         <columns>
-          <TableColumn fx:id="databaseToOpen" prefWidth="75.0" text="Open" />
-          <TableColumn fx:id="databaseDescription" prefWidth="124.0" text="Database name" />
+          <TableColumn fx:id="databaseToOpen" editable="false" prefWidth="23.0" sortable="false" />
+          <TableColumn fx:id="databaseDescription" prefWidth="176.0" sortable="false" text="Database description (name - username)" />
         </columns>
       </TableView>
    </children>
