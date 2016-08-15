@@ -28,6 +28,8 @@ import ch.gaps.slasher.database.driver.database.Schema;
 import ch.gaps.slasher.database.driver.database.Server;
 import ch.gaps.slasher.database.driver.database.Table;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.LinkedList;
 
 /**
@@ -48,7 +50,7 @@ public interface Driver {
 
   public ServerType type();
 
-  public void connect(String ... connectionInfo);
+  public void connect(String host, String username, String password, String database) throws SQLException, ClassNotFoundException;
 
   public void test();
 
@@ -63,5 +65,9 @@ public interface Driver {
   public LinkedList<Database> getDatabases(Server server, String username, String password);
 
   public enum ServerType{Server, File};
+
+  public ResultSet executeQuarry (String quarry) throws SQLException;
+
+  public Boolean isConnected();
   
 }

@@ -23,14 +23,104 @@
  */
 package ch.gaps.slasher.views.editor;
 
+import ch.gaps.slasher.database.driver.database.Database;
+import ch.gaps.slasher.views.dataTableView.DataTableController;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.AnchorPane;
+
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.concurrent.ExecutionException;
 
 /**
  *
  * @author leroy
  */
 public class EditorController {
-    @FXML TextArea request;
-    
+    @FXML
+    private TextArea request;
+    @FXML
+    private AnchorPane tableViewPane;
+    @FXML
+    private Button execute;
+    @FXML
+    private ProgressIndicator progress;
+
+    private Database database;
+
+    private DataTableController dataTableController;
+
+
+    @FXML
+    private void initialize(){
+        progress.setVisible(false);
+
+        FXMLLoader loader = new FXMLLoader(DataTableController.class.getResource("DataTableView.fxml"));
+        try
+        {
+            TableView tableView = loader.load();
+            AnchorPane.setTopAnchor(tableView, 10.);
+            AnchorPane.setBottomAnchor(tableView, 10.);
+            AnchorPane.setLeftAnchor(tableView, 10.);
+            AnchorPane.setRightAnchor(tableView, 10.);
+            dataTableController = loader.getController();
+
+            tableViewPane.getChildren().add(tableView);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+
+
+
+    @FXML
+    private void execute(){
+
+        progress.setVisible(true);
+
+        Task<ResultSet> task = new Task<ResultSet>()
+        {
+            @Override
+            protected ResultSet call() throws Exception
+            {
+                final ResultSet filanRs;
+                try
+                {
+                    filanRs = database.executeQuarry(request.getText());
+                    return filanRs;
+
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        };
+
+        new Thread(task).start();
+
+        try
+        {
+            dataTableController.display(task.get());
+        } catch (InterruptedException | ExecutionException e)
+        {
+            e.printStackTrace();
+        }
+        progress.progressProperty().bind(task.progressProperty());
+
+    }
+
+    public void setDatabase(Database database){
+        this.database = database;
+        execute.disableProperty().bind(database.disabledProperty().not());
+    }
 }

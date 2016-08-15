@@ -2,11 +2,13 @@ package ch.gaps.slasher;
 
 import ch.gaps.slasher.database.driver.Driver;
 import ch.gaps.slasher.tool.Tool;
-import java.util.LinkedList;
+import ch.gaps.slasher.views.main.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.util.LinkedList;
 /**
  *
  * @author jvarani
@@ -61,7 +63,7 @@ public class Slasher extends Application{
     
     @Override
     public void stop(){
-        
+        MainController.getInstance().writeToJson();
     }
 
 }

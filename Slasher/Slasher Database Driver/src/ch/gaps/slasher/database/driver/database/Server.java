@@ -2,9 +2,8 @@ package ch.gaps.slasher.database.driver.database;
 
 import ch.gaps.slasher.database.driver.Driver;
 
+import java.sql.SQLException;
 import java.util.LinkedList;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * Created by leroy on 15.07.2016.
@@ -68,7 +67,8 @@ public class Server extends DbObject {
         driver.close();
     }
 
-    public void connectSelectedDatabases(String password) {
+    public void connectSelectedDatabases(String password) throws SQLException, ClassNotFoundException
+    {
         for (Database database : openedDatabase) {
             database.connect(password);
         }
@@ -83,6 +83,10 @@ public class Server extends DbObject {
 
     public Driver.ServerType type(){
         return driver.type();
+    }
+
+    public String getDiverName(){
+        return driver.toString();
     }
 
 }

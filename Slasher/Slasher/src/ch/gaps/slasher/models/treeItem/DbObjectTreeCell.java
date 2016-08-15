@@ -49,7 +49,16 @@ public class DbObjectTreeCell extends TreeCell<DbObject> {
 
             if (dbObject.disabled()){
                 setTextFill(Color.GREY);
+            } else {
+                setTextFill(Color.BLACK);
             }
+
+            dbObject.disabledProperty().addListener((observable, oldValue, newValue) ->
+            {
+                if (newValue){
+                    setTextFill(Color.GREY);
+                }
+            });
         }
     }
 }

@@ -29,21 +29,13 @@ import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.database.driver.database.Server;
 import ch.gaps.slasher.views.main.MainController;
 import javafx.beans.property.*;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxListCell;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.util.Callback;
 
-import java.util.Arrays;
+import java.sql.SQLException;
 import java.util.LinkedList;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 
 public class ServerServerController implements ServerController {
@@ -190,7 +182,8 @@ public class ServerServerController implements ServerController {
     }
 
     @Override
-    public void connect() {
+    public void connect() throws SQLException, ClassNotFoundException
+    {
         server.connectSelectedDatabases(password.getText());
     }
 

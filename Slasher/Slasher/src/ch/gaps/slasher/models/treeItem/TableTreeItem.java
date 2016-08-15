@@ -26,12 +26,41 @@ package ch.gaps.slasher.models.treeItem;
 import ch.gaps.slasher.database.driver.database.Table;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
+
+import java.util.LinkedList;
 
 
-public class TableTreeItem extends DbObjectTreeItem {
-    public TableTreeItem(Table table){
-        super(table);
+public class TableTreeItem extends DbComponentTreeItem {
+
+    DatabaseTreeItem databaseTreeItem;
+
+    public TableTreeItem(Table table, DatabaseTreeItem databaseTreeItem){
+        super(table, databaseTreeItem);
+        this.databaseTreeItem = databaseTreeItem;
     }
+
+    @Override
+    public void addTab(Tab tab){
+        databaseTreeItem.addTab(tab);
+    }
+
+    @Override
+    public void removeTab(Tab tab){
+        databaseTreeItem.removeTab(tab);
+    }
+
+    @Override
+    public LinkedList<Tab> getTabs(){
+        return databaseTreeItem.getTabs();
+    }
+
+    @Override
+    public TreeItemType getType()
+    {
+        return TreeItemType.TABLE;
+    }
+
 
     @Override
     public ContextMenu getContextMenu(){

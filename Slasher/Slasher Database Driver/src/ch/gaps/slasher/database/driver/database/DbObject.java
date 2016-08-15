@@ -24,10 +24,15 @@
 package ch.gaps.slasher.database.driver.database;
 
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 public class DbObject {
     public String toString(){
         return null;
     }
 
     public boolean disabled(){return false;}
+
+    public BooleanProperty disabledProperty() { return new SimpleBooleanProperty(false); }
 }

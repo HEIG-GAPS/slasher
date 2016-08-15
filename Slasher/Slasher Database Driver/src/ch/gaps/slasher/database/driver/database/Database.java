@@ -24,6 +24,11 @@
 package ch.gaps.slasher.database.driver.database;
 
 import ch.gaps.slasher.database.driver.Driver;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Database extends DbObject {
 
@@ -34,13 +39,16 @@ public class Database extends DbObject {
     private String description;
     private boolean connected = false;
 
+    private BooleanProperty connectedProperty = new SimpleBooleanProperty();
+
 
     public Database(Driver driver, String name, Server server, String username){
         this.driver = driver;
         this.name = name;
         this.server = server;
         this.username = username;
-        description = name + " - " + username;
+        description = username + "@" + name;
+        connectedProperty.setValue(false);
     }
 
     public Database(Driver driver, String name, String description, Server server, String username){
@@ -49,9 +57,10 @@ public class Database extends DbObject {
         this.server = server;
         this.username = username;
         if (description == null){
-            description = name + " - " + username;
+            description = username + "@" + name;
         }
         this.description = description;
+        connectedProperty.setValue(false);
     }
 
     public String toString(){
@@ -74,6 +83,7 @@ public class Database extends DbObject {
         if (connected) {
             driver.close();
             connected = false;
+            connectedProperty.setValue(false);
         }
     }
 
@@ -81,10 +91,14 @@ public class Database extends DbObject {
         return name;
     }
 
-    public void connect(String password){
+    public String getUsername(){ return username; }
+
+    public void connect(String password) throws SQLException, ClassNotFoundException
+    {
         if (!connected) {
-            driver.connect(server.getHost(), username, password);
+            driver.connect(server.getHost(), username, password, name);
             connected = true;
+            connectedProperty.setValue(true);
         }
     }
 
@@ -102,6 +116,14 @@ public class Database extends DbObject {
 
     public boolean disabled(){
         return !connected;
+    }
+
+    public boolean isConnected() { return connected; }
+
+    public BooleanProperty disabledProperty() { return connectedProperty; }
+
+    public ResultSet executeQuarry(String quarry) throws SQLException{
+        return driver.executeQuarry(quarry);
     }
 
 }

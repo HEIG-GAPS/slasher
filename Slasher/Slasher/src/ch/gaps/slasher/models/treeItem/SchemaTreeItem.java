@@ -24,10 +24,36 @@
 package ch.gaps.slasher.models.treeItem;
 
 import ch.gaps.slasher.database.driver.database.Schema;
+import javafx.scene.control.Tab;
+
+import java.util.LinkedList;
 
 
-public class SchemaTreeItem extends DbObjectTreeItem {
-    public SchemaTreeItem(Schema schema){
-        super(schema);
+public class SchemaTreeItem extends DbComponentTreeItem {
+
+
+
+    public SchemaTreeItem(Schema schema, DatabaseTreeItem databaseTreeItem){
+        super(schema, databaseTreeItem);
+    }
+
+    public void addTab(Tab tab){
+
+    }
+
+    @Override
+    public void removeTab(Tab tab){
+
+    }
+
+    @Override
+    public LinkedList<Tab> getTabs(){
+        return null;
+    }
+
+    @Override
+    public TreeItemType getType()
+    {
+        return TreeItemType.SCHEMA;
     }
 }

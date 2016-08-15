@@ -23,22 +23,18 @@
  */
 package ch.gaps.slasher.views.main;
 
+import ch.gaps.slasher.database.driver.Driver;
+import ch.gaps.slasher.database.driver.MySql;
+import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.database.driver.database.DbObject;
 import ch.gaps.slasher.database.driver.database.Server;
 import ch.gaps.slasher.models.buttons.ServerDisconnectItem;
-import ch.gaps.slasher.models.treeItem.DbObjectTreeCell;
-import ch.gaps.slasher.models.treeItem.DbObjectTreeItem;
-import ch.gaps.slasher.models.treeItem.ServerTreeItem;
-import ch.gaps.slasher.views.editor.EditorController;
+import ch.gaps.slasher.models.treeItem.*;
 import ch.gaps.slasher.views.connectServer.ConnectServerController;
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
+import ch.gaps.slasher.views.editor.EditorController;
+import com.google.gson.*;
+import com.google.gson.stream.JsonReader;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -48,6 +44,9 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.*;
+import java.util.LinkedList;
+
 /**
  *
  * @author leroy
@@ -55,8 +54,8 @@ import javafx.stage.Stage;
 public class MainController {
 
     private static MainController instance;
-    
-    
+
+
     @FXML private MenuBar menu;
     @FXML private BorderPane borderPane;
     @FXML private TabPane tabPane;
@@ -64,54 +63,76 @@ public class MainController {
     @FXML private Menu closeServerButton;
     @FXML private MenuItem newEditorTab;
 
-    private TreeItem<DbObject> rootTreeItem = new DbObjectTreeItem();
-
-
+    private TreeItem<DbObject> rootTreeItem = new TreeItem<DbObject>();
+    private DatabaseTreeItem currentDatabaseTreeItem;
     private LinkedList<Server> servers = new LinkedList<>();
+    private BufferedWriter os;
 
     public MainController(){
         instance = this;
     }
 
     public static MainController getInstance(){
-        if (instance == null) instance = new MainController();
         return instance;
     }
-    
+
     @FXML
     private void initialize(){
+
+        readFromJson();
+        refreshTreeView();
+
         menu.setUseSystemMenuBar(true);
         treeView.setRoot(rootTreeItem);
         treeView.setShowRoot(false);
         rootTreeItem.setExpanded(true);
         treeView.setCellFactory(param -> new DbObjectTreeCell());
 
+
         treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null){
-                newEditorTab.setDisable(false);
-                tabPane.getTabs().clear();
-                tabPane.getTabs().addAll(((DbObjectTreeItem)newValue).getTabs());
-            }
-            else {
-                newEditorTab.setDisable(true);
+            if (newValue != null)
+            {
+                if (((DbObjectTreeItem) newValue).getType() != TreeItemType.SERVER)
+                {
+                    newEditorTab.setDisable(false);
+                } else
+                {
+                    newEditorTab.setDisable(true);
+                }
             }
         });
     }
-    
+
     @FXML
     private void close(){
         Platform.exit();
     }
-    
+
     @FXML
     private void newEditorTab() throws IOException{
+
+        Database database;
+        DbObjectTreeItem dbObjectTreeItem = (DbObjectTreeItem)treeView.getSelectionModel().getSelectedItem();
+
+        if ( dbObjectTreeItem.getType()== TreeItemType.DATABASE ){
+            database = (Database) dbObjectTreeItem.getValue();
+        }
+        else{
+            database = (Database) ( (DbComponentTreeItem)dbObjectTreeItem ).getDatabase().getValue();
+        }
+
+
         FXMLLoader loader = new FXMLLoader(EditorController.class.getResource("EditorView.fxml"));
-        Pane newPane = loader.load();
-        Tab newTab = new Tab("Editor", newPane);
+
+
+        Tab newTab = new Tab("Editor on " + database.getDescritpion(), loader.load());
+        EditorController editorController = loader.getController();
+        editorController.setDatabase( database );
+
         ((DbObjectTreeItem)treeView.getSelectionModel().getSelectedItem()).addTab(newTab);
         tabPane.getTabs().add(newTab);
     }
-    
+
     @FXML
     private void connectDB() throws IOException{
         Stage stage = new Stage();
@@ -122,9 +143,12 @@ public class MainController {
         connectServerController.setController(this);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(new Scene(pane));
-        int prevSize = servers.size();
+
+        //Display the connection windows and wait undill the user close it by adding a server or by
+        //cannceling
         stage.showAndWait();
         refreshTreeView();
+        writeToJson();
     }
 
     public void refreshTreeView(){
@@ -133,7 +157,6 @@ public class MainController {
         });
     }
 
-
     public  void disconnectServer(ServerTreeItem serverItem) {
         servers.remove(serverItem.getValue());
         serverItem.disconnect();
@@ -141,8 +164,22 @@ public class MainController {
     }
 
 
+    /**
+     * Called by the connection window to add a new server.
+     * Rewrite the json too
+     * @param server
+     */
     public void addServer(Server server){
+        addServerToSystem(server);
+        writeToJson();
+    }
 
+
+    /**
+     * Private method to add the server to application
+     * @param server
+     */
+    private void addServerToSystem(Server server){
         servers.add(server);
 
         ServerTreeItem item = new ServerTreeItem(server);
@@ -160,6 +197,95 @@ public class MainController {
 
     public LinkedList<Server> getServersList(){
         return servers;
+    }
+
+    public void writeToJson(){
+        try
+        {
+            os = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("save.json")));
+            Gson jsonEngine = new GsonBuilder().setPrettyPrinting().create();
+            JsonArray mainArray = new JsonArray();
+
+            for (Server s : servers)
+            {
+                JsonObject server = new JsonObject();
+
+                server.addProperty("serverDescription", s.getDescription());
+                server.addProperty("serverDriver", s.getDiverName());
+                server.addProperty("serverHost", s.getHost());
+
+                JsonArray databases = new JsonArray();
+
+                for (Database db: s.getDatabases()){
+
+                    JsonObject database = new JsonObject();
+
+                    database.addProperty("databaseDescritpion", db.getDescritpion());
+                    database.addProperty("databaseName", db.getName());
+                    database.addProperty("databaseUsername", db.getUsername());
+
+                    databases.add(database);
+                }
+                server.add("databases", databases);
+
+                mainArray.add(server);
+            }
+
+            os.write(jsonEngine.toJson(mainArray));
+            os.flush();
+
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    private void readFromJson(){
+        try
+        {
+            Gson gson = new Gson();
+            JsonReader reader = new JsonReader(new FileReader("save.json"));
+            JsonArray mainArray = gson.fromJson(reader, JsonArray.class);
+
+            if (mainArray != null)
+            {
+                for (JsonElement e : mainArray)
+                {
+                    JsonObject server = e.getAsJsonObject();
+
+                    Driver driver = new MySql();
+
+                    Server s = new Server(driver, server.get("serverHost").getAsString(), server.get("serverDescription").getAsString());
+
+                    JsonArray databases = server.get("databases").getAsJsonArray();
+
+                    if (databases != null)
+                    {
+                        for (JsonElement d : databases)
+                        {
+                            JsonObject database = d.getAsJsonObject();
+
+                            Driver dbDriver = new MySql();
+
+                            Database db = new Database(dbDriver, database.get("databaseName").getAsString(),
+                                    database.get("databaseDescritpion").getAsString(),
+                                    s,
+                                    database.get("databaseUsername").getAsString());
+                            s.addDatabase(db);
+                        }
+                    }
+
+                    addServerToSystem(s);
+                }
+            }
+
+        int a = 0;
+        } catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+
+
     }
 
 }

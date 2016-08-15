@@ -24,31 +24,27 @@
 package ch.gaps.slasher.models.treeItem;
 
 import ch.gaps.slasher.database.driver.database.DbObject;
-import javafx.scene.control.*;
-import javafx.scene.effect.ColorInput;
-import javafx.scene.layout.Pane;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TreeItem;
 
 import java.util.LinkedList;
 
-public class DbObjectTreeItem extends TreeItem <DbObject> {
-    private LinkedList<Tab> tabs;
-    public DbObjectTreeItem(){}
+public abstract class DbObjectTreeItem extends TreeItem <DbObject> {
+
     public DbObjectTreeItem(DbObject dbObject){
         super(dbObject);
-        tabs = new LinkedList<>();
     }
-    public void addTab(Tab tab){
-        tabs.add(tab);
-    }
-    public void removeTab(Tab tab){
-        tabs.remove(tab);
-    }
+    public abstract void addTab(Tab tab);
 
-    public Tab[] getTabs(){
-        return tabs.toArray(new Tab[tabs.size()]);
-    }
+    public abstract void removeTab(Tab tab);
+
+    public abstract LinkedList<Tab> getTabs();
+    public abstract TreeItemType getType();
 
     public ContextMenu getContextMenu(){
         return null;
     }
+
+
 }

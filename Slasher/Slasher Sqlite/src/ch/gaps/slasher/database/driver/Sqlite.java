@@ -35,7 +35,7 @@ public class Sqlite implements Driver {
 
 
   @Override
-  public void connect(String ... connectionInfo) {
+  public void connect(String host, String username, String password, String database) {
     try {
       Class.forName("org.sqlite.JDBC");
     } catch (ClassNotFoundException e) {
@@ -44,7 +44,7 @@ public class Sqlite implements Driver {
 
 
     try {
-      connection = DriverManager.getConnection("jdbc:sqlite:" + connectionInfo[0]);
+      connection = DriverManager.getConnection("jdbc:sqlite:" + host);
       Statement statement = connection.createStatement();
       ResultSet rs = statement.executeQuery("select * from person");
 
@@ -110,6 +110,18 @@ public class Sqlite implements Driver {
   @Override
   public LinkedList<Database> getDatabases(Server server, String username, String password) {
     return null;
+  }
+
+  @Override
+  public ResultSet executeQuarry(String quarry)
+  {
+    return null;
+  }
+
+  @Override
+  public Boolean isConnected()
+  {
+    return true;
   }
 
 
