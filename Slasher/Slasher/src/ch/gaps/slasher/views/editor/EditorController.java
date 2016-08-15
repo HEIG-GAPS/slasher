@@ -37,7 +37,6 @@ import javafx.scene.layout.AnchorPane;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.concurrent.ExecutionException;
 
 /**
  *
@@ -85,18 +84,17 @@ public class EditorController {
     @FXML
     private void execute(){
 
-        progress.setVisible(true);
 
-        Task<ResultSet> task = new Task<ResultSet>()
+        Task<Void> task = new Task<Void>()
         {
             @Override
-            protected ResultSet call() throws Exception
+            protected Void call() throws Exception
             {
                 final ResultSet filanRs;
                 try
                 {
-                    filanRs = database.executeQuarry(request.getText());
-                    return filanRs;
+                    ResultSet rs = database.executeQuarry(request.getText());
+                    dataTableController.display(rs);
 
                 } catch (SQLException e)
                 {
@@ -105,18 +103,10 @@ public class EditorController {
                 return null;
             }
         };
+        progress.visibleProperty().bind(task.runningProperty());
 
         new Thread(task).start();
-
-        try
-        {
-            dataTableController.display(task.get());
-        } catch (InterruptedException | ExecutionException e)
-        {
-            e.printStackTrace();
-        }
-        progress.progressProperty().bind(task.progressProperty());
-
+        
     }
 
     public void setDatabase(Database database){
