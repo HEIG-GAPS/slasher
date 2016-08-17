@@ -25,18 +25,20 @@ package ch.gaps.slasher.views.editor;
 
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.views.dataTableView.DataTableController;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  *
@@ -64,14 +66,14 @@ public class EditorController {
         FXMLLoader loader = new FXMLLoader(DataTableController.class.getResource("DataTableView.fxml"));
         try
         {
-            TableView tableView = loader.load();
-            AnchorPane.setTopAnchor(tableView, 10.);
-            AnchorPane.setBottomAnchor(tableView, 10.);
-            AnchorPane.setLeftAnchor(tableView, 10.);
-            AnchorPane.setRightAnchor(tableView, 10.);
+            Pane pane = loader.load();
+            AnchorPane.setTopAnchor(pane, 10.);
+            AnchorPane.setBottomAnchor(pane, 10.);
+            AnchorPane.setLeftAnchor(pane, 10.);
+            AnchorPane.setRightAnchor(pane, 10.);
             dataTableController = loader.getController();
 
-            tableViewPane.getChildren().add(tableView);
+            tableViewPane.getChildren().add(pane);
         } catch (IOException e)
         {
             e.printStackTrace();
@@ -84,33 +86,56 @@ public class EditorController {
     @FXML
     private void execute(){
 
-
         Task<Void> task = new Task<Void>()
         {
             @Override
             protected Void call() throws Exception
             {
-                final ResultSet filanRs;
-                try
-                {
-                    ResultSet rs = database.executeQuarry(request.getText());
-                    dataTableController.display(rs);
+                ResultSet rs = database.executeQuarry(request.getText());
+                int columnCount = rs.getMetaData().getColumnCount();
+                String columnName[] = new String[columnCount];
 
-                } catch (SQLException e)
+                for (int i = 0; i < columnCount; ++i)
                 {
-                    e.printStackTrace();
+                    columnName[i] = rs.getMetaData().getColumnName(i + 1);
                 }
+
+                ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
+
+                while (rs.next())
+                {
+                    ObservableList<String> row = FXCollections.observableArrayList();
+
+                    for (int i = 1; i <= columnCount; ++i)
+                    {
+                        row.add(rs.getString(i));
+                    }
+
+                    data.add(row);
+                }
+
+                Platform.runLater(() -> {
+                    dataTableController.display(data, columnName);
+                });
+
                 return null;
             }
         };
+
         progress.visibleProperty().bind(task.runningProperty());
 
-        new Thread(task).start();
-        
+
+        Thread th = new Thread(task);
+        th.start();
+
     }
 
     public void setDatabase(Database database){
         this.database = database;
         execute.disableProperty().bind(database.disabledProperty().not());
+    }
+
+    public String getContent(){
+        return request.getText();
     }
 }

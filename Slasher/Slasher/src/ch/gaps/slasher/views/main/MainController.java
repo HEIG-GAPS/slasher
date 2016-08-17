@@ -45,7 +45,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  *
@@ -67,6 +69,7 @@ public class MainController {
     private DatabaseTreeItem currentDatabaseTreeItem;
     private LinkedList<Server> servers = new LinkedList<>();
     private BufferedWriter os;
+    private Map<Database, Tab> tabs = new LinkedHashMap<>();
 
     public MainController(){
         instance = this;
@@ -128,6 +131,7 @@ public class MainController {
         Tab newTab = new Tab("Editor on " + database.getDescritpion(), loader.load());
         EditorController editorController = loader.getController();
         editorController.setDatabase( database );
+        tabs.put(database, newTab);
 
         ((DbObjectTreeItem)treeView.getSelectionModel().getSelectedItem()).addTab(newTab);
         tabPane.getTabs().add(newTab);
@@ -225,6 +229,10 @@ public class MainController {
                     database.addProperty("databaseUsername", db.getUsername());
 
                     databases.add(database);
+
+                    Tab tab = tabs.get(db);
+
+
                 }
                 server.add("databases", databases);
 

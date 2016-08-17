@@ -3,12 +3,11 @@ package ch.gaps.slasher.views.dataTableView;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Created by julien on 15.08.16.
@@ -17,41 +16,51 @@ public class DataTableController
 {
     @FXML
     private TableView <ObservableList<String>> tableView;
+    @FXML
+    private Label count;
+    @FXML
+    private Label displayZone;
 
     private ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
 
 
-    public void display(ResultSet resultSet){
-
-        try
+    @FXML
+    private void sort(){
+        new Thread(() ->
         {
-            int colunms = resultSet.getMetaData().getColumnCount();
+            tableView.getColumns().get(0).setSortType(TableColumn.SortType.ASCENDING);
+        }).start();
 
-            for (int i = 0; i < colunms; ++i){
-                final int j = i;
-                TableColumn<ObservableList<String>, String> column = new TableColumn<>(resultSet.getMetaData().getColumnName(i+1));
-                column.setCellValueFactory(tc -> new SimpleObjectProperty<>(tc.getValue().get(j)));
-                tableView.getColumns().add(column);
-
-            }
+    }
 
 
-            while (resultSet.next()){
-                ObservableList<String> row = FXCollections.observableArrayList();
 
-                for (int i = 1 ; i <= colunms; ++i )
-                {
-                    row.add(resultSet.getString(i));
-                }
 
-                data.add(row);
-            }
 
-            tableView.setItems(data);
-        } catch (SQLException e)
-        {
-            e.printStackTrace();
+    public void display(ObservableList<ObservableList<String>> data, String[] colunmsName){
+
+        tableView.getColumns().clear();
+
+
+        int i = 0;
+        for (String colunm: colunmsName){
+            final int j = i;
+            TableColumn<ObservableList<String>, String> column = new TableColumn<>(colunm);
+            column.setCellValueFactory(tc -> new SimpleObjectProperty<>(tc.getValue().get(j)));
+            tableView.getColumns().add(column);
+            i++;
         }
+
+
+        tableView.setOnSort(event ->
+        {
+            System.out.println("Sort");
+        });
+        count.setText(Integer.toString(data.size()));
+        SortedList<ObservableList<String>> sortedList = data.sorted();
+        sortedList.comparatorProperty().bind(tableView.comparatorProperty());
+        tableView.setItems(sortedList);
+
     }
 
 }
