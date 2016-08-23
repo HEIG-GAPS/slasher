@@ -118,6 +118,9 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
         if (((Database) getValue()).type() == Driver.ServerType.Server) {
             buildContextMenu();
         }
+        else {
+            buildFileContextMenu();
+        }
     }
 
     /**
@@ -125,9 +128,9 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
      */
     @Override
     public void buildContextMenu(){
-        contextMenu.getItems().clear();
 
-        MenuItem editor = new MenuItem(Slasher.getBundle().getString("new.sql.editor"));
+        buildFileContextMenu();
+
         MenuItem connect = new MenuItem(Slasher.getBundle().getString("connect"));
         MenuItem disconnect = new MenuItem(Slasher.getBundle().getString("disconnect"));
         MenuItem remove= new MenuItem(Slasher.getBundle().getString("remove"));
@@ -137,13 +140,7 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
         connect.disableProperty().bind(db.disabledProperty());
         disconnect.disableProperty().bind(db.disabledProperty().not());
 
-        editor.setOnAction(event -> {
 
-            MainController.getInstance().newEditorTab();
-
-        });
-
-        contextMenu.getItems().add(editor);
 
         connect.setOnAction(event ->
         {
@@ -213,6 +210,15 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
             disconnect();
         });
         contextMenu.getItems().add(remove);
+    }
+
+    public void buildFileContextMenu(){
+        contextMenu.getItems().clear();
+
+        MenuItem editor = new MenuItem(Slasher.getBundle().getString("new.sql.editor"));
+
+        editor.setOnAction(event -> MainController.getInstance().newEditorTab());
+        contextMenu.getItems().add(editor);
     }
 
     /**

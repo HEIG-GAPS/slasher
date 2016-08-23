@@ -49,6 +49,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -389,7 +390,10 @@ public class MainController {
                     {
                         for (JsonElement d : databases)
                         {
-                            driver = driver.getClass().newInstance();
+                            if (!serverDriver.equals("Sqlite"))
+                            {
+                                driver = driver.getClass().newInstance();
+                            }
                             JsonObject database = d.getAsJsonObject();
 
 
@@ -398,6 +402,16 @@ public class MainController {
                                     s,
                                     database.get("databaseUsername").getAsString());
                             s.addDatabase(db);
+
+                            if (serverDriver.equals("Sqlite")){
+                                try
+                                {
+                                    db.connect("");
+                                } catch (SQLException | ClassNotFoundException e1)
+                                {
+                                    e1.printStackTrace();
+                                }
+                            }
 
 
                             JsonArray tabs = database.get("tabs").getAsJsonArray();

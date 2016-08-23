@@ -34,6 +34,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.sql.SQLException;
 
 public class FileServerController implements ServerController {
     @FXML private Pane mainPane;
@@ -65,11 +66,18 @@ public class FileServerController implements ServerController {
 
     @Override
     public Server getServer() {
-        Server server = new Server(null, path.getText(), file.getName());
-        Database mainDatabase = new Database(driver, "main", null, server, null);
+        Server server = new Server(driver, path.getText(), file.getName());
+        Database mainDatabase = new Database(driver, "main", null, server, "main");
+        try
+        {
+            mainDatabase.connect(null);
+        } catch (SQLException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        }
         server.addDatabase(mainDatabase);
         return server;
-    }
+}
 
     @Override
     public BooleanProperty getFieldValidation() {

@@ -42,15 +42,6 @@ public class Sqlite implements Driver {
 
     try {
       connection = DriverManager.getConnection("jdbc:sqlite:" + host);
-      Statement statement = connection.createStatement();
-      ResultSet rs = statement.executeQuery("select * from person");
-
-      while(rs.next())
-      {
-        // read the result set
-        System.out.println("name = " + rs.getString("name"));
-        System.out.println("id = " + rs.getInt("id"));
-      }
 
     } catch (SQLException e) {
       e.printStackTrace();
@@ -102,7 +93,6 @@ public class Sqlite implements Driver {
 
   @Override
   public void close() {
-
   }
 
   @Override
@@ -111,9 +101,9 @@ public class Sqlite implements Driver {
   }
 
   @Override
-  public ResultSet executeQuery(String query)
+  public ResultSet executeQuery(String query) throws SQLException
   {
-    return null;
+    return connection.createStatement().executeQuery(query);
   }
 
   @Override
@@ -137,9 +127,15 @@ public class Sqlite implements Driver {
   @Override
   public ResultSet getAllData(Database database, Schema schema, Table table)
   {
+    try
+    {
+      return connection.createStatement().executeQuery("SELECT * FROM " + table);
+    } catch (SQLException e)
+    {
+      e.printStackTrace();
+    }
     return null;
   }
-
 
   @Override
   public boolean hasSchema() {
