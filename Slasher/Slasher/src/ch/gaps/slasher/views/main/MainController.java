@@ -64,13 +64,13 @@ public class MainController {
     private static ResourceBundle bundle = ResourceBundle.getBundle("ch.gaps.slasher.bundle.Bundle", new Locale("en", "EN"));
 
 
-
     @FXML private MenuBar menu;
     @FXML private BorderPane borderPane;
     @FXML private TabPane tabPane;
     @FXML private TreeView<DbObject> treeView;
     @FXML private Menu closeServerButton;
     @FXML private MenuItem newEditorTab;
+    @FXML private ListView<String> userCommunication;
 
     private Tab structureTab = new Tab("Struct");
 
@@ -240,7 +240,8 @@ public class MainController {
      * Disconnect "nicly" a server.
      * @param serverItem
      */
-    public  void disconnectServer(ServerTreeItem serverItem) {
+    public  void disconnectServer(ServerTreeItem serverItem) throws SQLException
+    {
         servers.remove(serverItem.getValue());
         serverItem.disconnect();
         closeServerButton.getItems().removeIf(menuItem -> ((ServerDisconnectItem) menuItem).getServerTreeItem() == serverItem);
@@ -271,7 +272,13 @@ public class MainController {
         ServerDisconnectItem serverDisconnectItem = new ServerDisconnectItem(item);
 
         serverDisconnectItem.setOnAction(event -> {
-            disconnectServer(item);
+            try
+            {
+                disconnectServer(item);
+            } catch (SQLException e)
+            {
+                e.printStackTrace();
+            }
             closeServerButton.getItems().remove(serverDisconnectItem);
         });
 
@@ -439,5 +446,7 @@ public class MainController {
 
     }
 
-    public static ResourceBundle getBundle(){return bundle;}
+    public void addToUserCommunication(String message){
+        userCommunication.getItems().add(message);
+    }
 }

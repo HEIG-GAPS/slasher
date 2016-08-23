@@ -24,6 +24,7 @@
 package ch.gaps.slasher.database.driver.database;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.LinkedList;
 
 public class Schema extends DbObject implements DbParent {
@@ -36,7 +37,8 @@ public class Schema extends DbObject implements DbParent {
         this.database = database;
     }
 
-    public LinkedList<Table> getTables(){
+    public LinkedList<Table> getTables() throws SQLException
+    {
         return database.getTables(this);
     }
 
@@ -54,7 +56,7 @@ public class Schema extends DbObject implements DbParent {
     }
 
     @Override
-    public ResultSet getAllData(Table table)
+    public ResultSet getAllData(Table table) throws SQLException
     {
         return database.getAllData(this, table);
     }

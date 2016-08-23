@@ -38,15 +38,24 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 
 
-public class ServerServerController implements ServerController {
-    @FXML private TextField host;
-    @FXML private TextField username;
-    @FXML private PasswordField password;
-    @FXML private AnchorPane mainPane;
-    @FXML private Button connect;
-    @FXML private TableView<Item> tableView;
-    @FXML private TableColumn<Item, TextField> databaseDescription;
-    @FXML private TableColumn<Item, CheckBox> databaseToOpen;
+public class ServerServerController implements ServerController
+{
+    @FXML
+    private TextField host;
+    @FXML
+    private TextField username;
+    @FXML
+    private PasswordField password;
+    @FXML
+    private AnchorPane mainPane;
+    @FXML
+    private Button connect;
+    @FXML
+    private TableView<Item> tableView;
+    @FXML
+    private TableColumn<Item, TextField> databaseDescription;
+    @FXML
+    private TableColumn<Item, CheckBox> databaseToOpen;
 
     private BooleanProperty hostOk = new SimpleBooleanProperty(false);
     private BooleanProperty usernameOk = new SimpleBooleanProperty(false);
@@ -64,19 +73,22 @@ public class ServerServerController implements ServerController {
 
 
     @FXML
-    public void initialize(){
+    public void initialize()
+    {
         mainController = MainController.getInstance();
         filedOk.bind(hostOk.and(usernameOk));
         allOk.bind(dbCount.isNotEqualTo(0));
 
-        host.textProperty().addListener((observable, oldValue, newValue) -> {
+        host.textProperty().addListener((observable, oldValue, newValue) ->
+        {
             if (newValue == null || newValue.isEmpty())
                 hostOk.set(false);
             else
                 hostOk.set(true);
         });
 
-        username.textProperty().addListener((observable, oldValue, newValue) -> {
+        username.textProperty().addListener((observable, oldValue, newValue) ->
+        {
             if (newValue == null || newValue.isEmpty())
                 usernameOk.set(false);
             else
@@ -86,14 +98,16 @@ public class ServerServerController implements ServerController {
 
         connect.disableProperty().bind(filedOk.not());
 
-        databaseDescription.setCellValueFactory(param -> {
+        databaseDescription.setCellValueFactory(param ->
+        {
             ObservableValue<TextField> tf = new SimpleObjectProperty<TextField>(new TextField());
             tf.getValue().disableProperty().bind(param.getValue().disable);
             tf.getValue().textProperty().bindBidirectional(param.getValue().description);
             return tf;
         });
 
-        databaseToOpen.setCellValueFactory(param -> {
+        databaseToOpen.setCellValueFactory(param ->
+        {
             ObservableValue<CheckBox> cb = new SimpleObjectProperty<CheckBox>(new CheckBox());
             cb.getValue().disableProperty().bind(param.getValue().disable);
             cb.getValue().selectedProperty().bindBidirectional(param.getValue().selected);
@@ -108,10 +122,14 @@ public class ServerServerController implements ServerController {
      * sur le server avec le nom d'utilisateur saisi
      */
     @FXML
-    public void loadDatabases(){
+    public void loadDatabases()
+    {
         if (mainController.getServersList().stream()
                 .filter(server1 -> server1.getHost().equals(host.getText()))
-                .peek(server12 -> {server = server12;})
+                .peek(server12 ->
+                {
+                    server = server12;
+                })
                 .count() == 0)
         {
             server = new Server(driver, host.getText(), null);
@@ -121,15 +139,19 @@ public class ServerServerController implements ServerController {
         LinkedList<Database> databases = server.getDatabases();
 
         // Look for the allready opened databases and add them with a checked checkbox
-        databases.forEach(database -> {
+        databases.forEach(database ->
+        {
             Item item = new Item(database);
             item.selected.set(true);
             item.disable.setValue(true);
-            item.onProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue) {
+            item.onProperty().addListener((observable, oldValue, newValue) ->
+            {
+                if (newValue)
+                {
                     server.addDatabase(item.database);
                     dbCount.set(dbCount.get() + 1);
-                } else {
+                } else
+                {
                     server.removeDatabase(item.database);
                     dbCount.set(dbCount.get() - 1);
                 }
@@ -138,40 +160,57 @@ public class ServerServerController implements ServerController {
             tableView.getItems().add(item);
         });
 
-        LinkedList<Database> allDatabases = server.getAllDatabases(username.getText(), password.getText());
+        LinkedList<Database> allDatabases = null;
+        try
+        {
+            allDatabases = server.getAllDatabases(username.getText(), password.getText());
 
-        //Add all the other database (the ones on the server that are not opened
-        allDatabases.stream()
-                .filter(database -> databases.stream().noneMatch(database1 -> database1.getDescritpion().equals(database.getDescritpion())))
-                .forEach(database -> {
-                    Item item = new Item(database);
-                    item.onProperty().addListener((observable, oldValue, newValue) -> {
-                        if (newValue) {
-                            server.addDatabase(item.database);
-                            dbCount.set(dbCount.get() + 1);
-                        } else {
-                            server.removeDatabase(item.database);
-                            dbCount.set(dbCount.get() - 1);
-                        }
 
+            //Add all the other database (the ones on the server that are not opened
+            allDatabases.stream()
+                    .filter(database -> databases.stream().noneMatch(database1 -> database1.getDescritpion().equals(database.getDescritpion())))
+                    .forEach(database ->
+                    {
+                        Item item = new Item(database);
+                        item.onProperty().addListener((observable, oldValue, newValue) ->
+                        {
+                            if (newValue)
+                            {
+                                server.addDatabase(item.database);
+                                dbCount.set(dbCount.get() + 1);
+                            } else
+                            {
+                                server.removeDatabase(item.database);
+                                dbCount.set(dbCount.get() - 1);
+                            }
+
+                        });
+                        tableView.getItems().add(item);
                     });
-                    tableView.getItems().add(item);
-                });
 
+
+        } catch (SQLException | ClassNotFoundException e)
+        {
+            MainController.getInstance().addToUserCommunication(e.getMessage());
+        }
     }
 
+
     @Override
-    public Server getServer() {
+    public Server getServer()
+    {
         return server;
     }
 
     @Override
-    public BooleanProperty getFieldValidation() {
+    public BooleanProperty getFieldValidation()
+    {
         return allOk;
     }
 
     @Override
-    public void setDriver(Driver driver) {
+    public void setDriver(Driver driver)
+    {
         this.driver = driver;
     }
 
@@ -181,32 +220,38 @@ public class ServerServerController implements ServerController {
         server.connectSelectedDatabases(password.getText());
     }
 
-    class Item{
+    class Item
+    {
         private Database database;
         private BooleanProperty selected;
         private StringProperty description;
         private BooleanProperty disable = new SimpleBooleanProperty(false);
 
-        Item(Database database){
+        Item(Database database)
+        {
             this.selected = new SimpleBooleanProperty(false);
             this.database = database;
             description = new SimpleStringProperty(database.getDescritpion());
 
-            description.addListener(observable -> {
+            description.addListener(observable ->
+            {
                 database.setDescription(description.toString());
             });
         }
 
-        public BooleanProperty onProperty(){
+        public BooleanProperty onProperty()
+        {
             return selected;
         }
 
-        public String toString (){
+        public String toString()
+        {
             return database.toString();
         }
     }
 
-    public boolean newServer(){
+    public boolean newServer()
+    {
         return newServer;
     }
 

@@ -45,7 +45,8 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
 
 
 
-    public DatabaseTreeItem(Database db) {
+    public DatabaseTreeItem(Database db) throws SQLException
+    {
         super(db);
         refreshTree();
     }
@@ -71,7 +72,8 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
     /**
      * Refresh the tree
      */
-    private void refreshTree(){
+    private void refreshTree() throws SQLException
+    {
         Database db = (Database)getValue();
 
         if (db.isConnected())
@@ -187,7 +189,13 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
                 {
                     e.printStackTrace();
                 }
-                refreshTree();
+                try
+                {
+                    refreshTree();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
 
             });
 
@@ -198,7 +206,13 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
         // Disconnect option
         disconnect.setOnAction(event ->
         {
-            disconnect();
+            try
+            {
+                disconnect();
+            } catch (SQLException e)
+            {
+                e.printStackTrace();
+            }
         });
         contextMenu.getItems().add(disconnect);
 
@@ -207,7 +221,13 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
         {
             ((Server) getParent().getValue()).removeDatabase((Database) getValue());
             getParent().getChildren().remove(this);
-            disconnect();
+            try
+            {
+                disconnect();
+            } catch (SQLException e)
+            {
+                e.printStackTrace();
+            }
         });
         contextMenu.getItems().add(remove);
     }
@@ -224,7 +244,8 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
     /**
      * Disconnect the database
      */
-    public void disconnect() {
+    public void disconnect() throws SQLException
+    {
         ((Database) getValue()).close();
         getChildren().clear();
     }

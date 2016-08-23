@@ -24,7 +24,8 @@ public class Server extends DbObject {
             this.description = descritpion;
     }
 
-    public LinkedList<Database> getAllDatabases(String username, String password) {
+    public LinkedList<Database> getAllDatabases(String username, String password) throws SQLException, ClassNotFoundException
+    {
         return driver.getDatabases(this, username, password);
     }
 
@@ -63,7 +64,8 @@ public class Server extends DbObject {
         return description;
     }
 
-    public void disconnect() {
+    public void disconnect() throws SQLException
+    {
         driver.close();
     }
 
@@ -76,7 +78,13 @@ public class Server extends DbObject {
 
     public void closeSelectedDatabases(){
        openedDatabase.stream().peek(database -> {
-           database.close();
+           try
+           {
+               database.close();
+           } catch (SQLException e)
+           {
+               e.printStackTrace();
+           }
        });
         openedDatabase.clear();
     }

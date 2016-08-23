@@ -68,15 +68,18 @@ public class Database extends DbObject implements DbParent {
         return description;
     }
 
-    public LinkedList<Table> getTables(){
+    public LinkedList<Table> getTables() throws SQLException
+    {
         return driver.getTables(this, null);
     }
 
-    public LinkedList<Table> getTables(Schema schema) { return driver.getTables(this, schema); }
+    public LinkedList<Table> getTables(Schema schema) throws SQLException
+    { return driver.getTables(this, schema); }
 
     public View[] getView() { return driver.getViews();}
 
-    public LinkedList<Schema> getSchemas(){
+    public LinkedList<Schema> getSchemas() throws SQLException
+    {
         return driver.getSchemas(this);
     }
 
@@ -88,7 +91,8 @@ public class Database extends DbObject implements DbParent {
         return driver.hasSchema();
     }
 
-    public void close(){
+    public void close() throws SQLException
+    {
         if (connected) {
             driver.close();
             connected = false;
@@ -135,12 +139,13 @@ public class Database extends DbObject implements DbParent {
         return driver.executeQuery(query);
     }
 
-    public ResultSet getAllData(Schema schema, Table table){
+    public ResultSet getAllData(Schema schema, Table table) throws SQLException
+    {
         return driver.getAllData(this, schema, table);
     }
 
     @Override
-    public ResultSet getAllData(Table table)
+    public ResultSet getAllData(Table table) throws SQLException
     {
         return driver.getAllData(this, null, table);
     }

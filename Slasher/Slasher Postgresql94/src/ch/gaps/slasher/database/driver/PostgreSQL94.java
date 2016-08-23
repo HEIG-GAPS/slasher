@@ -75,8 +75,9 @@ public class PostgreSQL94 implements Driver
         {
             ResultSet resultSet = connection.createStatement().executeQuery("SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = \'" + schema + "\'");
 
-            while (resultSet.next()){
-                tables.add( new Table(resultSet.getString(1), schema) );
+            while (resultSet.next())
+            {
+                tables.add(new Table(resultSet.getString(1), schema));
             }
         } catch (SQLException e)
         {
@@ -87,64 +88,51 @@ public class PostgreSQL94 implements Driver
     }
 
     @Override
-    public LinkedList<Schema> getSchemas(Database database)
+    public LinkedList<Schema> getSchemas(Database database) throws SQLException
     {
         LinkedList<Schema> schemas = new LinkedList<>();
-        try
-        {
-            ResultSet resultSet = connection.createStatement().executeQuery("select nspname " +
-                    "from pg_catalog.pg_namespace");
+
+        ResultSet resultSet = connection.createStatement().executeQuery("select nspname " +
+                "from pg_catalog.pg_namespace");
 
 
-            while (resultSet.next()){
-                schemas.add( new Schema(resultSet.getString(1), database));
-            }
-        } catch (SQLException e)
+        while (resultSet.next())
         {
-            e.printStackTrace();
+            schemas.add(new Schema(resultSet.getString(1), database));
         }
+
         return schemas;
     }
 
     @Override
-    public void close()
+    public void close() throws SQLException
     {
         if (connected)
         {
-            try
-            {
-                connection.close();
-            } catch (SQLException e)
-            {
-                e.printStackTrace();
-            }
+            connection.close();
         }
 
     }
 
     @Override
-    public LinkedList<Database> getDatabases(Server server, String username, String password)
+    public LinkedList<Database> getDatabases(Server server, String username, String password) throws SQLException, ClassNotFoundException
     {
         LinkedList<Database> databases = new LinkedList<>();
 
-        try
+
+        Class.forName("org.postgresql.Driver");
+        connection = DriverManager
+                .getConnection("jdbc:postgresql://" + server + ":5432/",
+                        username, password);
+
+        ResultSet rs = connection.createStatement().executeQuery("SELECT datname FROM pg_database WHERE datistemplate = false");
+
+
+        while (rs.next())
         {
-            Class.forName("org.postgresql.Driver");
-            connection = DriverManager
-                    .getConnection("jdbc:postgresql://" + server + ":5432/",
-                            username, password);
-
-            ResultSet rs = connection.createStatement().executeQuery("SELECT datname FROM pg_database WHERE datistemplate = false");
-
-
-            while (rs.next())
-            {
-                databases.add(new Database(new PostgreSQL94(), rs.getString("datname"), null, server, username));
-            }
-        } catch (SQLException | ClassNotFoundException e)
-        {
-            e.printStackTrace();
+            databases.add(new Database(new PostgreSQL94(), rs.getString("datname"), null, server, username));
         }
+
 
         return databases;
 
@@ -175,7 +163,8 @@ public class PostgreSQL94 implements Driver
     }
 
     @Override
-    public ResultSet getAllData(Database database, Schema schema, Table table){
+    public ResultSet getAllData(Database database, Schema schema, Table table)
+    {
 
         try
         {

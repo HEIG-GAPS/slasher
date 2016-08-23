@@ -127,11 +127,17 @@ public class ConnectServerController {
     }
 
     @FXML
-    private void validate() throws SQLException, ClassNotFoundException {
+    private void validate(){
         server = serverController.getServer();
         if (!serverDescription.getText().isEmpty())
             server.setDescription(serverDescription.getText());
-        serverController.connect();
+        try
+        {
+            serverController.connect();
+        } catch (SQLException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        }
 
         if (serverController.newServer()){
             mainController.addServer(server);
@@ -147,5 +153,4 @@ public class ConnectServerController {
         this.mainController = mainController;
     }
 
-    public boolean oldServer(){return oldServer;}
 }

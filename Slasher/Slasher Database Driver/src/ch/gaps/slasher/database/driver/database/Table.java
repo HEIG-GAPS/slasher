@@ -25,6 +25,7 @@ package ch.gaps.slasher.database.driver.database;
 
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Table extends DbComponent {
 
@@ -36,9 +37,9 @@ public class Table extends DbComponent {
         return name;
     }
 
-    public ResultSet getAllData(){
+    public ResultSet getAllData() throws SQLException
+    {
         return dbParent.getAllData(this);
     }
-
 
 }

@@ -12,6 +12,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.LinkedList;
 
 /**
@@ -44,13 +45,21 @@ public class ServerTreeItem extends DbObjectTreeItem {
 
         databases.stream().filter(database -> getChildren().stream().noneMatch(dbObjectTreeItem -> ((Database)dbObjectTreeItem.getValue()).getDescritpion().equals(database.getDescritpion()))
         ).forEach(database -> {
-            DbObjectTreeItem databaseItem = new DatabaseTreeItem(database);
+            DbObjectTreeItem databaseItem = null;
+            try
+            {
+                databaseItem = new DatabaseTreeItem(database);
+            } catch (SQLException e)
+            {
+                e.printStackTrace();
+            }
             getChildren().add(databaseItem);
         });
     }
 
 
-    public void disconnect(){
+    public void disconnect() throws SQLException
+    {
         this.getParent().getChildren().remove(this);
         ((Server)getValue()).disconnect();
     }
@@ -72,7 +81,13 @@ public class ServerTreeItem extends DbObjectTreeItem {
         ContextMenu contextMenu = new ContextMenu();
         MenuItem closeServer = new MenuItem("Disconnect");
         closeServer.setOnAction(event -> {
-            MainController.getInstance().disconnectServer(this);
+            try
+            {
+                MainController.getInstance().disconnectServer(this);
+            } catch (SQLException e)
+            {
+                e.printStackTrace();
+            }
         });
         contextMenu.getItems().add(closeServer);
 

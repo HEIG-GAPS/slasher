@@ -26,6 +26,7 @@ package ch.gaps.slasher.models.treeItem;
 import ch.gaps.slasher.Slasher;
 import ch.gaps.slasher.database.driver.database.Table;
 import ch.gaps.slasher.views.dataTableView.DataTableController;
+import ch.gaps.slasher.views.main.MainController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -33,6 +34,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 
 public class TableTreeItem extends DbComponentTreeItem {
@@ -92,14 +94,26 @@ public class TableTreeItem extends DbComponentTreeItem {
             tableController = loader.getController();
             final DataTableController dataTableController = tableController;
             refresh.setOnAction(event -> {
-                dataTableController.display(((Table)getValue()).getAllData());
+                try
+                {
+                    dataTableController.display(((Table)getValue()).getAllData());
+                } catch (SQLException e)
+                {
+                    MainController.getInstance().addToUserCommunication(e.getMessage());
+                }
             });
         } catch (IOException e)
         {
             e.printStackTrace();
         }
 
-        tableController.display(((Table)getValue()).getAllData());
+        try
+        {
+            tableController.display(((Table)getValue()).getAllData());
+        } catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
         data.setContent(anchorPane);
         structureTab.getTabs().add(data);
     }

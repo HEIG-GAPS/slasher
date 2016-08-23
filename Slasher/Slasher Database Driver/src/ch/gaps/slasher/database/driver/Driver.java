@@ -53,13 +53,13 @@ public interface Driver {
 
   public boolean hasSchema();
 
-  public LinkedList<Table> getTables(Database database, Schema schema);
+  public LinkedList<Table> getTables(Database database, Schema schema) throws SQLException;
 
-  public LinkedList<Schema> getSchemas(Database database);
+  public LinkedList<Schema> getSchemas(Database database) throws SQLException;
 
-  public void close();
+  public void close() throws SQLException;
 
-  public LinkedList<Database> getDatabases(Server server, String username, String password);
+  public LinkedList<Database> getDatabases(Server server, String username, String password) throws SQLException, ClassNotFoundException;
 
   public enum ServerType{Server, File};
 
@@ -71,6 +71,6 @@ public interface Driver {
 
   public Trigger[] getTriggers();
 
-  public ResultSet getAllData(Database database, Schema schema, Table table);
+  public ResultSet getAllData(Database database, Schema schema, Table table) throws SQLException;
   
 }
