@@ -23,6 +23,7 @@
  */
 package ch.gaps.slasher.models.treeItem;
 
+import ch.gaps.slasher.Slasher;
 import ch.gaps.slasher.database.driver.database.Table;
 import ch.gaps.slasher.views.dataTableView.DataTableController;
 import javafx.fxml.FXMLLoader;
@@ -63,15 +64,15 @@ public class TableTreeItem extends DbComponentTreeItem {
     public void loadStructureTab() {
         structureTab = new TabPane();
 
-        Tab data = new Tab("Data");
+        Tab data = new Tab(Slasher.getBundle().getString("u.data"));
         DataTableController tableController = null;
 
 
-        FXMLLoader loader = new FXMLLoader(DataTableController.class.getResource("DataTableView.fxml"));
+        FXMLLoader loader = new FXMLLoader(DataTableController.class.getResource("DataTableView.fxml"), Slasher.getBundle());
         Pane pane = null;
         AnchorPane anchorPane = new AnchorPane();
 
-        Button refresh = new Button("Refresh");
+        Button refresh = new Button(Slasher.getBundle().getString("u.refresh"));
 
         AnchorPane.setLeftAnchor(refresh, 10.);
         AnchorPane.setTopAnchor(refresh, 5.);

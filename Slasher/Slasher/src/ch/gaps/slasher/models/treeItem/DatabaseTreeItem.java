@@ -23,6 +23,7 @@
  */
 package ch.gaps.slasher.models.treeItem;
 
+import ch.gaps.slasher.Slasher;
 import ch.gaps.slasher.database.driver.Driver;
 import ch.gaps.slasher.database.driver.database.*;
 import ch.gaps.slasher.views.main.MainController;
@@ -42,16 +43,10 @@ import java.util.Optional;
 
 public class DatabaseTreeItem extends DbObjectTreeItem {
 
-    private MenuItem editor = new MenuItem("New Editor");
-    private MenuItem connect = new MenuItem("Connect");
-    private MenuItem disconnect = new MenuItem("Disconnect");
-    private MenuItem remove= new MenuItem("Remove");
+
 
     public DatabaseTreeItem(Database db) {
         super(db);
-        connect.disableProperty().bind(db.disabledProperty());
-        disconnect.disableProperty().bind(db.disabledProperty().not());
-
         refreshTree();
     }
 
@@ -130,6 +125,17 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
      */
     @Override
     public void buildContextMenu(){
+        contextMenu.getItems().clear();
+
+        MenuItem editor = new MenuItem(Slasher.getBundle().getString("new.sql.editor"));
+        MenuItem connect = new MenuItem(Slasher.getBundle().getString("connect"));
+        MenuItem disconnect = new MenuItem(Slasher.getBundle().getString("disconnect"));
+        MenuItem remove= new MenuItem(Slasher.getBundle().getString("remove"));
+
+        Database db = (Database)getValue();
+
+        connect.disableProperty().bind(db.disabledProperty());
+        disconnect.disableProperty().bind(db.disabledProperty().not());
 
         editor.setOnAction(event -> {
 
@@ -143,10 +149,10 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
         {
             // Create the custom dialog.
             Dialog<String> dialog = new Dialog<>();
-            dialog.setTitle("Database Login");
+            dialog.setTitle(Slasher.getBundle().getString("database.login"));
 
             // Set the button types.
-            ButtonType loginButtonType = new ButtonType("Login", ButtonBar.ButtonData.OK_DONE);
+            ButtonType loginButtonType = new ButtonType(Slasher.getBundle().getString("login"), ButtonBar.ButtonData.OK_DONE);
             dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
 
             // Create the username and password labels and fields.
@@ -156,9 +162,9 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
             grid.setPadding(new Insets(20, 150, 10, 10));
 
             PasswordField password = new PasswordField();
-            password.setPromptText("Password");
+            password.setPromptText(Slasher.getBundle().getString("password"));
 
-            grid.add(new Label("Password:"), 0, 1);
+            grid.add(new Label(Slasher.getBundle().getString("password").concat(":")), 0, 1);
             grid.add(password, 1, 1);
 
             // Enable/Disable login button depending on whether a username was entered.

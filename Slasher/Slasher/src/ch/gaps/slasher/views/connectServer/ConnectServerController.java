@@ -24,19 +24,23 @@
 package ch.gaps.slasher.views.connectServer;
 
 import ch.gaps.slasher.DriverService;
+import ch.gaps.slasher.Slasher;
 import ch.gaps.slasher.database.driver.Driver;
+import ch.gaps.slasher.database.driver.database.Server;
+import ch.gaps.slasher.views.main.MainController;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
-import ch.gaps.slasher.database.driver.database.Server;
-import ch.gaps.slasher.views.main.MainController;
-import javafx.beans.property.*;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 
 /**
  *
@@ -78,8 +82,8 @@ public class ConnectServerController {
             driverOk.set(true);
             if (newValue.type() == Driver.ServerType.Server){
                 try {
-                    displayLabel.setText("(If leave blank the description will be the host name)");
-                    FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("ServerServer.fxml"));
+                    displayLabel.setText(Slasher.getBundle().getString("leave.blank.host"));
+                    FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("ServerServer.fxml"), Slasher.getBundle());
                     connectionPane = loader.load();
                     AnchorPane.setTopAnchor(connectionPane, 75.0);
                     AnchorPane.setLeftAnchor(connectionPane, 10.0);
@@ -96,8 +100,8 @@ public class ConnectServerController {
 
             else if (newValue.type() == Driver.ServerType.File){
                 try {
-                    displayLabel.setText("(If leave blank the description will be the file name)");
-                    FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("FileServer.fxml"));
+                    displayLabel.setText(Slasher.getBundle().getString("leave.blank.file"));
+                    FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("FileServer.fxml"), Slasher.getBundle());
                     connectionPane = loader.load();
                     AnchorPane.setTopAnchor(connectionPane, 75.0);
                     AnchorPane.setLeftAnchor(connectionPane, 0.0);

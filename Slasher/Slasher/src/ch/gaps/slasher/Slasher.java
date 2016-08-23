@@ -9,11 +9,15 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.util.LinkedList;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  *
  * @author jvarani
  */
 public class Slasher extends Application{
+    private static ResourceBundle bundle = ResourceBundle.getBundle("ch.gaps.slasher.bundle.Bundle", new Locale("en", "EN"));
     private Slasher instance;
     private LinkedList<Driver> drivers;
     private LinkedList<Tool> tools;
@@ -55,8 +59,9 @@ public class Slasher extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        ResourceBundle bundle = ResourceBundle.getBundle("ch.gaps.slasher.bundle.Bundle", new Locale("en", "EN"));
         primaryStage.setTitle("Slasher");
-        FXMLLoader loader = new FXMLLoader(Slasher.class.getResource("views/main/MainView.fxml"));
+        FXMLLoader loader = new FXMLLoader(Slasher.class.getResource("views/main/MainView.fxml"), bundle);
         primaryStage.setScene(new Scene(loader.load()));
         primaryStage.show();
     }
@@ -65,5 +70,7 @@ public class Slasher extends Application{
     public void stop(){
         MainController.getInstance().saveState();
     }
+
+    public static ResourceBundle getBundle() { return bundle;}
 
 }

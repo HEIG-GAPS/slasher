@@ -23,6 +23,7 @@
  */
 package ch.gaps.slasher.views.editor;
 
+import ch.gaps.slasher.Slasher;
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.views.dataTableView.DataTableController;
 import ch.gaps.slasher.views.main.MainController;
@@ -64,7 +65,7 @@ public class EditorController {
     private void initialize(){
         progress.setVisible(false);
 
-        FXMLLoader loader = new FXMLLoader(DataTableController.class.getResource("DataTableView.fxml"));
+        FXMLLoader loader = new FXMLLoader(DataTableController.class.getResource("DataTableView.fxml"), Slasher.getBundle());
         try
         {
             Pane pane = loader.load();

@@ -24,6 +24,7 @@
 package ch.gaps.slasher.views.main;
 
 import ch.gaps.slasher.DriverService;
+import ch.gaps.slasher.Slasher;
 import ch.gaps.slasher.database.driver.Driver;
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.database.driver.database.DbObject;
@@ -49,6 +50,8 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.util.LinkedList;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  *
@@ -57,6 +60,8 @@ import java.util.LinkedList;
 public class MainController {
 
     private static MainController instance;
+    private static ResourceBundle bundle = ResourceBundle.getBundle("ch.gaps.slasher.bundle.Bundle", new Locale("en", "EN"));
+
 
 
     @FXML private MenuBar menu;
@@ -177,7 +182,7 @@ public class MainController {
      */
     private Tab loadEditorTab(Database database, String content) throws IOException
     {
-        FXMLLoader loader = new FXMLLoader(EditorController.class.getResource("EditorView.fxml"));
+        FXMLLoader loader = new FXMLLoader(EditorController.class.getResource("EditorView.fxml"), Slasher.getBundle());
         Node node = loader.load();
         EditorController editorController = loader.getController();
 
@@ -206,7 +211,7 @@ public class MainController {
     @FXML
     private void connectDB() throws IOException{
         Stage stage = new Stage();
-        FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("ConnectServerView.fxml"));
+        FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("ConnectServerView.fxml"), bundle);
         stage.setTitle("Open a database");
         Pane pane = loader.load();
         ConnectServerController connectServerController = loader.getController();
@@ -420,4 +425,5 @@ public class MainController {
 
     }
 
+    public static ResourceBundle getBundle(){return bundle;}
 }

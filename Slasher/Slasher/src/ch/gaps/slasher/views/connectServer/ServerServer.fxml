@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane prefHeight="372.0" prefWidth="603.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.gaps.slasher.views.connectServer.ServerServerController">
+<AnchorPane prefHeight="372.0" prefWidth="603.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.gaps.slasher.views.connectServer.ServerServerController">
    <children>
       <GridPane prefHeight="123.0" prefWidth="392.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="10.0">
          <columnConstraints>
@@ -24,19 +24,19 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <Label text="Host:" />
+            <Label text="%host" />
             <TextField fx:id="host" GridPane.columnIndex="1" />
-            <Label text="Username:" GridPane.rowIndex="1" />
-            <Label text="Password:" GridPane.rowIndex="2" />
+            <Label text="%username" GridPane.rowIndex="1" />
+            <Label text="%password" GridPane.rowIndex="2" />
             <TextField fx:id="username" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <PasswordField fx:id="password" GridPane.columnIndex="1" GridPane.rowIndex="2" />
          </children>
       </GridPane>
-      <Button fx:id="connect" layoutX="293.0" layoutY="133.0" mnemonicParsing="false" onAction="#loadDatabases" text="Load databases" AnchorPane.leftAnchor="293.0" AnchorPane.topAnchor="133.0" />
+      <Button fx:id="connect" layoutX="293.0" layoutY="133.0" mnemonicParsing="false" onAction="#loadDatabases" text="%load.databases" AnchorPane.leftAnchor="293.0" AnchorPane.topAnchor="133.0" />
       <TableView fx:id="tableView" layoutX="426.0" layoutY="86.0" prefHeight="200.0" prefWidth="200.0" stylesheets="@tableView.css" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="403.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
         <columns>
           <TableColumn fx:id="databaseToOpen" editable="false" prefWidth="23.0" sortable="false" />
-          <TableColumn fx:id="databaseDescription" prefWidth="176.0" sortable="false" text="Database description (name - username)" />
+          <TableColumn fx:id="databaseDescription" prefWidth="176.0" sortable="false" text="%database.description" />
         </columns>
       </TableView>
    </children>
