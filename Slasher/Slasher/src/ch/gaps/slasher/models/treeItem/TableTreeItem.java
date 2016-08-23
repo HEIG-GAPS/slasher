@@ -24,11 +24,14 @@
 package ch.gaps.slasher.models.treeItem;
 
 import ch.gaps.slasher.database.driver.database.Table;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tab;
+import ch.gaps.slasher.views.dataTableView.DataTableController;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 
-import java.util.LinkedList;
+import java.io.IOException;
 
 
 public class TableTreeItem extends DbComponentTreeItem {
@@ -41,32 +44,64 @@ public class TableTreeItem extends DbComponentTreeItem {
     }
 
     @Override
-    public void addTab(Tab tab){
-        databaseTreeItem.addTab(tab);
-    }
-
-    @Override
-    public void removeTab(Tab tab){
-        databaseTreeItem.removeTab(tab);
-    }
-
-    @Override
-    public LinkedList<Tab> getTabs(){
-        return databaseTreeItem.getTabs();
-    }
-
-    @Override
     public TreeItemType getType()
     {
         return TreeItemType.TABLE;
     }
 
-
     @Override
-    public ContextMenu getContextMenu(){
-        ContextMenu contextMenu = new ContextMenu();
-        contextMenu.getItems().add(new MenuItem("Test Table"));
+    public Node getStructureTab()
+    {
+        if (structureTab == null){
+            loadStructureTab();
+        }
 
-        return contextMenu;
+        return structureTab;
     }
+
+
+    public void loadStructureTab() {
+        structureTab = new TabPane();
+
+        Tab data = new Tab("Data");
+        DataTableController tableController = null;
+
+
+        FXMLLoader loader = new FXMLLoader(DataTableController.class.getResource("DataTableView.fxml"));
+        Pane pane = null;
+        AnchorPane anchorPane = new AnchorPane();
+
+        Button refresh = new Button("Refresh");
+
+        AnchorPane.setLeftAnchor(refresh, 10.);
+        AnchorPane.setTopAnchor(refresh, 5.);
+
+        anchorPane.getChildren().add(refresh);
+
+        try
+        {
+            pane = loader.load();
+
+            AnchorPane.setTopAnchor(pane, 25.);
+            AnchorPane.setLeftAnchor(pane, 0.);
+            AnchorPane.setRightAnchor(pane, 0.);
+            AnchorPane.setBottomAnchor(pane, 0.);
+            anchorPane.getChildren().add(pane);
+
+            tableController = loader.getController();
+            final DataTableController dataTableController = tableController;
+            refresh.setOnAction(event -> {
+                dataTableController.display(((Table)getValue()).getAllData());
+            });
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        tableController.display(((Table)getValue()).getAllData());
+        data.setContent(anchorPane);
+        structureTab.getTabs().add(data);
+    }
+
+
 }

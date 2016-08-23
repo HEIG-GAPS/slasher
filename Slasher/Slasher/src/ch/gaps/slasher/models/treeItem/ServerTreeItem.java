@@ -9,6 +9,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -35,10 +36,10 @@ public class ServerTreeItem extends DbObjectTreeItem {
             e.printStackTrace();
         }
 
-        refresh();
+        addAllServerDb();
     }
 
-    public void refresh(){
+    public void addAllServerDb(){
         LinkedList<Database> databases = ((Server)getValue()).getDatabases();
 
         databases.stream().filter(database -> getChildren().stream().noneMatch(dbObjectTreeItem -> ((Database)dbObjectTreeItem.getValue()).getDescritpion().equals(database.getDescritpion()))
@@ -55,28 +56,15 @@ public class ServerTreeItem extends DbObjectTreeItem {
     }
 
     @Override
-    public void addTab(Tab tab)
-    {
-
-    }
-
-    @Override
-    public void removeTab(Tab tab)
-    {
-
-    }
-
-    @Override
-    public LinkedList<Tab> getTabs() {
-        LinkedList<Tab> tabs = new LinkedList<>();
-        tabs.add(structureTab);
-        return tabs;
-    }
-
-    @Override
     public TreeItemType getType()
     {
         return TreeItemType.SERVER;
+    }
+
+    @Override
+    public Pane getStructureTab()
+    {
+        return null;
     }
 
     @Override
@@ -89,5 +77,11 @@ public class ServerTreeItem extends DbObjectTreeItem {
         contextMenu.getItems().add(closeServer);
 
         return contextMenu;
+    }
+
+    @Override
+    public void buildContextMenu()
+    {
+
     }
 }

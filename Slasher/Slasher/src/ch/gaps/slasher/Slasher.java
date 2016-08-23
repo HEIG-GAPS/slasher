@@ -63,7 +63,7 @@ public class Slasher extends Application{
     
     @Override
     public void stop(){
-        MainController.getInstance().writeToJson();
+        MainController.getInstance().saveState();
     }
 
 }

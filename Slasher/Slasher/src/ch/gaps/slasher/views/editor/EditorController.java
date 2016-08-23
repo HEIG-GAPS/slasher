@@ -25,6 +25,7 @@ package ch.gaps.slasher.views.editor;
 
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.views.dataTableView.DataTableController;
+import ch.gaps.slasher.views.main.MainController;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -81,10 +82,10 @@ public class EditorController {
 
     }
 
-
-
     @FXML
     private void execute(){
+
+        MainController.getInstance().saveState();
 
         Task<Void> task = new Task<Void>()
         {
@@ -137,5 +138,9 @@ public class EditorController {
 
     public String getContent(){
         return request.getText();
+    }
+
+    public void setContent(String content){
+        request.setText(content);
     }
 }

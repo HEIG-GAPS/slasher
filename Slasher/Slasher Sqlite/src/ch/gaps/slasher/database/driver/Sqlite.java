@@ -5,10 +5,7 @@
  */
 package ch.gaps.slasher.database.driver;
 
-import ch.gaps.slasher.database.driver.database.Database;
-import ch.gaps.slasher.database.driver.database.Schema;
-import ch.gaps.slasher.database.driver.database.Server;
-import ch.gaps.slasher.database.driver.database.Table;
+import ch.gaps.slasher.database.driver.database.*;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -79,7 +76,8 @@ public class Sqlite implements Driver {
 
   }
 
-  public Table[] getTables(String name){
+  @Override
+  public LinkedList<Table> getTables(Database database, Schema schema){
     LinkedList<Table> tables = new LinkedList<>();
     try {
       Statement statement = connection.createStatement();
@@ -87,18 +85,18 @@ public class Sqlite implements Driver {
 
       while(rs.next())
       {
-        tables.add(new Table(rs.getString("name")));
+        tables.add(new Table(rs.getString("name"), database));
       }
 
     } catch (SQLException e) {
       e.printStackTrace();
     }
 
-    return tables.toArray(new Table[tables.size()]);
+    return tables;
   }
 
   @Override
-  public Schema[] getSchemas(Database database) {
+  public LinkedList<Schema> getSchemas(Database database) {
     return null;
   }
 
@@ -113,7 +111,7 @@ public class Sqlite implements Driver {
   }
 
   @Override
-  public ResultSet executeQuarry(String quarry)
+  public ResultSet executeQuery(String query)
   {
     return null;
   }
@@ -122,6 +120,24 @@ public class Sqlite implements Driver {
   public Boolean isConnected()
   {
     return true;
+  }
+
+  @Override
+  public View[] getViews()
+  {
+    return new View[0];
+  }
+
+  @Override
+  public Trigger[] getTriggers()
+  {
+    return new Trigger[0];
+  }
+
+  @Override
+  public ResultSet getAllData(Database database, Schema schema, Table table)
+  {
+    return null;
   }
 
 

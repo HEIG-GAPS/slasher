@@ -66,7 +66,7 @@ public class ServerServerController implements ServerController {
     @FXML
     public void initialize(){
         mainController = MainController.getInstance();
-        filedOk.bind(hostOk.and(usernameOk).and(passwordOk));
+        filedOk.bind(hostOk.and(usernameOk));
         allOk.bind(dbCount.isNotEqualTo(0));
 
         host.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -83,12 +83,6 @@ public class ServerServerController implements ServerController {
                 usernameOk.set(true);
         });
 
-        password.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null || newValue.isEmpty())
-                passwordOk.set(false);
-            else
-                passwordOk.set(true);
-        });
 
         connect.disableProperty().bind(filedOk.not());
 

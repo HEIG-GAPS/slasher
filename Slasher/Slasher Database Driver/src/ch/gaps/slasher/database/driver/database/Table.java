@@ -24,15 +24,21 @@
 package ch.gaps.slasher.database.driver.database;
 
 
-public class Table extends DbComponent {
-    private String name;
+import java.sql.ResultSet;
 
-    public Table(String name){
-        this.name = name;
+public class Table extends DbComponent {
+
+    public Table(String name, DbParent dbParent){
+        super(name, dbParent);
     }
 
     public String toString(){
         return name;
     }
+
+    public ResultSet getAllData(){
+        return dbParent.getAllData(this);
+    }
+
 
 }

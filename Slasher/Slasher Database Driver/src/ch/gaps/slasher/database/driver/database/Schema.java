@@ -23,22 +23,39 @@
  */
 package ch.gaps.slasher.database.driver.database;
 
-public class Schema extends DbComponent {
-    private Database database;
-    private String name;
+import java.sql.ResultSet;
+import java.util.LinkedList;
 
-    public Schema(Database database, String name){
-        this.database = database;
+public class Schema extends DbObject implements DbParent {
+
+    Database database;
+    String name;
+
+    public Schema(String name, Database database){
         this.name = name;
+        this.database = database;
     }
 
-    public Table[] getTables(){
-        return null;
+    public LinkedList<Table> getTables(){
+        return database.getTables(this);
     }
+
+    public View[] getViews() { return null;}
+
+    public Trigger[] getTriggers() { return null;}
 
     public String toString()
     {
         return name;
     }
 
+    public Database getDatabase(){
+        return database;
+    }
+
+    @Override
+    public ResultSet getAllData(Table table)
+    {
+        return database.getAllData(this, table);
+    }
 }

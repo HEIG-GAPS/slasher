@@ -24,36 +24,53 @@
 package ch.gaps.slasher.models.treeItem;
 
 import ch.gaps.slasher.database.driver.Driver;
-import ch.gaps.slasher.database.driver.database.Database;
-import ch.gaps.slasher.database.driver.database.Schema;
-import ch.gaps.slasher.database.driver.database.Server;
-import ch.gaps.slasher.database.driver.database.Table;
+import ch.gaps.slasher.database.driver.database.*;
 import ch.gaps.slasher.views.main.MainController;
+import ch.gaps.slasher.views.structure.StructureTabController;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Optional;
 
 public class DatabaseTreeItem extends DbObjectTreeItem {
 
-    private ContextMenu contextMenu = new ContextMenu();
+    private MenuItem editor = new MenuItem("New Editor");
     private MenuItem connect = new MenuItem("Connect");
     private MenuItem disconnect = new MenuItem("Disconnect");
     private MenuItem remove= new MenuItem("Remove");
-
-    private LinkedList<Tab> tabs;
-
 
     public DatabaseTreeItem(Database db) {
         super(db);
         connect.disableProperty().bind(db.disabledProperty());
         disconnect.disableProperty().bind(db.disabledProperty().not());
-        tabs = new LinkedList<>();
+
         refreshTree();
+    }
+
+
+    public Pane getStructureTab(){
+        AnchorPane pane = null;
+
+        FXMLLoader loader = new FXMLLoader(StructureTabController.class.getResource("StructureTabView.fxml"));
+        try
+        {
+            pane = new AnchorPane();
+            pane = loader.load();
+
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        return pane;
     }
 
     /**
@@ -66,23 +83,35 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
         {
             if (db.hasSchemas())
             {
-                Schema[] schemas = db.getSchemas();
+                LinkedList<Schema> schemas = db.getSchemas();
 
                 for (Schema schema : schemas)
                 {
                     DbObjectTreeItem schemaItem = new SchemaTreeItem(schema, this);
-                    Table[] tables = schema.getTables();
+                    LinkedList<Table> tables = schema.getTables();
 
                     for (Table table : tables)
                     {
                         schemaItem.getChildren().add(new TableTreeItem(table, this));
-
                     }
+
+//                    View[] views = schema.getViews();
+//
+//                    for (View view: views){
+//                        schemaItem.getChildren().add(new ViewTreeItem(view, this));
+//                    }
+//
+//                    Trigger[] triggers = schema.getTriggers();
+//
+//                    for (Trigger trigger: triggers){
+//                        schemaItem.getChildren().add(new TriggerTreeItem(trigger, this));
+//                    }
+
                     getChildren().add(schemaItem);
                 }
             } else
             {
-                Table[] tables = db.getTables();
+                LinkedList<Table> tables = db.getTables();
                 for (Table table : tables)
                 {
                     this.getChildren().add(new TableTreeItem(table, this));
@@ -92,22 +121,29 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
 
         //menu
         if (((Database) getValue()).type() == Driver.ServerType.Server) {
-            buildMenu();
+            buildContextMenu();
         }
     }
 
     /**
      * Built the ContextMenu
      */
-    private void buildMenu(){
+    @Override
+    public void buildContextMenu(){
+
+        editor.setOnAction(event -> {
+
+            MainController.getInstance().newEditorTab();
+
+        });
+
+        contextMenu.getItems().add(editor);
+
         connect.setOnAction(event ->
         {
             // Create the custom dialog.
             Dialog<String> dialog = new Dialog<>();
             dialog.setTitle("Database Login");
-
-            // Set the icon (must be included in the project).
-//             dialog.setGraphic(new ImageView(this.getClass().getResource("login.png").toString()));
 
             // Set the button types.
             ButtonType loginButtonType = new ButtonType("Login", ButtonBar.ButtonData.OK_DONE);
@@ -127,14 +163,10 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
 
             // Enable/Disable login button depending on whether a username was entered.
             Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
-            loginButton.setDisable(true);
 
-            loginButton.disableProperty().bind(password.textProperty().isEmpty());
 
             dialog.getDialogPane().setContent(grid);
 
-
-            // Convert the result to a username-password-pair when the login button is clicked.
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == loginButtonType) {
                     return password.getText();
@@ -189,21 +221,6 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
     @Override
     public ContextMenu getContextMenu(){
         return contextMenu;
-    }
-
-    @Override
-    public void addTab(Tab tab){
-        tabs.add(tab);
-    }
-
-    @Override
-    public void removeTab(Tab tab){
-        tabs.remove(tab);
-    }
-
-    @Override
-    public LinkedList<Tab> getTabs(){
-        return tabs;
     }
 
     @Override

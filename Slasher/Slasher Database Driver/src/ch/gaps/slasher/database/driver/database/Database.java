@@ -29,50 +29,59 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedList;
 
-public class Database extends DbObject {
+public class Database extends DbObject implements DbParent {
 
-    private Driver driver;
-    private Server server;
-    private String name;
-    private String username;
-    private String description;
-    private boolean connected = false;
+        private Driver driver;
+        private Server server;
+        private String name;
+        private String username;
+        private String description;
+        private boolean connected = false;
 
-    private BooleanProperty connectedProperty = new SimpleBooleanProperty();
+        private BooleanProperty connectedProperty = new SimpleBooleanProperty();
 
 
     public Database(Driver driver, String name, Server server, String username){
-        this.driver = driver;
-        this.name = name;
-        this.server = server;
-        this.username = username;
-        description = username + "@" + name;
-        connectedProperty.setValue(false);
-    }
+            this.driver = driver;
+            this.name = name;
+            this.server = server;
+            this.username = username;
+            description = username + "@" + name;
+            connectedProperty.setValue(false);
+        }
 
     public Database(Driver driver, String name, String description, Server server, String username){
-        this.driver = driver;
-        this.name = name;
-        this.server = server;
-        this.username = username;
-        if (description == null){
-            description = username + "@" + name;
+            this.driver = driver;
+            this.name = name;
+            this.server = server;
+            this.username = username;
+            if (description == null){
+                description = username + "@" + name;
+            }
+            this.description = description;
+            connectedProperty.setValue(false);
         }
-        this.description = description;
-        connectedProperty.setValue(false);
-    }
 
     public String toString(){
         return description;
     }
 
-    public Table[] getTables(){
-        return driver.getTables(name);
+    public LinkedList<Table> getTables(){
+        return driver.getTables(this, null);
     }
 
-    public Schema[] getSchemas(){
-       return driver.getSchemas(this);
+    public LinkedList<Table> getTables(Schema schema) { return driver.getTables(this, schema); }
+
+    public View[] getView() { return driver.getViews();}
+
+    public LinkedList<Schema> getSchemas(){
+        return driver.getSchemas(this);
+    }
+
+    public View[] getViews(){
+        return driver.getViews();
     }
 
     public boolean hasSchemas(){
@@ -122,10 +131,17 @@ public class Database extends DbObject {
 
     public BooleanProperty disabledProperty() { return connectedProperty; }
 
-    public ResultSet executeQuarry(String quarry) throws SQLException{
-        return driver.executeQuarry(quarry);
+    public ResultSet executeQuarry(String query) throws SQLException{
+        return driver.executeQuery(query);
     }
 
+    public ResultSet getAllData(Schema schema, Table table){
+        return driver.getAllData(this, schema, table);
+    }
 
-
+    @Override
+    public ResultSet getAllData(Table table)
+    {
+        return driver.getAllData(this, null, table);
+    }
 }

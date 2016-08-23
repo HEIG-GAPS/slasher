@@ -24,31 +24,18 @@
 package ch.gaps.slasher.models.treeItem;
 
 import ch.gaps.slasher.database.driver.database.Schema;
-import javafx.scene.control.Tab;
+import ch.gaps.slasher.views.main.MainController;
+import javafx.scene.Node;
+import javafx.scene.control.MenuItem;
 
-import java.util.LinkedList;
 
-
-public class SchemaTreeItem extends DbComponentTreeItem {
+public class SchemaTreeItem extends DbObjectTreeItem {
 
 
 
     public SchemaTreeItem(Schema schema, DatabaseTreeItem databaseTreeItem){
-        super(schema, databaseTreeItem);
-    }
-
-    public void addTab(Tab tab){
-
-    }
-
-    @Override
-    public void removeTab(Tab tab){
-
-    }
-
-    @Override
-    public LinkedList<Tab> getTabs(){
-        return null;
+        super(schema);
+        buildContextMenu();
     }
 
     @Override
@@ -56,4 +43,21 @@ public class SchemaTreeItem extends DbComponentTreeItem {
     {
         return TreeItemType.SCHEMA;
     }
+
+    @Override
+    public Node getStructureTab()
+    {
+        return null;
+    }
+
+    @Override
+    public void buildContextMenu()
+    {
+        MenuItem sqlEditor = new MenuItem("new SqlEditor");
+        sqlEditor.setOnAction(event -> MainController.getInstance().newEditorTab());
+
+        contextMenu.getItems().add(sqlEditor);
+    }
+
+
 }

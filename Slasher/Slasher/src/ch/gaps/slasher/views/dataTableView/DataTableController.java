@@ -1,13 +1,17 @@
 package ch.gaps.slasher.views.dataTableView;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+
+import java.sql.ResultSet;
 
 /**
  * Created by julien on 15.08.16.
@@ -34,7 +38,48 @@ public class DataTableController
     }
 
 
+    public void display(ResultSet resultSet){
 
+        Task<Void> task = new Task<Void>()
+        {
+            @Override
+            protected Void call() throws Exception
+            {
+
+                int columnCount = resultSet.getMetaData().getColumnCount();
+                String columnName[] = new String[columnCount];
+
+                for (int i = 0; i < columnCount; ++i)
+                {
+                    columnName[i] = resultSet.getMetaData().getColumnName(i + 1);
+                }
+
+                ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
+
+                while (resultSet.next())
+                {
+                    ObservableList<String> row = FXCollections.observableArrayList();
+
+                    for (int i = 1; i <= columnCount; ++i)
+                    {
+                        row.add(resultSet.getString(i));
+                    }
+
+                    data.add(row);
+                }
+
+                Platform.runLater(() -> {
+                    display(data, columnName);
+                });
+
+                return null;
+            }
+        };
+
+
+        Thread th = new Thread(task);
+        th.start();
+    }
 
 
     public void display(ObservableList<ObservableList<String>> data, String[] colunmsName){

@@ -23,10 +23,7 @@
  */
 package ch.gaps.slasher.database.driver;
 
-import ch.gaps.slasher.database.driver.database.Database;
-import ch.gaps.slasher.database.driver.database.Schema;
-import ch.gaps.slasher.database.driver.database.Server;
-import ch.gaps.slasher.database.driver.database.Table;
+import ch.gaps.slasher.database.driver.database.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -56,9 +53,9 @@ public interface Driver {
 
   public boolean hasSchema();
 
-  public Table[] getTables(String name);
+  public LinkedList<Table> getTables(Database database, Schema schema);
 
-  public Schema[] getSchemas(Database database);
+  public LinkedList<Schema> getSchemas(Database database);
 
   public void close();
 
@@ -66,8 +63,14 @@ public interface Driver {
 
   public enum ServerType{Server, File};
 
-  public ResultSet executeQuarry (String quarry) throws SQLException;
+  public ResultSet executeQuery (String query) throws SQLException;
 
   public Boolean isConnected();
+
+  public View[] getViews();
+
+  public Trigger[] getTriggers();
+
+  public ResultSet getAllData(Database database, Schema schema, Table table);
   
 }

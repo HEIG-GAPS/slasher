@@ -5,10 +5,7 @@
  */
 package ch.gaps.slasher.database.driver;
 
-import ch.gaps.slasher.database.driver.database.Database;
-import ch.gaps.slasher.database.driver.database.Schema;
-import ch.gaps.slasher.database.driver.database.Server;
-import ch.gaps.slasher.database.driver.database.Table;
+import ch.gaps.slasher.database.driver.database.*;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -74,7 +71,7 @@ public class MySql implements Driver
     }
 
     @Override
-    public Table[] getTables(String name)
+    public LinkedList<Table> getTables(Database database, Schema schema)
     {
 
         LinkedList<Table> tables = new LinkedList<>();
@@ -83,25 +80,25 @@ public class MySql implements Driver
         {
             DatabaseMetaData meta = connection.getMetaData();
             Statement statement = connection.createStatement();
-            ResultSet rs2 = meta.getTables(null, name, "%", null);
+            ResultSet rs2 = meta.getTables(null, database.getName(), "%", null);
             ResultSet rs = statement.executeQuery("SELECT DISTINCT TABLE_NAME\n" +
                     "      FROM INFORMATION_SCHEMA.COLUMNS\n" +
-                    "      WHERE TABLE_SCHEMA='" + name + "'");
+                    "      WHERE TABLE_SCHEMA='" + database.getName() + "'");
 
             while (rs.next())
             {
                 System.out.println(rs.getString(1));
-                tables.add(new Table(rs.getString(1)));
+                tables.add(new Table(rs.getString(1), database));
             }
         } catch (SQLException e)
         {
             e.printStackTrace();
         }
-        return tables.toArray(new Table[tables.size()]);
+        return tables;
     }
 
     @Override
-    public Schema[] getSchemas(Database database)
+    public LinkedList<Schema> getSchemas(Database database)
     {
         LinkedList<Schema> schemas = new LinkedList<>();
 
@@ -112,14 +109,14 @@ public class MySql implements Driver
             ResultSet rs = connection.getMetaData().getCatalogs();
             while (rs.next())
             {
-                schemas.add(new Schema(database, rs.getString("TABLE_CAT")));
+                schemas.add(new Schema(rs.getString("TABLE_CAT"), database));
             }
         } catch (SQLException e)
         {
             e.printStackTrace();
         }
 
-        return schemas.toArray(new Schema[schemas.size()]);
+        return schemas;
     }
 
     @Override
@@ -175,12 +172,12 @@ public class MySql implements Driver
     }
 
     @Override
-    public ResultSet executeQuarry(String quarry) throws SQLException
+    public ResultSet executeQuery(String query) throws SQLException
     {
         if (connected)
         {
             Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(quarry);
+            ResultSet rs = statement.executeQuery(query);
             return rs;
         } else
         {
@@ -192,6 +189,32 @@ public class MySql implements Driver
     public Boolean isConnected()
     {
         return connected;
+    }
+
+    @Override
+    public View[] getViews()
+    {
+        return new View[0];
+    }
+
+    @Override
+    public Trigger[] getTriggers()
+    {
+        return new Trigger[0];
+    }
+
+    @Override
+    public ResultSet getAllData(Database database, Schema schema, Table table)
+    {
+        try
+        {
+            return connection.createStatement().executeQuery("SELECT * FROM " + table);
+        } catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     @Override
