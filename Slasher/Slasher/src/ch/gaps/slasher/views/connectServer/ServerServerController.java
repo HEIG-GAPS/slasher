@@ -37,7 +37,9 @@ import javafx.scene.layout.AnchorPane;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
-
+/**
+ * @author j.leroy
+ */
 public class ServerServerController implements ServerController
 {
     @FXML
@@ -59,7 +61,6 @@ public class ServerServerController implements ServerController
 
     private BooleanProperty hostOk = new SimpleBooleanProperty(false);
     private BooleanProperty usernameOk = new SimpleBooleanProperty(false);
-    private BooleanProperty passwordOk = new SimpleBooleanProperty(false);
 
     private BooleanProperty filedOk = new SimpleBooleanProperty(false);
     private BooleanProperty allOk = new SimpleBooleanProperty(false);
@@ -118,8 +119,7 @@ public class ServerServerController implements ServerController
     }
 
     /**
-     * Fonction appele par le GUI pour afficher la liste des bases de donnees disponibles
-     * sur le server avec le nom d'utilisateur saisi
+     * Method called by the UI to load and display all the databases that the user can have acces to and open
      */
     @FXML
     public void loadDatabases()
@@ -138,7 +138,7 @@ public class ServerServerController implements ServerController
         }
         LinkedList<Database> databases = server.getDatabases();
 
-        // Look for the allready opened databases and add them with a checked checkbox
+        // Look for the already opened databases and add them disabled with a checked checkbox
         databases.forEach(database ->
         {
             Item item = new Item(database);
@@ -195,7 +195,6 @@ public class ServerServerController implements ServerController
         }
     }
 
-
     @Override
     public Server getServer()
     {
@@ -217,7 +216,7 @@ public class ServerServerController implements ServerController
     @Override
     public void connect() throws SQLException, ClassNotFoundException
     {
-        server.connectSelectedDatabases(password.getText());
+        server.connectRegisteredDatabases(password.getText());
     }
 
     class Item

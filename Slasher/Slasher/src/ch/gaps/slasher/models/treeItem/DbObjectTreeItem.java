@@ -26,24 +26,43 @@ package ch.gaps.slasher.models.treeItem;
 import ch.gaps.slasher.database.driver.database.DbObject;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
 
+/**
+ * @author jfleroy
+ */
 public abstract class DbObjectTreeItem extends TreeItem <DbObject> {
 
     protected ContextMenu contextMenu = new ContextMenu();
+    protected TabPane structureTab;
 
     public DbObjectTreeItem(DbObject dbObject){
         super(dbObject);
     }
 
+    /**
+     * @return the type of the tree item
+     */
     public abstract TreeItemType getType();
 
-    public abstract Node getStructureTab();
+    /**
+     * @return the structure tab for the item
+     */
+    public Node getStructureTab(){
+        return structureTab;
+    }
 
+    /**
+     * @return the context menu
+     */
     public ContextMenu getContextMenu(){
         return contextMenu;
     }
 
+    /**
+     * build the context menu
+     */
     public abstract void buildContextMenu();
 
 }

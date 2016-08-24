@@ -55,22 +55,29 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- *
- * @author leroy
+ * @author j.leroy
  */
-public class MainController {
+public class MainController
+{
 
     private static MainController instance;
     private static ResourceBundle bundle = ResourceBundle.getBundle("ch.gaps.slasher.bundle.Bundle", new Locale("en", "EN"));
 
 
-    @FXML private MenuBar menu;
-    @FXML private BorderPane borderPane;
-    @FXML private TabPane tabPane;
-    @FXML private TreeView<DbObject> treeView;
-    @FXML private Menu closeServerButton;
-    @FXML private MenuItem newEditorTab;
-    @FXML private ListView<String> userCommunication;
+    @FXML
+    private MenuBar menu;
+    @FXML
+    private BorderPane borderPane;
+    @FXML
+    private TabPane tabPane;
+    @FXML
+    private TreeView<DbObject> treeView;
+    @FXML
+    private Menu closeServerButton;
+    @FXML
+    private MenuItem newEditorTab;
+    @FXML
+    private ListView<String> userCommunication;
 
     private Tab structureTab = new Tab("Struct");
 
@@ -80,20 +87,24 @@ public class MainController {
     private BufferedWriter os;
     private LinkedList<EditorTab> tabs = new LinkedList<>();
 
-    public MainController(){
+    public MainController()
+    {
         instance = this;
     }
 
     /**
      * To get the MainController instance
+     *
      * @return
      */
-    public static MainController getInstance(){
+    public static MainController getInstance()
+    {
         return instance;
     }
 
     /**
      * UI initializing method
+     *
      * @throws IOException
      */
     @FXML
@@ -109,7 +120,8 @@ public class MainController {
         treeView.setCellFactory(param -> new DbObjectTreeCell());
 
 
-        treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+        {
             if (newValue != null)
             {
                 structureTab.setContent(null);
@@ -122,7 +134,8 @@ public class MainController {
                     newEditorTab.setDisable(true);
                 }
 
-                if (dbObjectTreeItem.getStructureTab() != null){
+                if (dbObjectTreeItem.getStructureTab() != null)
+                {
                     structureTab.setContent(dbObjectTreeItem.getStructureTab());
 
                 }
@@ -138,29 +151,32 @@ public class MainController {
      * Called by the UI to close the app
      */
     @FXML
-    private void close(){
+    private void close()
+    {
         Platform.exit();
     }
 
     /**
      * Called by the UI to open a new tab
+     *
      * @throws IOException
      */
     @FXML
-    public void newEditorTab(){
+    public void newEditorTab()
+    {
 
         Database database;
-        DbObjectTreeItem dbObjectTreeItem = (DbObjectTreeItem)treeView.getSelectionModel().getSelectedItem();
+        DbObjectTreeItem dbObjectTreeItem = (DbObjectTreeItem) treeView.getSelectionModel().getSelectedItem();
 
-        if ( dbObjectTreeItem.getType()== TreeItemType.DATABASE ){
+        if (dbObjectTreeItem.getType() == TreeItemType.DATABASE)
+        {
             database = (Database) dbObjectTreeItem.getValue();
-        }
-        else if ( dbObjectTreeItem.getType()== TreeItemType.SCHEMA ){
-            database = ((Schema)dbObjectTreeItem.getValue()).getDatabase();
-        }
-
-        else{
-            database = (Database) ( (DbComponentTreeItem)dbObjectTreeItem ).getDatabase().getValue();
+        } else if (dbObjectTreeItem.getType() == TreeItemType.SCHEMA)
+        {
+            database = ((Schema) dbObjectTreeItem.getValue()).getDatabase();
+        } else
+        {
+            database = (Database) ((DbComponentTreeItem) dbObjectTreeItem).getDatabase().getValue();
         }
 
         try
@@ -168,7 +184,7 @@ public class MainController {
             loadEditorTab(database, "");
         } catch (IOException e)
         {
-            e.printStackTrace();
+            addToUserCommunication(e.getMessage());
         }
 
         saveState();
@@ -176,9 +192,10 @@ public class MainController {
 
     /**
      * Load the fxml of the SQL Editor
+     *
      * @param database to link the query to
-     * @param content   to initialise the content of the editor
-     * @return  Loaded Tab
+     * @param content  to initialise the content of the editor
+     * @return Loaded Tab
      * @throws IOException
      */
     private Tab loadEditorTab(Database database, String content) throws IOException
@@ -193,11 +210,12 @@ public class MainController {
             tabs.remove(event.getSource());
         });
 
-        if (content !=null){
+        if (content != null)
+        {
             editorController.setContent(content);
         }
 
-        editorController.setDatabase( database );
+        editorController.setDatabase(database);
         tabs.add(newTab);
 
         tabPane.getTabs().add(newTab);
@@ -207,53 +225,72 @@ public class MainController {
 
     /**
      * Load the connection window
+     *
      * @throws IOException
      */
     @FXML
-    private void connectDB() throws IOException{
+    private void connectDB()
+    {
         Stage stage = new Stage();
         FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("ConnectServerView.fxml"), bundle);
         stage.setTitle("Open a database");
-        Pane pane = loader.load();
-        ConnectServerController connectServerController = loader.getController();
-        connectServerController.setController(this);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setScene(new Scene(pane));
+        Pane pane = null;
+        try
+        {
+            pane = loader.load();
+            ConnectServerController connectServerController = loader.getController();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(pane));
 
-        //Display the connection windows and wait undill the user close it by adding a server or by
-        //cannceling
-        stage.showAndWait();
-        refreshTreeView();
-        saveState();
+            //Display the connection windows and wait undill the user close it by adding a server or by
+            //cannceling
+            stage.showAndWait();
+            refreshTreeView();
+            saveState();
+
+        } catch (IOException e)
+        {
+            addToUserCommunication(e.getMessage());
+        }
     }
 
     /**
      * To Refresh the left tree view
      */
-    public void refreshTreeView(){
-        rootTreeItem.getChildren().forEach(dbObjectTreeItem -> {
-            ((ServerTreeItem)dbObjectTreeItem).addAllServerDb();
+    public void refreshTreeView()
+    {
+        rootTreeItem.getChildren().forEach(dbObjectTreeItem ->
+        {
+            ((ServerTreeItem) dbObjectTreeItem).addAllServerDb();
         });
     }
 
     /**
      * Disconnect "nicly" a server.
+     *
      * @param serverItem
      */
-    public  void disconnectServer(ServerTreeItem serverItem) throws SQLException
+    public void disconnectServer(ServerTreeItem serverItem)
     {
-        servers.remove(serverItem.getValue());
-        serverItem.disconnect();
-        closeServerButton.getItems().removeIf(menuItem -> ((ServerDisconnectItem) menuItem).getServerTreeItem() == serverItem);
+        try
+        {
+            servers.remove(serverItem.getValue());
+            serverItem.disconnect();
+            closeServerButton.getItems().removeIf(menuItem -> ((ServerDisconnectItem) menuItem).getServerTreeItem() == serverItem);
+        } catch (SQLException e)
+        {
+            addToUserCommunication(e.getMessage());
+        }
     }
 
 
     /**
      * Called by the connection window to add a new server.
      * Rewrite the json too
+     *
      * @param server
      */
-    public void addServer(Server server){
+    public void addServer(Server server) {
         addServerToSystem(server);
         saveState();
     }
@@ -261,9 +298,11 @@ public class MainController {
 
     /**
      * Private method to add the server to application
+     *
      * @param server
      */
-    private ServerTreeItem addServerToSystem(Server server){
+    private ServerTreeItem addServerToSystem(Server server)
+    {
         servers.add(server);
 
         ServerTreeItem item = new ServerTreeItem(server);
@@ -271,34 +310,31 @@ public class MainController {
 
         ServerDisconnectItem serverDisconnectItem = new ServerDisconnectItem(item);
 
-        serverDisconnectItem.setOnAction(event -> {
-            try
-            {
-                disconnectServer(item);
-            } catch (SQLException e)
-            {
-                e.printStackTrace();
-            }
+        serverDisconnectItem.setOnAction(event ->
+        {
+            disconnectServer(item);
             closeServerButton.getItems().remove(serverDisconnectItem);
         });
 
         closeServerButton.getItems().add(serverDisconnectItem);
-
         return item;
     }
 
     /**
      * Return the registered servers
+     *
      * @return registered servers list
      */
-    public LinkedList<Server> getServersList(){
+    public LinkedList<Server> getServersList()
+    {
         return servers;
     }
 
     /**
-     * Tosave the state of the software, the tab, the servers and the databases.
+     * To save the state of the software, the tab, the servers and the databases.
      */
-    public void saveState(){
+    public void saveState()
+    {
         try
         {
             os = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("save.json")));
@@ -315,7 +351,8 @@ public class MainController {
 
                 JsonArray databases = new JsonArray();
 
-                for (Database db: s.getDatabases()){
+                for (Database db : s.getDatabases())
+                {
 
                     JsonObject database = new JsonObject();
 
@@ -328,7 +365,8 @@ public class MainController {
 
                     tabs.forEach(editorTab ->
                     {
-                        if (editorTab.getDatabase() == db){
+                        if (editorTab.getDatabase() == db)
+                        {
 
                             JsonObject tabJson = new JsonObject();
                             tabJson.addProperty("tabName", "name");
@@ -351,17 +389,18 @@ public class MainController {
             os.write(jsonEngine.toJson(mainArray));
             os.flush();
 
-        } catch (IOException e){
-            e.printStackTrace();
+        } catch (IOException e)
+        {
+            addToUserCommunication(e.getMessage());
         }
-
     }
 
     /**
      * Read the save file and laod all the data in the software
+     *
      * @throws IOException
      */
-    private void readSave() throws IOException
+    private void readSave()
     {
         try
         {
@@ -381,8 +420,10 @@ public class MainController {
 
                     String serverDriver = server.get("serverDriver").getAsString();
 
-                    for (Driver d: drivers){
-                        if (d.toString().equals(serverDriver)){
+                    for (Driver d : drivers)
+                    {
+                        if (d.toString().equals(serverDriver))
+                        {
                             driver = d.getClass().newInstance();
                         }
                     }
@@ -410,7 +451,8 @@ public class MainController {
                                     database.get("databaseUsername").getAsString());
                             s.addDatabase(db);
 
-                            if (serverDriver.equals("Sqlite")){
+                            if (serverDriver.equals("Sqlite"))
+                            {
                                 try
                                 {
                                     db.connect("");
@@ -423,10 +465,12 @@ public class MainController {
 
                             JsonArray tabs = database.get("tabs").getAsJsonArray();
 
-                            for (JsonElement t : tabs){
+                            for (JsonElement t : tabs)
+                            {
                                 JsonObject tab = t.getAsJsonObject();
 
-                                if (tab.get("moduleName").getAsString().equals("Editor")){
+                                if (tab.get("moduleName").getAsString().equals("Editor"))
+                                {
                                     loadEditorTab(db, tab.get("content").getAsString());
                                 }
 
@@ -437,16 +481,18 @@ public class MainController {
                     rootTreeItem.getChildren().add(serverTreeItem);
                 }
             }
-
-        int a = 0;
-        } catch (FileNotFoundException | IllegalAccessException | InstantiationException e)
+        } catch (IOException | IllegalAccessException | InstantiationException e)
         {
-            e.printStackTrace();
+            addToUserCommunication(e.getMessage());
         }
-
     }
 
-    public void addToUserCommunication(String message){
+    /**
+     * Add a message to the user communication
+     * @param message message to add
+     */
+    public void addToUserCommunication(String message)
+    {
         userCommunication.getItems().add(message);
     }
 }

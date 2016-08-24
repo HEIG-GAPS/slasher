@@ -41,17 +41,19 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Optional;
 
+/**
+ * @author j.leroy
+ */
 public class DatabaseTreeItem extends DbObjectTreeItem {
 
 
 
-    public DatabaseTreeItem(Database db) throws SQLException
-    {
+    public DatabaseTreeItem(Database db) throws SQLException {
         super(db);
         refreshTree();
     }
 
-
+    @Override
     public Pane getStructureTab(){
         AnchorPane pane = null;
 
@@ -116,6 +118,8 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
             }
         }
 
+        contextMenu.getItems().clear();
+
         //menu
         if (((Database) getValue()).type() == Driver.ServerType.Server) {
             buildContextMenu();
@@ -125,9 +129,6 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
         }
     }
 
-    /**
-     * Built the ContextMenu
-     */
     @Override
     public void buildContextMenu(){
 
@@ -139,8 +140,8 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
 
         Database db = (Database)getValue();
 
-        connect.disableProperty().bind(db.disabledProperty());
-        disconnect.disableProperty().bind(db.disabledProperty().not());
+        connect.disableProperty().bind(db.enabledProperty());
+        disconnect.disableProperty().bind(db.enabledProperty().not());
 
 
 
@@ -232,9 +233,10 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
         contextMenu.getItems().add(remove);
     }
 
+    /**
+     * Build the file type only (Sqlite) part of the menu
+     */
     public void buildFileContextMenu(){
-        contextMenu.getItems().clear();
-
         MenuItem editor = new MenuItem(Slasher.getBundle().getString("new.sql.editor"));
 
         editor.setOnAction(event -> MainController.getInstance().newEditorTab());
@@ -248,12 +250,6 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
     {
         ((Database) getValue()).close();
         getChildren().clear();
-    }
-
-
-    @Override
-    public ContextMenu getContextMenu(){
-        return contextMenu;
     }
 
     @Override

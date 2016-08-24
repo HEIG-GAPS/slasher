@@ -36,17 +36,27 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.sql.SQLException;
 
-public class FileServerController implements ServerController {
-    @FXML private Pane mainPane;
-    @FXML private TextField path;
+/**
+ * @author j.leroy
+ */
+public class FileServerController implements ServerController
+{
+    @FXML
+    private Pane mainPane;
+    @FXML
+    private TextField path;
     private File file;
     private Driver driver;
-    private String [] connectionData = new String[1];
+    private String[] connectionData = new String[1];
     private BooleanProperty filedOk = new SimpleBooleanProperty(false);
+    Server server;
+    private Database mainDatabase;
 
     @FXML
-    private void initialize(){
-        path.textProperty().addListener((observable, oldValue, newValue) -> {
+    private void initialize()
+    {
+        path.textProperty().addListener((observable, oldValue, newValue) ->
+        {
             if (newValue == null || newValue.isEmpty())
                 filedOk.set(false);
             else
@@ -54,48 +64,51 @@ public class FileServerController implements ServerController {
         });
     }
 
+    /**
+     * Called by the browse button to choose a file for the file database
+     */
     @FXML
-    private void browse(){
+    private void browse()
+    {
         FileChooser fileChooser = new FileChooser();
         file = fileChooser.showOpenDialog(mainPane.getScene().getWindow());
-        if (file != null) {
+        if (file != null)
+        {
             path.setText(file.getPath());
             connectionData[0] = file.getPath();
         }
     }
 
     @Override
-    public Server getServer() {
-        Server server = new Server(driver, path.getText(), file.getName());
-        Database mainDatabase = new Database(driver, "main", null, server, "main");
-        try
-        {
-            mainDatabase.connect(null);
-        } catch (SQLException | ClassNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        server.addDatabase(mainDatabase);
+    public Server getServer()
+    {
+        server = new Server(driver, path.getText(), file.getName());
+        mainDatabase = new Database(driver, "main", null, server, "main");
+
         return server;
-}
+    }
 
     @Override
-    public BooleanProperty getFieldValidation() {
+    public BooleanProperty getFieldValidation()
+    {
         return filedOk;
     }
 
     @Override
-    public void setDriver(Driver driver) {
+    public void setDriver(Driver driver)
+    {
         this.driver = driver;
     }
 
     @Override
-    public void connect() {
-
+    public void connect() throws SQLException, ClassNotFoundException  {
+        mainDatabase.connect(null);
+        server.addDatabase(mainDatabase);
     }
 
     @Override
-    public boolean newServer() {
+    public boolean newServer()
+    {
         return true;
     }
 

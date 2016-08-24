@@ -2,40 +2,36 @@ package ch.gaps.slasher.models.treeItem;
 
 import ch.gaps.slasher.database.driver.database.DbObject;
 import ch.gaps.slasher.views.main.MainController;
-import javafx.scene.Node;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TabPane;
 
 /**
- * Created by julien on 15.08.16.
+ * @author j.leroy
  */
 public abstract class DbComponentTreeItem extends DbObjectTreeItem
 {
     private DatabaseTreeItem databaseTreeItem;
-
-    protected TabPane structureTab;
 
 
     public DbComponentTreeItem(DbObject dbObject, DatabaseTreeItem databaseTreeItem)
     {
         super(dbObject);
         this.databaseTreeItem = databaseTreeItem;
+        contextMenu.getItems().clear();
         buildContextMenu();
     }
 
+    /**
+     * @return the mother databaseTreeItem
+     */
     public DatabaseTreeItem getDatabase()
     {
         return databaseTreeItem;
     }
 
-    @Override
-    public TreeItemType getType()
-    {
-        return null;
-    }
 
     @Override
-    public abstract Node getStructureTab();
+    public abstract TreeItemType getType();
+
 
     @Override
     public void buildContextMenu(){

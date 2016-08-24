@@ -27,6 +27,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
+/**
+ * @author j.leroy
+ */
 public class Schema extends DbObject implements DbParent {
 
     Database database;
@@ -37,24 +40,46 @@ public class Schema extends DbObject implements DbParent {
         this.database = database;
     }
 
+    /**
+     * @return talbe(s) list
+     * @throws SQLException
+     */
     public LinkedList<Table> getTables() throws SQLException
     {
         return database.getTables(this);
     }
 
-    public View[] getViews() { return null;}
+    /**
+     * @return view(s) list
+     */
+    public LinkedList<View> getViews() { return null;}
 
-    public Trigger[] getTriggers() { return null;}
+    /**
+     * @return trigger(s) list
+     */
+    public LinkedList<Trigger> getTriggers() { return null;}
 
+    /**
+     * @return schema name
+     */
     public String toString()
     {
         return name;
     }
 
+    /**
+     * @return schema's database
+     */
     public Database getDatabase(){
         return database;
     }
 
+    /**
+     * Implementation of the DbParent method
+     * @param table
+     * @return result set with all the talbe data
+     * @throws SQLException
+     */
     @Override
     public ResultSet getAllData(Table table) throws SQLException
     {

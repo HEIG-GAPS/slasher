@@ -11,13 +11,31 @@ import java.sql.SQLException;
  */
 public interface ServerController {
 
+    /**
+     * @return the server to add to the main controller server list
+     */
     public Server getServer();
 
+    /**
+     * @return the validation property
+     */
     public BooleanProperty getFieldValidation();
 
+    /**
+     * @param driver driver to set
+     */
     public void setDriver(Driver driver);
 
+    /**
+     * Connect to the server or databases
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void connect() throws SQLException, ClassNotFoundException;
 
+    /**
+     * @return true if it's a new server
+     * (new in the way no other database from this server is opened in the application)
+     */
     public boolean newServer();
 }

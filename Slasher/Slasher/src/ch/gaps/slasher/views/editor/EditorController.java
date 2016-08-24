@@ -44,7 +44,7 @@ import java.sql.ResultSet;
 
 /**
  *
- * @author leroy
+ * @author j.leroy
  */
 public class EditorController {
     @FXML
@@ -93,7 +93,7 @@ public class EditorController {
             @Override
             protected Void call() throws Exception
             {
-                ResultSet rs = database.executeQuarry(request.getText());
+                ResultSet rs = database.executeQuery(request.getText());
                 int columnCount = rs.getMetaData().getColumnCount();
                 String columnName[] = new String[columnCount];
 
@@ -134,7 +134,7 @@ public class EditorController {
 
     public void setDatabase(Database database){
         this.database = database;
-        execute.disableProperty().bind(database.disabledProperty().not());
+        execute.disableProperty().bind(database.enabledProperty().not());
     }
 
     public String getContent(){

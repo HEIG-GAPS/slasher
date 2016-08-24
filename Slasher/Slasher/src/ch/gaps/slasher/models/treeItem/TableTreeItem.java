@@ -36,10 +36,12 @@ import javafx.scene.layout.Pane;
 import java.io.IOException;
 import java.sql.SQLException;
 
-
+/**
+ * @author j.leroy
+ */
 public class TableTreeItem extends DbComponentTreeItem {
 
-    DatabaseTreeItem databaseTreeItem;
+    private DatabaseTreeItem databaseTreeItem;
 
     public TableTreeItem(Table table, DatabaseTreeItem databaseTreeItem){
         super(table, databaseTreeItem);
@@ -62,8 +64,10 @@ public class TableTreeItem extends DbComponentTreeItem {
         return structureTab;
     }
 
-
-    public void loadStructureTab() {
+    /**
+     * Method to load the structure pane
+     */
+    private void loadStructureTab() {
         structureTab = new TabPane();
 
         Tab data = new Tab(Slasher.getBundle().getString("u.data"));

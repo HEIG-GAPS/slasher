@@ -25,13 +25,12 @@ package ch.gaps.slasher.models.treeItem;
 
 import ch.gaps.slasher.database.driver.database.Schema;
 import ch.gaps.slasher.views.main.MainController;
-import javafx.scene.Node;
 import javafx.scene.control.MenuItem;
 
-
+/**
+ * @author j.leroy
+ */
 public class SchemaTreeItem extends DbObjectTreeItem {
-
-
 
     public SchemaTreeItem(Schema schema, DatabaseTreeItem databaseTreeItem){
         super(schema);
@@ -44,11 +43,6 @@ public class SchemaTreeItem extends DbObjectTreeItem {
         return TreeItemType.SCHEMA;
     }
 
-    @Override
-    public Node getStructureTab()
-    {
-        return null;
-    }
 
     @Override
     public void buildContextMenu()

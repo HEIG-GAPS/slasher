@@ -31,119 +31,214 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
-public class Database extends DbObject implements DbParent {
+/**
+ * @author j.leroy
+ */
+public class Database extends DbObject implements DbParent
+{
 
-        private Driver driver;
-        private Server server;
-        private String name;
-        private String username;
-        private String description;
-        private boolean connected = false;
+    private Driver driver;
+    private Server server;
+    private String name;
+    private String username;
+    private String description;
+    private boolean connected = false;
+    private BooleanProperty connectedProperty;
 
-        private BooleanProperty connectedProperty = new SimpleBooleanProperty();
 
+    public Database(Driver driver, String name, Server server, String username)
+    {
+        this.driver = driver;
+        this.name = name;
+        this.server = server;
+        this.username = username;
+        description = username + "@" + name;
+        connectedProperty = new SimpleBooleanProperty(false);
+    }
 
-    public Database(Driver driver, String name, Server server, String username){
-            this.driver = driver;
-            this.name = name;
-            this.server = server;
-            this.username = username;
+    public Database(Driver driver, String name, String description, Server server, String username)
+    {
+        this.driver = driver;
+        this.name = name;
+        this.server = server;
+        this.username = username;
+        if (description == null)
+        {
             description = username + "@" + name;
-            connectedProperty.setValue(false);
         }
+        this.description = description;
+        connectedProperty = new SimpleBooleanProperty(false);
+    }
 
-    public Database(Driver driver, String name, String description, Server server, String username){
-            this.driver = driver;
-            this.name = name;
-            this.server = server;
-            this.username = username;
-            if (description == null){
-                description = username + "@" + name;
-            }
-            this.description = description;
-            connectedProperty.setValue(false);
-        }
-
-    public String toString(){
+    /**
+      * @return description
+     */
+    public String toString()
+    {
         return description;
     }
 
+    /**
+     * @return  talbe(s) list of the database
+     * @throws SQLException
+     */
     public LinkedList<Table> getTables() throws SQLException
     {
         return driver.getTables(this, null);
     }
 
+    /**
+     * If the database has a schema
+     * @param schema
+     * @return talbe(s) list of the database
+     * @throws SQLException
+     */
     public LinkedList<Table> getTables(Schema schema) throws SQLException
-    { return driver.getTables(this, schema); }
+    {
+        return driver.getTables(this, schema);
+    }
 
-    public View[] getView() { return driver.getViews();}
+    /**
+     * @return view(s) list
+     */
+    public LinkedList<View> getViews()
+    {
+        return driver.getViews();
+    }
 
+    /**
+     * @return schema(s) list
+     * @throws SQLException
+     */
     public LinkedList<Schema> getSchemas() throws SQLException
     {
         return driver.getSchemas(this);
     }
 
-    public View[] getViews(){
-        return driver.getViews();
-    }
 
-    public boolean hasSchemas(){
+    /**
+     * @return true if the database has schema(s)
+     */
+    public boolean hasSchemas()
+    {
         return driver.hasSchema();
     }
 
+    /**
+     * To close nicly the database
+     * @throws SQLException
+     */
     public void close() throws SQLException
     {
-        if (connected) {
+        if (connectedProperty.getValue()){
             driver.close();
-            connected = false;
             connectedProperty.setValue(false);
         }
     }
 
-    public String getName(){
+    /**
+     * @return database name
+     */
+    public String getName()
+    {
         return name;
     }
 
-    public String getUsername(){ return username; }
+    /**
+     * @return the username linked to this database
+     */
+    public String getUsername()
+    {
+        return username;
+    }
 
+    /**
+     * TO connect the database
+     * @param password
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void connect(String password) throws SQLException, ClassNotFoundException
     {
-        if (!connected) {
+        if (!connectedProperty.getValue())
+        {
             driver.connect(server.getHost(), username, password, name);
-            connected = true;
             connectedProperty.setValue(true);
         }
     }
 
-    public void setDescription(String newDescritpion){
+    /**
+     * @param newDescritpion new description to set
+     */
+    public void setDescription(String newDescritpion)   {
         description = newDescritpion;
     }
 
-    public String getDescritpion (){
+    /**
+     * @return database description
+     */
+    public String getDescritpion() {
         return description;
     }
 
-    public Driver.ServerType type(){
+    /**
+     * @return driver server type
+     */
+    public Driver.ServerType type() {
         return driver.type();
     }
 
+    /**
+     * @return !connected
+     */
     public boolean disabled(){
-        return !connected;
+        return !connectedProperty.getValue();
     }
 
-    public boolean isConnected() { return connected; }
+    /**
+     * @return connected
+     */
+    public boolean isConnected(){
+        return connectedProperty.getValue();
+    }
 
-    public BooleanProperty disabledProperty() { return connectedProperty; }
+    /**
+     * @return enabled property
+     */
+    public BooleanProperty enabledProperty()
+    {
+        return connectedProperty;
+    }
 
-    public ResultSet executeQuarry(String query) throws SQLException{
+    /**
+     * To execute a query on the driver
+     * @param query
+     * @return query result set
+     * @throws SQLException
+     */
+    public ResultSet executeQuery(String query) throws SQLException
+    {
         return driver.executeQuery(query);
     }
 
+    /**
+     * To get all the data of a table with a schema
+     * @param schema
+     * @param table
+     * @return the result set with all the data
+     * @throws SQLException
+     */
     public ResultSet getAllData(Schema schema, Table table) throws SQLException
     {
         return driver.getAllData(this, schema, table);
     }
 
+    /**
+     * Implementation of the DbParent method
+     * @param table
+     * @return result set with all the talbe data
+     * @throws SQLException
+     */
     @Override
     public ResultSet getAllData(Table table) throws SQLException
     {

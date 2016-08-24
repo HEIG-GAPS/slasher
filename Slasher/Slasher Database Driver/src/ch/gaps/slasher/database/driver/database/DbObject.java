@@ -27,12 +27,27 @@ package ch.gaps.slasher.database.driver.database;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
-public class DbObject {
-    public String toString(){
-        return null;
+/**
+ * @author j.leroy
+ */
+public abstract class DbObject {
+
+    /**
+     * @return toString
+     */
+    public abstract String toString();
+
+    /**
+     * @return if the element is disabled
+     */
+    public boolean disabled(){
+        return false;
     }
 
-    public boolean disabled(){return false;}
-
-    public BooleanProperty disabledProperty() { return new SimpleBooleanProperty(false); }
+    /**
+     * @return the enabled property to bind in the UI
+     */
+    public BooleanProperty enabledProperty(){
+        return new SimpleBooleanProperty(false);
+    }
 }

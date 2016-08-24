@@ -14,7 +14,7 @@ import javafx.scene.control.TableView;
 import java.sql.ResultSet;
 
 /**
- * Created by julien on 15.08.16.
+ * @author j.leroy
  */
 public class DataTableController
 {

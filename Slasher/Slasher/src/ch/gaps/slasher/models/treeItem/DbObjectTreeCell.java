@@ -24,15 +24,13 @@
 package ch.gaps.slasher.models.treeItem;
 
 import ch.gaps.slasher.database.driver.database.DbObject;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeCell;
 import javafx.scene.paint.Color;
 
+/**
+ * @author j.leroy
+ */
 public class DbObjectTreeCell extends TreeCell<DbObject> {
-
-    public ContextMenu getContexmenu(){
-        return new ContextMenu();
-    }
 
     @Override
     public void updateItem(DbObject dbObject, boolean empty){
@@ -53,9 +51,9 @@ public class DbObjectTreeCell extends TreeCell<DbObject> {
                 setTextFill(Color.BLACK);
             }
 
-            dbObject.disabledProperty().addListener((observable, oldValue, newValue) ->
+            dbObject.enabledProperty().addListener((observable, oldValue, newValue) ->
             {
-                if (newValue){
+                if (!newValue){
                     setTextFill(Color.GREY);
                 }
             });

@@ -43,8 +43,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 /**
- *
- * @author leroy
+ * @author j.leroy
  */
 public class ConnectServerController {
     @FXML private ChoiceBox<Driver> driversListCB;
@@ -54,7 +53,6 @@ public class ConnectServerController {
     @FXML private Label displayLabel;
 
     private ServerController serverController;
-    private MainController mainController;
     private AnchorPane connectionPane;
 
 
@@ -62,7 +60,6 @@ public class ConnectServerController {
     private BooleanProperty driverOk = new SimpleBooleanProperty(false);
     private BooleanProperty otherDataOk = new SimpleBooleanProperty(false);
     private Server server;
-    private boolean oldServer = false;
 
     @FXML
     private void initialize(){
@@ -120,37 +117,37 @@ public class ConnectServerController {
 
     }
 
+    /**
+     * Called by the cancel button
+     */
     @FXML
     private void cancel(){
         ((Stage)mainPane.getScene().getWindow()).close();
-        oldServer = false;
     }
 
+    /**
+     * called by the validate button
+     */
     @FXML
     private void validate(){
-        server = serverController.getServer();
-        if (!serverDescription.getText().isEmpty())
-            server.setDescription(serverDescription.getText());
         try
         {
+            server = serverController.getServer();
+
+            if (!serverDescription.getText().isEmpty())
+                server.setDescription(serverDescription.getText());
+
             serverController.connect();
+
+            if (serverController.newServer()){
+                MainController.getInstance().addServer(server);
+            }
         } catch (SQLException | ClassNotFoundException e)
         {
-            e.printStackTrace();
+            MainController.getInstance().addToUserCommunication(e.getMessage());
         }
 
-        if (serverController.newServer()){
-            mainController.addServer(server);
-            oldServer = false;
-        }
-        else {
-            oldServer = true;
-        }
         ((Stage)mainPane.getScene().getWindow()).close();
-    }
-
-    public void setController(MainController mainController){
-        this.mainController = mainController;
     }
 
 }

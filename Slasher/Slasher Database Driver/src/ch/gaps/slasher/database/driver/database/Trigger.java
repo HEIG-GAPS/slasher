@@ -1,10 +1,11 @@
 package ch.gaps.slasher.database.driver.database;
 
 /**
- * Created by julien on 19.08.16.
+ * @author j.leroy
  */
 public class Trigger extends DbComponent
 {
+    //TODO a implementer
     public Trigger(String name, Database database)
     {
         super(name, database);

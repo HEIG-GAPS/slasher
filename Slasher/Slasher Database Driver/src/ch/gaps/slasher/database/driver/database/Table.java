@@ -27,18 +27,27 @@ package ch.gaps.slasher.database.driver.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * @author j.leroy
+ */
 public class Table extends DbComponent {
 
     public Table(String name, DbParent dbParent){
         super(name, dbParent);
     }
 
+    /**
+     * @return table name
+     */
     public String toString(){
         return name;
     }
 
-    public ResultSet getAllData() throws SQLException
-    {
+    /**
+     * @return result set with all the data of the table
+     * @throws SQLException
+     */
+    public ResultSet getAllData() throws SQLException {
         return dbParent.getAllData(this);
     }
 

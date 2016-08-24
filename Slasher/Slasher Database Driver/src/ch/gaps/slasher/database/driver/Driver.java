@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 jvarani.
+ * Copyright 2015 Leroy.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,47 +30,117 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 
 /**
- *
- * @author jvarani
+ * @author j.leroy
  */
-public interface Driver {
+public interface Driver
+{
 
-  /**
-   * @return the id of this driver. Can be the lower case name of the main class.
-   */
-  public String id();
-  
-  /**
-   * @return the human readable name of this driver.
-   */
-  public String toString();
+    /**
+     * Server type enum
+     */
+    public enum ServerType
+    {
+        Server, File
+    }
 
-  public ServerType type();
+    /**
+     * @return the id of this driver. Can be the lower case name of the main class.
+     */
+    public String id();
 
-  public void connect(String host, String username, String password, String database) throws SQLException, ClassNotFoundException;
+    /**
+     * @return the human readable name of this driver.
+     */
+    public String toString();
 
-  public void test();
+    /**
+     * To get the server type
+     * @return the server type
+     */
+    public ServerType type();
 
-  public boolean hasSchema();
+    /**
+     * Methode to connect the driver to the server
+     * @param host the host name
+     * @param username the username
+     * @param password the password of the username
+     * @param database the database to connect to
+     * @throws SQLException problem with the sql connection
+     * @throws ClassNotFoundException jdbc driver not found
+     */
+    public void connect(String host, String username, String password, String database) throws SQLException, ClassNotFoundException;
 
-  public LinkedList<Table> getTables(Database database, Schema schema) throws SQLException;
+    /**
+     * Close the database
+     * @throws SQLException
+     */
+    public void close() throws SQLException;
 
-  public LinkedList<Schema> getSchemas(Database database) throws SQLException;
+    /**
+     * @return if the driver is connected
+     */
+    public Boolean isConnected();
 
-  public void close() throws SQLException;
+    /**
+     * @return true if has a schema false else
+     */
+    public boolean hasSchema();
 
-  public LinkedList<Database> getDatabases(Server server, String username, String password) throws SQLException, ClassNotFoundException;
+    /**
+     * Use by the server to list the databases
+     * @param server server to get the host
+     * @param username
+     * @param password
+     * @return database(s) list
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public LinkedList<Database> getDatabases(Server server, String username, String password) throws SQLException, ClassNotFoundException;
 
-  public enum ServerType{Server, File};
+    /**
+     * Get the database schema(s) list
+     * @param database
+     * @return schema(s) list
+     * @throws SQLException
+     */
+    public LinkedList<Schema> getSchemas(Database database) throws SQLException;
 
-  public ResultSet executeQuery (String query) throws SQLException;
+    /**
+     * Get the database or schema table(s) list
+     * @param database
+     * @param schema
+     * @return table(s) list
+     * @throws SQLException
+     */
+    public LinkedList<Table> getTables(Database database, Schema schema) throws SQLException;
 
-  public Boolean isConnected();
+    /**
+     * To get the vise of view(s)
+     * @return the list of view(s)
+     */
+    public LinkedList<View> getViews();
 
-  public View[] getViews();
+    /**
+     * To get the trigger(s)
+     * @return the list of the trigger(s)
+     */
+    public LinkedList<Trigger> getTriggers();
 
-  public Trigger[] getTriggers();
+    /**
+     * Methode to execute a query on the database
+     * @param query query to execute
+     * @return the result set corresponding to the query
+     * @throws SQLException
+     */
+    public ResultSet executeQuery(String query) throws SQLException;
 
-  public ResultSet getAllData(Database database, Schema schema, Table table) throws SQLException;
-  
+    /**
+     * Method to get all the data of a table
+     * @param database the database of the table
+     * @param schema the schema if it has one
+     * @param table
+     * @return The result set with all the data
+     * @throws SQLException
+     */
+    public ResultSet getAllData(Database database, Schema schema, Table table) throws SQLException;
 }

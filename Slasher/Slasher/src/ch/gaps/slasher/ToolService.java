@@ -5,8 +5,8 @@
  */
 package ch.gaps.slasher;
 
-import ch.gaps.slasher.database.driver.Driver;
 import ch.gaps.slasher.tool.Tool;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ServiceConfigurationError;
@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author jvarani
+ * @author j.leroy
  */
 public final class ToolService {
   private static ToolService service;
