@@ -39,6 +39,7 @@ public class DataTableController
 
 
     public void display(ResultSet resultSet){
+        
 
         Task<Void> task = new Task<Void>()
         {

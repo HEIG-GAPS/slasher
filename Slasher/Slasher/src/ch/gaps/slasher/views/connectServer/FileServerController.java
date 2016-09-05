@@ -37,6 +37,7 @@ import java.io.File;
 import java.sql.SQLException;
 
 /**
+ * This class is used to connect database in files, like Sqlite
  * @author j.leroy
  */
 public class FileServerController implements ServerController

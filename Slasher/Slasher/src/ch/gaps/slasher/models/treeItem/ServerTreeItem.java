@@ -40,6 +40,7 @@ public class ServerTreeItem extends DbObjectTreeItem {
     public ServerTreeItem (Server server){
         super(server);
         addAllServerDb();
+        buildContextMenu();
     }
 
     /**

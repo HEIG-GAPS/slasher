@@ -38,6 +38,7 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 
 /**
+ * This class is used to connect databases who works with a server
  * @author j.leroy
  */
 public class ServerServerController implements ServerController
@@ -62,8 +63,13 @@ public class ServerServerController implements ServerController
     private BooleanProperty hostOk = new SimpleBooleanProperty(false);
     private BooleanProperty usernameOk = new SimpleBooleanProperty(false);
 
+    private BooleanProperty databaseNameConflict = new SimpleBooleanProperty(true);
+
     private BooleanProperty filedOk = new SimpleBooleanProperty(false);
     private BooleanProperty allOk = new SimpleBooleanProperty(false);
+
+
+
     private boolean newServer = false;
 
     private Driver driver;
@@ -78,7 +84,7 @@ public class ServerServerController implements ServerController
     {
         mainController = MainController.getInstance();
         filedOk.bind(hostOk.and(usernameOk));
-        allOk.bind(dbCount.isNotEqualTo(0));
+        allOk.bind(dbCount.isNotEqualTo(0).and(databaseNameConflict));
 
         host.textProperty().addListener((observable, oldValue, newValue) ->
         {
@@ -99,13 +105,29 @@ public class ServerServerController implements ServerController
 
         connect.disableProperty().bind(filedOk.not());
 
+
         databaseDescription.setCellValueFactory(param ->
         {
             ObservableValue<TextField> tf = new SimpleObjectProperty<TextField>(new TextField());
             tf.getValue().disableProperty().bind(param.getValue().disable);
+            tf.getValue().textProperty().addListener((observable, oldValue, newValue) ->
+            {
+                // We change the background to red and lock the connection
+                // if the database description == to an already opened
+                if (!checkDatabaseDesc(newValue) && !param.getValue().disable.getValue()){
+                    tf.getValue().setStyle("-fx-background-color: red");
+                    databaseNameConflict.setValue(false);
+                }
+                else {
+                    tf.getValue().setStyle("");
+                    databaseNameConflict.setValue(true);
+                }
+            });
+
             tf.getValue().textProperty().bindBidirectional(param.getValue().description);
             return tf;
         });
+
 
         databaseToOpen.setCellValueFactory(param ->
         {
@@ -114,6 +136,7 @@ public class ServerServerController implements ServerController
             cb.getValue().selectedProperty().bindBidirectional(param.getValue().selected);
             return cb;
         });
+
 
         databaseDescription.prefWidthProperty().bind(tableView.widthProperty().subtract(databaseToOpen.widthProperty()).subtract(2));
     }
@@ -159,6 +182,7 @@ public class ServerServerController implements ServerController
             });
             tableView.getItems().add(item);
         });
+
 
         LinkedList<Database> allDatabases = null;
         try
@@ -232,10 +256,17 @@ public class ServerServerController implements ServerController
             this.database = database;
             description = new SimpleStringProperty(database.getDescritpion());
 
-            description.addListener(observable ->
+            description.addListener((observable, oldValue, newValue) ->
             {
-                database.setDescription(description.toString());
+                if (checkDatabaseDesc(newValue))
+                {
+                    database.setDescription(description.getValue());
+                }
+                else{
+
+                }
             });
+
         }
 
         public BooleanProperty onProperty()
@@ -247,6 +278,15 @@ public class ServerServerController implements ServerController
         {
             return database.toString();
         }
+    }
+
+    private boolean checkDatabaseDesc(String description){
+        for (Database database : server.getDatabases()){
+            if (database.getDescritpion().equals(description))
+                return false;
+        }
+
+        return true;
     }
 
     public boolean newServer()
