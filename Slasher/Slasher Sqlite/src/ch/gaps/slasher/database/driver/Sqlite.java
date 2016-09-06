@@ -50,7 +50,7 @@ public class Sqlite implements Driver {
 
 
   @Override
-  public void connect(String host, String username, String password, String database) {
+  public void connect(Server server, String username, String password, String database) {
     try {
       Class.forName("org.sqlite.JDBC");
     } catch (ClassNotFoundException e) {
@@ -59,7 +59,7 @@ public class Sqlite implements Driver {
 
 
     try {
-      connection = DriverManager.getConnection("jdbc:sqlite:" + host);
+      connection = DriverManager.getConnection("jdbc:sqlite:" + server.getHost());
 
     } catch (SQLException e) {
       e.printStackTrace();
@@ -134,6 +134,12 @@ public class Sqlite implements Driver {
       e.printStackTrace();
     }
     return null;
+  }
+
+  @Override
+  public int getDefaultPort()
+  {
+    return 0;
   }
 
   @Override

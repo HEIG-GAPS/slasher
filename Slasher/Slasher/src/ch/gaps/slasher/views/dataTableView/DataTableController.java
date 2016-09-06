@@ -39,7 +39,10 @@ public class DataTableController
 
 
     public void display(ResultSet resultSet){
-        
+
+        ObservableList<ObservableList<String>> data = tableView.getItems();
+
+
 
         Task<Void> task = new Task<Void>()
         {
@@ -55,7 +58,16 @@ public class DataTableController
                     columnName[i] = resultSet.getMetaData().getColumnName(i + 1);
                 }
 
-                ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
+                int j = 0;
+                for (String colunm: columnName){
+                    final int k = j;
+                    TableColumn<ObservableList<String>, String> column = new TableColumn<>(colunm);
+                    column.setCellValueFactory(tc -> new SimpleObjectProperty<>(tc.getValue().get(k)));
+                    Platform.runLater(() -> tableView.getColumns().add(column));
+                    j++;
+                }
+
+                //ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
 
                 while (resultSet.next())
                 {
@@ -70,7 +82,7 @@ public class DataTableController
                 }
 
                 Platform.runLater(() -> {
-                    display(data, columnName);
+                    //display(data, columnName);
                 });
 
                 return null;
@@ -85,7 +97,7 @@ public class DataTableController
 
     public void display(ObservableList<ObservableList<String>> data, String[] colunmsName){
 
-        tableView.getColumns().clear();
+        clear();
 
 
         int i = 0;
@@ -107,6 +119,11 @@ public class DataTableController
         sortedList.comparatorProperty().bind(tableView.comparatorProperty());
         tableView.setItems(sortedList);
 
+    }
+
+    public void clear(){
+        tableView.getColumns().clear();
+        count.setText("0");
     }
 
 }

@@ -35,10 +35,12 @@ public class Server extends DbObject {
     private String description;
     private Driver driver;
     private String host;
+    private int port;
     private LinkedList<Database> openedDatabase = new LinkedList<>();
 
-    public Server(Driver driver, String host, String descritpion) {
+    public Server(Driver driver, String host, int port, String descritpion) {
         this.host = host;
+        this.port = port;
         this.driver = driver;
         if (descritpion == null) {
             this.description = host;
@@ -164,6 +166,12 @@ public class Server extends DbObject {
      */
     public String getDiverName(){
         return driver.toString();
+    }
+
+    /**
+     * @return the port number
+     */
+    public int getPort() { return port;
     }
 
 }

@@ -83,7 +83,7 @@ public class FileServerController implements ServerController
     @Override
     public Server getServer()
     {
-        server = new Server(driver, path.getText(), file.getName());
+        server = new Server(driver, path.getText(), 0, file.getName());
         mainDatabase = new Database(driver, "main", null, server, "main");
 
         return server;

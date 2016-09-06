@@ -50,6 +50,8 @@ public class ServerServerController implements ServerController
     @FXML
     private PasswordField password;
     @FXML
+    private TextField port;
+    @FXML
     private AnchorPane mainPane;
     @FXML
     private Button connect;
@@ -59,8 +61,11 @@ public class ServerServerController implements ServerController
     private TableColumn<Item, TextField> databaseDescription;
     @FXML
     private TableColumn<Item, CheckBox> databaseToOpen;
+    @FXML
+    private Label errorLabel;
 
     private BooleanProperty hostOk = new SimpleBooleanProperty(false);
+    private BooleanProperty portOk = new SimpleBooleanProperty(false);
     private BooleanProperty usernameOk = new SimpleBooleanProperty(false);
 
     private BooleanProperty databaseNameConflict = new SimpleBooleanProperty(true);
@@ -76,34 +81,36 @@ public class ServerServerController implements ServerController
     private Server server;
 
     private IntegerProperty dbCount = new SimpleIntegerProperty(0);
+    private LinkedList<Database> databasesToOpen = new LinkedList<>();
+
     private MainController mainController;
 
 
     @FXML
     public void initialize()
     {
+        errorLabel.setMaxWidth(380);
+        errorLabel.setWrapText(true);
+
+
         mainController = MainController.getInstance();
-        filedOk.bind(hostOk.and(usernameOk));
+        filedOk.bind(hostOk.and(usernameOk).and(portOk));
         allOk.bind(dbCount.isNotEqualTo(0).and(databaseNameConflict));
-
-        host.textProperty().addListener((observable, oldValue, newValue) ->
-        {
-            if (newValue == null || newValue.isEmpty())
-                hostOk.set(false);
-            else
-                hostOk.set(true);
-        });
-
-        username.textProperty().addListener((observable, oldValue, newValue) ->
-        {
-            if (newValue == null || newValue.isEmpty())
-                usernameOk.set(false);
-            else
-                usernameOk.set(true);
-        });
-
+        
+        hostOk.bind(host.textProperty().isNotEmpty());
+        portOk.bind(port.textProperty().isNotEmpty());
+        usernameOk.bind(username.textProperty().isNotEmpty());
 
         connect.disableProperty().bind(filedOk.not());
+
+
+        // force the field to be numeric only
+        port.textProperty().addListener((observable, oldValue, newValue) ->
+        {
+            if (!newValue.matches("\\d*")) {
+                port.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
 
 
         databaseDescription.setCellValueFactory(param ->
@@ -139,14 +146,18 @@ public class ServerServerController implements ServerController
 
 
         databaseDescription.prefWidthProperty().bind(tableView.widthProperty().subtract(databaseToOpen.widthProperty()).subtract(2));
+
     }
 
     /**
-     * Method called by the UI to load and display all the databases that the user can have acces to and open
+     * Method called by the UI to load and display all the databases that the user have access to and is able to open
      */
     @FXML
     public void loadDatabases()
     {
+        errorLabel.setText("");
+        databasesToOpen.clear();
+        tableView.getItems().clear();
         if (mainController.getServersList().stream()
                 .filter(server1 -> server1.getHost().equals(host.getText()))
                 .peek(server12 ->
@@ -155,7 +166,7 @@ public class ServerServerController implements ServerController
                 })
                 .count() == 0)
         {
-            server = new Server(driver, host.getText(), null);
+            server = new Server(driver, host.getText(), Integer.parseInt(port.getText()), null);
             newServer = true;
 
         }
@@ -169,14 +180,14 @@ public class ServerServerController implements ServerController
             item.disable.setValue(true);
             item.onProperty().addListener((observable, oldValue, newValue) ->
             {
-                if (newValue)
-                {
+                if (newValue) {
                     server.addDatabase(item.database);
                     dbCount.set(dbCount.get() + 1);
-                } else
-                {
+                    databasesToOpen.add(item.database);
+                } else  {
                     server.removeDatabase(item.database);
                     dbCount.set(dbCount.get() - 1);
+                    databasesToOpen.remove(item.database);
                 }
 
             });
@@ -192,7 +203,7 @@ public class ServerServerController implements ServerController
 
             //Add all the other database (the ones on the server that are not opened
             allDatabases.stream()
-                    .filter(database -> databases.stream().noneMatch(database1 -> database1.getDescritpion().equals(database.getDescritpion())))
+                    .filter(database -> databases.stream().noneMatch(database1 -> database1.getDescritpion().equals(database.getDescritpion())))//TODO change to username dbname
                     .forEach(database ->
                     {
                         Item item = new Item(database);
@@ -215,7 +226,7 @@ public class ServerServerController implements ServerController
 
         } catch (SQLException | ClassNotFoundException e)
         {
-            MainController.getInstance().addToUserCommunication(e.getMessage());
+            errorLabel.setText(e.getMessage());
         }
     }
 
@@ -235,12 +246,15 @@ public class ServerServerController implements ServerController
     public void setDriver(Driver driver)
     {
         this.driver = driver;
+        port.setText(Integer.toString(driver.getDefaultPort()));
     }
 
     @Override
     public void connect() throws SQLException, ClassNotFoundException
     {
-        server.connectRegisteredDatabases(password.getText());
+        for (Database database : databasesToOpen){
+            database.connect(password.getText());
+        }
     }
 
     class Item
@@ -261,9 +275,6 @@ public class ServerServerController implements ServerController
                 if (checkDatabaseDesc(newValue))
                 {
                     database.setDescription(description.getValue());
-                }
-                else{
-
                 }
             });
 

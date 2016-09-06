@@ -7,7 +7,8 @@ Super classe de tous les objects d'une base de données
 Serveur
 -------
 Modélisation d'un serveur de base de données. Contient une instance du driver pour récupérer les bases de données disponibles.
-Contient une liste avec les bases de données enregistrées(connectées).
+Contient une liste avec les bases de données enregistrées(connectées). Le port et le hostname est recuper sur le serveur
+
 
 Database
 --------
@@ -20,7 +21,7 @@ Super classe de tous les objects contenus dans une base de données (Schema, tab
 
 Tous les composants de base de données
 --------------------------------------
-Pour chaque élément de la base de données, il y a une classe qui la représente. 
+Pour chaque élément de la base de données, il y a une classe qui la représente.
 
 
 Package treeItem

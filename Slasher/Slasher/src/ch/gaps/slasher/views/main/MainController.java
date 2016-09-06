@@ -348,6 +348,7 @@ public class MainController
                 server.addProperty("serverDescription", s.getDescription());
                 server.addProperty("serverDriver", s.getDiverName());
                 server.addProperty("serverHost", s.getHost());
+                server.addProperty("serverPort", s.getPort());
 
                 JsonArray databases = new JsonArray();
 
@@ -428,7 +429,7 @@ public class MainController
                         }
                     }
 
-                    Server s = new Server(driver, server.get("serverHost").getAsString(), server.get("serverDescription").getAsString());
+                    Server s = new Server(driver, server.get("serverHost").getAsString(), server.get("serverPort").getAsInt(),server.get("serverDescription").getAsString());
                     ServerTreeItem serverTreeItem = new ServerTreeItem(s);
                     servers.add(s);
 
@@ -493,6 +494,6 @@ public class MainController
      */
     public void addToUserCommunication(String message)
     {
-        userCommunication.getItems().add(message);
+        userCommunication.getItems().add(0, message);
     }
 }

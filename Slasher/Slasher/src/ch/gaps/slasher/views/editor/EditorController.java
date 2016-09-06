@@ -41,6 +41,7 @@ import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *
@@ -86,45 +87,61 @@ public class EditorController {
     @FXML
     private void execute(){
 
+
         MainController.getInstance().saveState();
 
+        dataTableController.clear();
         Task<Void> task = new Task<Void>()
         {
             @Override
-            protected Void call() throws Exception
+            protected Void call()
             {
-                ResultSet rs = database.executeQuery(request.getText());
-                int columnCount = rs.getMetaData().getColumnCount();
-                String columnName[] = new String[columnCount];
-
-                for (int i = 0; i < columnCount; ++i)
+                ResultSet rs = null;
+                try
                 {
-                    columnName[i] = rs.getMetaData().getColumnName(i + 1);
-                }
+                    rs = database.executeQuery(request.getText());
 
-                ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
+                    int columnCount = rs.getMetaData().getColumnCount();
+                    String columnName[] = new String[columnCount];
 
-                while (rs.next())
-                {
-                    ObservableList<String> row = FXCollections.observableArrayList();
-
-                    for (int i = 1; i <= columnCount; ++i)
+                    for (int i = 0; i < columnCount; ++i)
                     {
-                        row.add(rs.getString(i));
+                        columnName[i] = rs.getMetaData().getColumnName(i + 1);
                     }
 
-                    data.add(row);
+                    ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
+
+                    while (rs.next())
+                    {
+                        ObservableList<String> row = FXCollections.observableArrayList();
+
+                        for (int i = 1; i <= columnCount; ++i)
+                        {
+                            row.add(rs.getString(i));
+                        }
+
+                        data.add(row);
+                    }
+
+
+
+                    Platform.runLater(() -> {
+                        dataTableController.display(data, columnName);
+                    });
+
+
+                } catch (SQLException e)
+                {
+                    Platform.runLater(() -> {
+                        MainController.getInstance().addToUserCommunication(e.getMessage());
+                    });
                 }
-
-                Platform.runLater(() -> {
-                    dataTableController.display(data, columnName);
-                });
-
                 return null;
             }
         };
 
         progress.visibleProperty().bind(task.runningProperty());
+
 
 
         Thread th = new Thread(task);

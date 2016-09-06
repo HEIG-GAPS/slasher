@@ -61,7 +61,7 @@ public class PostgreSQL94 implements Driver
     }
 
     @Override
-    public void connect(String host, String username, String password, String database) throws SQLException, ClassNotFoundException
+    public void connect(Server server, String username, String password, String database) throws SQLException, ClassNotFoundException
     {
         if (!connected)
         {
@@ -70,7 +70,7 @@ public class PostgreSQL94 implements Driver
                 database = "";
 
             connection = DriverManager
-                    .getConnection("jdbc:postgresql://" + host + ":5432/" + database,
+                    .getConnection("jdbc:postgresql://" + server.getHost() + ":" + server.getPort() + "/" + database,
                             username, password);
 
             connected = true;
@@ -138,7 +138,7 @@ public class PostgreSQL94 implements Driver
 
         Class.forName("org.postgresql.Driver");
         connection = DriverManager
-                .getConnection("jdbc:postgresql://" + server + ":5432/",
+                .getConnection("jdbc:postgresql://" + server + ":" + server.getPort() + "/",
                         username, password);
 
         ResultSet rs = connection.createStatement().executeQuery("SELECT datname FROM pg_database WHERE datistemplate = false");
@@ -190,5 +190,11 @@ public class PostgreSQL94 implements Driver
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public int getDefaultPort()
+    {
+        return 5432;
     }
 }

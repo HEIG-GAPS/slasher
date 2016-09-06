@@ -56,7 +56,7 @@ public class MySql implements Driver
     }
 
     @Override
-    public void connect(String host, String username, String password, String database) throws SQLException, ClassNotFoundException
+    public void connect(Server server, String username, String password, String database) throws SQLException, ClassNotFoundException
     {
         Class.forName("com.mysql.jdbc.Driver");
 
@@ -70,7 +70,7 @@ public class MySql implements Driver
             database = "";
         }
 
-        String url = "jdbc:mysql://" + host + ":3306/" + database;
+        String url = "jdbc:mysql://" + server.getHost() + ":" + server.getPort() + "/" + database;
         connection = DriverManager.getConnection(url, info);
 
         connected = true;
@@ -134,7 +134,7 @@ public class MySql implements Driver
         info.setProperty("useSSL", "true");
 
 
-        String url = "jdbc:mysql://" + server.getHost() + ":3306";
+        String url = "jdbc:mysql://" + server.getHost() + ":" + server.getPort();
         connection = DriverManager.getConnection(url, info);
         ResultSet rs = connection.getMetaData().getCatalogs();
         while (rs.next())
@@ -183,6 +183,12 @@ public class MySql implements Driver
     public ResultSet getAllData(Database database, Schema schema, Table table) throws SQLException
     {
         return connection.createStatement().executeQuery("SELECT * FROM " + table);
+    }
+
+    @Override
+    public int getDefaultPort()
+    {
+        return 3306;
     }
 
     @Override

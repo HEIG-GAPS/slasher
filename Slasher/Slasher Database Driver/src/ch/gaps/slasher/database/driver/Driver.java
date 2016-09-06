@@ -61,14 +61,14 @@ public interface Driver
 
     /**
      * Methode to connect the driver to the server
-     * @param host the host name
+     * @param server the server
      * @param username the username
      * @param password the password of the username
      * @param database the database to connect to
      * @throws SQLException problem with the sql connection
      * @throws ClassNotFoundException jdbc driver not found
      */
-    public void connect(String host, String username, String password, String database) throws SQLException, ClassNotFoundException;
+    public void connect(Server server, String username, String password, String database) throws SQLException, ClassNotFoundException;
 
     /**
      * Close the database
@@ -143,4 +143,10 @@ public interface Driver
      * @throws SQLException
      */
     public ResultSet getAllData(Database database, Schema schema, Table table) throws SQLException;
+
+    /**
+     * @return the driver default port
+     */
+    public int getDefaultPort();
+
 }

@@ -186,16 +186,10 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
                 try
                 {
                     ((Database) getValue()).connect(passwordText);
+                    refreshTree();
                 } catch (SQLException | ClassNotFoundException e)
                 {
-                    e.printStackTrace();
-                }
-                try
-                {
-                    refreshTree();
-                } catch (SQLException e)
-                {
-                    e.printStackTrace();
+                    MainController.getInstance().addToUserCommunication(e.getMessage());
                 }
 
             });

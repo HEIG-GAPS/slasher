@@ -162,7 +162,7 @@ public class Database extends DbObject implements DbParent
     {
         if (!connectedProperty.getValue())
         {
-            driver.connect(server.getHost(), username, password, name);
+            driver.connect(server, username, password, name);
             connectedProperty.setValue(true);
         }
     }
