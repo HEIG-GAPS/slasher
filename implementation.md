@@ -7,7 +7,7 @@ Super classe de tous les objects d'une base de données
 Serveur
 -------
 Modélisation d'un serveur de base de données. Contient une instance du driver pour récupérer les bases de données disponibles.
-Contient une liste avec les bases de données enregistrées(connectées). Le port et le hostname est recuper sur le serveur
+Contient une liste avec les bases de données enregistrées(connectées). Le port et le hostname y sont stocké.
 
 
 Database

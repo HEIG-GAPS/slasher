@@ -291,7 +291,19 @@ public class MainController
      * @param server
      */
     public void addServer(Server server) {
-        addServerToSystem(server);
+
+        
+        ServerTreeItem item = addServerToSystem(server);
+
+        ServerDisconnectItem serverDisconnectItem = new ServerDisconnectItem(item);
+
+        serverDisconnectItem.setOnAction(event ->
+        {
+            disconnectServer(item);
+            closeServerButton.getItems().remove(serverDisconnectItem);
+        });
+
+        closeServerButton.getItems().add(serverDisconnectItem);
         saveState();
     }
 
@@ -303,20 +315,10 @@ public class MainController
      */
     private ServerTreeItem addServerToSystem(Server server)
     {
-        servers.add(server);
 
         ServerTreeItem item = new ServerTreeItem(server);
         rootTreeItem.getChildren().add(item);
 
-        ServerDisconnectItem serverDisconnectItem = new ServerDisconnectItem(item);
-
-        serverDisconnectItem.setOnAction(event ->
-        {
-            disconnectServer(item);
-            closeServerButton.getItems().remove(serverDisconnectItem);
-        });
-
-        closeServerButton.getItems().add(serverDisconnectItem);
         return item;
     }
 

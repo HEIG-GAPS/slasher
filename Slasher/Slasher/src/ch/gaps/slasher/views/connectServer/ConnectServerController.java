@@ -79,7 +79,7 @@ public class ConnectServerController {
             driverOk.set(true);
             if (newValue.type() == Driver.ServerType.Server){
                 try {
-                    displayLabel.setText(Slasher.getBundle().getString("leave.blank.host"));
+                    displayLabel.setText(Slasher.getBundle().getString("connection.leave.blank.host"));
                     FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("ServerServer.fxml"), Slasher.getBundle());
                     connectionPane = loader.load();
                     AnchorPane.setTopAnchor(connectionPane, 75.0);
@@ -97,7 +97,7 @@ public class ConnectServerController {
 
             else if (newValue.type() == Driver.ServerType.File){
                 try {
-                    displayLabel.setText(Slasher.getBundle().getString("leave.blank.file"));
+                    displayLabel.setText(Slasher.getBundle().getString("connection.leave.blank.file"));
                     FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("FileServer.fxml"), Slasher.getBundle());
                     connectionPane = loader.load();
                     AnchorPane.setTopAnchor(connectionPane, 75.0);

@@ -70,7 +70,7 @@ public class TableTreeItem extends DbComponentTreeItem {
     private void loadStructureTab() {
         structureTab = new TabPane();
 
-        Tab data = new Tab(Slasher.getBundle().getString("u.data"));
+        Tab data = new Tab(Slasher.getBundle().getString("structTab.data"));
         DataTableController tableController = null;
 
 
@@ -78,7 +78,7 @@ public class TableTreeItem extends DbComponentTreeItem {
         Pane pane = null;
         AnchorPane anchorPane = new AnchorPane();
 
-        Button refresh = new Button(Slasher.getBundle().getString("u.refresh"));
+        Button refresh = new Button(Slasher.getBundle().getString("structTab.refresh"));
 
         AnchorPane.setLeftAnchor(refresh, 10.);
         AnchorPane.setTopAnchor(refresh, 5.);

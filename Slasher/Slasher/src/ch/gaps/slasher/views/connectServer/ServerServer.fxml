@@ -25,21 +25,21 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <Label text="%host" />
+            <Label text="%connection.host" />
             <TextField fx:id="host" GridPane.columnIndex="1" />
-            <Label text="%username" GridPane.rowIndex="2" />
-            <Label text="%password" GridPane.rowIndex="3" />
+            <Label text="%connection.username" GridPane.rowIndex="2" />
+            <Label text="%connection.password" GridPane.rowIndex="3" />
             <TextField fx:id="username" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <PasswordField fx:id="password" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <TextField fx:id="port" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <Label text="%port" GridPane.rowIndex="1" />
+            <Label text="%connection.port" GridPane.rowIndex="1" />
          </children>
       </GridPane>
-      <Button fx:id="connect" layoutX="270.0" layoutY="173.0" mnemonicParsing="false" onAction="#loadDatabases" text="%load.databases" AnchorPane.leftAnchor="270.0" AnchorPane.topAnchor="173.0" />
+      <Button fx:id="connect" layoutX="270.0" layoutY="173.0" mnemonicParsing="false" onAction="#loadDatabases" prefHeight="27.0" prefWidth="121.0" text="%connection.load.databases" AnchorPane.leftAnchor="270.0" AnchorPane.topAnchor="173.0" />
       <TableView fx:id="tableView" layoutX="426.0" layoutY="86.0" prefHeight="200.0" prefWidth="200.0" stylesheets="@tableView.css" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="403.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
         <columns>
           <TableColumn fx:id="databaseToOpen" editable="false" prefWidth="23.0" sortable="false" />
-          <TableColumn fx:id="databaseDescription" prefWidth="176.0" sortable="false" text="%database.description" />
+          <TableColumn fx:id="databaseDescription" prefWidth="176.0" sortable="false" text="%connection.database.description" />
         </columns>
       </TableView>
       <Label fx:id="errorLabel" layoutY="223.0" />

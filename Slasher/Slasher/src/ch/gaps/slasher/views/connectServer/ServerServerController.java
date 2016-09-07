@@ -95,8 +95,8 @@ public class ServerServerController implements ServerController
 
         mainController = MainController.getInstance();
         filedOk.bind(hostOk.and(usernameOk).and(portOk));
-        allOk.bind(dbCount.isNotEqualTo(0).and(databaseNameConflict));
-        
+        allOk.bind(databaseNameConflict.and(dbCount.isNotEqualTo(0)));
+
         hostOk.bind(host.textProperty().isNotEmpty());
         portOk.bind(port.textProperty().isNotEmpty());
         usernameOk.bind(username.textProperty().isNotEmpty());
@@ -178,19 +178,6 @@ public class ServerServerController implements ServerController
             Item item = new Item(database);
             item.selected.set(true);
             item.disable.setValue(true);
-            item.onProperty().addListener((observable, oldValue, newValue) ->
-            {
-                if (newValue) {
-                    server.addDatabase(item.database);
-                    dbCount.set(dbCount.get() + 1);
-                    databasesToOpen.add(item.database);
-                } else  {
-                    server.removeDatabase(item.database);
-                    dbCount.set(dbCount.get() - 1);
-                    databasesToOpen.remove(item.database);
-                }
-
-            });
             tableView.getItems().add(item);
         });
 
@@ -203,22 +190,23 @@ public class ServerServerController implements ServerController
 
             //Add all the other database (the ones on the server that are not opened
             allDatabases.stream()
-                    .filter(database -> databases.stream().noneMatch(database1 -> database1.getDescritpion().equals(database.getDescritpion())))//TODO change to username dbname
+                    .filter(database -> databases.stream().noneMatch(database1 ->
+                             database1.getName().equals(database.getName()) && database1.getUsername().equals(database.getUsername())
+                            ))
                     .forEach(database ->
                     {
                         Item item = new Item(database);
                         item.onProperty().addListener((observable, oldValue, newValue) ->
                         {
-                            if (newValue)
-                            {
+                            if (newValue) {
                                 server.addDatabase(item.database);
                                 dbCount.set(dbCount.get() + 1);
-                            } else
-                            {
+                                databasesToOpen.add(item.database);
+                            } else  {
                                 server.removeDatabase(item.database);
                                 dbCount.set(dbCount.get() - 1);
+                                databasesToOpen.remove(item.database);
                             }
-
                         });
                         tableView.getItems().add(item);
                     });
@@ -253,9 +241,36 @@ public class ServerServerController implements ServerController
     public void connect() throws SQLException, ClassNotFoundException
     {
         for (Database database : databasesToOpen){
+            //Add "(username@database)" at the end of the description if it isn't standard
+            if (!database.getDescritpion().equals(database.getUsername() + "@" + database.getName())){
+                database.setDescription( database.getDescritpion() + " (" + database.getUsername() + "@" + database.getName() + ")");
+            }
+
             database.connect(password.getText());
         }
     }
+
+    @Override
+    public boolean newServer()
+    {
+        return newServer;
+    }
+
+
+    /**
+     * Method to check if the description already exist on this server
+     * @param description
+     * @return true if doesn't exist
+     */
+    private boolean checkDatabaseDesc(String description){
+        for (Database database : server.getDatabases()){
+            if (database.getDescritpion().equals(description))
+                return false;
+        }
+
+        return true;
+    }
+
 
     class Item
     {
@@ -289,20 +304,6 @@ public class ServerServerController implements ServerController
         {
             return database.toString();
         }
-    }
-
-    private boolean checkDatabaseDesc(String description){
-        for (Database database : server.getDatabases()){
-            if (database.getDescritpion().equals(description))
-                return false;
-        }
-
-        return true;
-    }
-
-    public boolean newServer()
-    {
-        return newServer;
     }
 
 }

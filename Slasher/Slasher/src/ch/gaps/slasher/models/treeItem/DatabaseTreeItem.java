@@ -134,9 +134,9 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
 
         buildFileContextMenu();
 
-        MenuItem connect = new MenuItem(Slasher.getBundle().getString("connect"));
-        MenuItem disconnect = new MenuItem(Slasher.getBundle().getString("disconnect"));
-        MenuItem remove= new MenuItem(Slasher.getBundle().getString("remove"));
+        MenuItem connect = new MenuItem(Slasher.getBundle().getString("contextMenu.connect"));
+        MenuItem disconnect = new MenuItem(Slasher.getBundle().getString("contextMenu.disconnect"));
+        MenuItem remove= new MenuItem(Slasher.getBundle().getString("contextMenu.remove"));
 
         Database db = (Database)getValue();
 
@@ -149,11 +149,12 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
         {
             // Create the custom dialog.
             Dialog<String> dialog = new Dialog<>();
-            dialog.setTitle(Slasher.getBundle().getString("database.login"));
+            dialog.setTitle(Slasher.getBundle().getString("databaseLogin.title"));
 
             // Set the button types.
-            ButtonType loginButtonType = new ButtonType(Slasher.getBundle().getString("login"), ButtonBar.ButtonData.OK_DONE);
-            dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+            ButtonType loginButtonType = new ButtonType(Slasher.getBundle().getString("databaseLogin.login"), ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancelButtonType = new ButtonType(Slasher.getBundle().getString("databaseLogin.canncel"), ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, cancelButtonType);
 
             // Create the username and password labels and fields.
             GridPane grid = new GridPane();
@@ -162,9 +163,9 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
             grid.setPadding(new Insets(20, 150, 10, 10));
 
             PasswordField password = new PasswordField();
-            password.setPromptText(Slasher.getBundle().getString("password"));
+            password.setPromptText(Slasher.getBundle().getString("databaseLogin.passwordFieldDefaultText"));
 
-            grid.add(new Label(Slasher.getBundle().getString("password").concat(":")), 0, 1);
+            grid.add(new Label(Slasher.getBundle().getString("databaseLogin.password")), 0, 1);
             grid.add(password, 1, 1);
 
             // Enable/Disable login button depending on whether a username was entered.
@@ -231,7 +232,7 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
      * Build the file type only (Sqlite) part of the menu
      */
     public void buildFileContextMenu(){
-        MenuItem editor = new MenuItem(Slasher.getBundle().getString("new.sql.editor"));
+        MenuItem editor = new MenuItem(Slasher.getBundle().getString("contextMenu.newSqlEditor"));
 
         editor.setOnAction(event -> MainController.getInstance().newEditorTab());
         contextMenu.getItems().add(editor);
