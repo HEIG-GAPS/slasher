@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="372.0" prefWidth="603.0"
+            xmlns="http://javafx.com/javafx/8.0.65"
+            fx:controller="ch.gaps.slasher.views.connectServer.ServerServerController">
+    <children>
+        <GridPane prefHeight="157.0" prefWidth="392.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="10.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="408.0" minWidth="10.0" prefWidth="77.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="400.0" minWidth="10.0" prefWidth="315.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <children>
+                <Label text="%connection.host"/>
+                <TextField fx:id="host" GridPane.columnIndex="1"/>
+                <Label text="%connection.username" GridPane.rowIndex="2"/>
+                <Label text="%connection.password" GridPane.rowIndex="3"/>
+                <TextField fx:id="username" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <PasswordField fx:id="password" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <TextField fx:id="port" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <Label text="%connection.port" GridPane.rowIndex="1"/>
+            </children>
+        </GridPane>
+        <Button fx:id="connect" layoutX="270.0" layoutY="173.0" mnemonicParsing="false" onAction="#loadDatabases"
+                prefHeight="27.0" prefWidth="121.0" text="%connection.load.databases" AnchorPane.leftAnchor="270.0"
+                AnchorPane.topAnchor="173.0"/>
+        <TableView fx:id="tableView" layoutX="426.0" layoutY="86.0" prefHeight="200.0" prefWidth="200.0"
+                   stylesheets="@tableView.css" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="403.0"
+                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
+            <columns>
+                <TableColumn fx:id="databaseToOpen" editable="false" prefWidth="23.0" sortable="false"/>
+                <TableColumn fx:id="databaseDescription" prefWidth="176.0" sortable="false"
+                             text="%connection.database.description"/>
+            </columns>
+        </TableView>
+        <Label fx:id="errorLabel" layoutY="223.0"/>
+    </children>
+</AnchorPane>

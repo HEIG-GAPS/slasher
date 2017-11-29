@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.65"
+            fx:controller="ch.gaps.slasher.views.dataTableView.DataTableController">
+    <children>
+        <TableView fx:id="tableView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                   minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0"
+                   AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0"/>
+        <Label fx:id="count" layoutX="64.0" layoutY="14.0"/>
+        <Label fx:id="displayZone" layoutX="14.0" layoutY="14.0" text="%dataTableView.rows"
+               AnchorPane.leftAnchor="0.0"/>
+    </children>
+</AnchorPane>
