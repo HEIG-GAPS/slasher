@@ -25,35 +25,28 @@ import java.util.List;
 
 /**
  * This is the base interface that defines the structure of any drivers.
- * 
+ *
  * @author Julien Leroy, Jérôme Varani
  */
 public interface Driver {
 
-  /** The various way DMBSs handle data. */
-  public enum DataHandlingType {
-    /** Data are handled remotely on a server. */
-    Server,
-    /** Data are handled in a local file. */
-    File
-  }
-
-  // **************************************************************************
-  // Object Overrides
-  // **************************************************************************
   /**
    * @return the human readable name of this driver.
    */
   public String toString();
 
   // **************************************************************************
-  // Driver Parameters
+  // Object Overrides
   // **************************************************************************
+
   /**
-   * @return the id of this driver. Can be the lower case name of the main
-   *         class.
+   * @return the id of this driver. Can be the lower case name of the main class.
    */
   public String id();
+
+  // **************************************************************************
+  // Driver Parameters
+  // **************************************************************************
 
   /** @return the {@link DataHandlingType}. */
   public DataHandlingType type();
@@ -61,117 +54,138 @@ public interface Driver {
   /** @return the default port used by the DBMS. */
   public int getDefaultPort();
 
-  // **************************************************************************
-  // Connection Matters
-  // **************************************************************************
   /**
    * Use by the server to list the databases
-   * 
+   *
    * @param server the {@link Server}.
    * @param username the user name.
    * @param password the password.
+   *
    * @return a list of {@Database} instances.
+   *
    * @throws SQLException if the query to get databases fails.
-   * @throws ClassNotFoundException the JDBC driver has not been founded in the
-   *           classpath.
+   * @throws ClassNotFoundException the JDBC driver has not been founded in the classpath.
    */
-  public List<Database> getDatabases(Server server, String username,
-                                     String password) throws SQLException, ClassNotFoundException;
+  public List<Database> getDatabases(Server server, String username, String password) throws SQLException,
+                                                                                               ClassNotFoundException;
+
+  // **************************************************************************
+  // Connection Matters
+  // **************************************************************************
 
   /**
    * Connects to the database that can be reached by the parameters given.
-   * 
+   *
    * @param server the {@link Server}.
    * @param username the user name.
    * @param password the password.
    * @param database the name of the database.
+   *
    * @throws SQLException a problem occurs while opening the connection.
-   * @throws ClassNotFoundException the JDBC driver has not been founded in the
-   *           classpath.
+   * @throws ClassNotFoundException the JDBC driver has not been founded in the classpath.
    */
-  public void connect(Server server, String username, String password,
-      String database) throws SQLException, ClassNotFoundException;
+  public void connect(Server server, String username, String password, String database) throws SQLException,
+                                                                                                 ClassNotFoundException;
 
   /**
    * Closes the database
-   * 
+   *
    * @throws SQLException if the connection was already closed.
    */
   public void close() throws SQLException;
 
   /**
-   * @return {@code true} if the connection to the database is opened, otherwise
-   *         {@code false}.
+   * @return {@code true} if the connection to the database is opened, otherwise {@code false}.
    */
   public Boolean isConnected();
 
-  // **************************************************************************
-  // Schema Matters
-  // **************************************************************************
   /**
    * @return {@code true} if the DBMS handle schemas, otherwise {@code false}.
    */
   public boolean hasSchema();
 
+  // **************************************************************************
+  // Schema Matters
+  // **************************************************************************
+
   /**
    * Retrieves the schemas handled by the {@link Database}.
-   * 
+   *
    * @param database the {@link Database} where to retrieve schemas.
+   *
    * @return a list of {@link Schema} instances.
+   *
    * @throws SQLException if an error occurs while retrieving the schemas.
    */
   public List<Schema> getSchemas(Database database) throws SQLException;
 
   /**
    * Retrieves all tables in the {@link Schema}.
-   * 
+   *
    * @param schema the {@link Schema} where to retrieve tables.
+   *
    * @return a list of {@link Table} instances.
+   *
    * @throws SQLException if the retrieval of tables fails.
    */
   public List<Table> getTables(Schema schema) throws SQLException;
 
   /**
    * Retrieves all views in the {@link Schema}.
-   * 
+   *
    * @param schema the {@link Schema} where to retrieve views.
+   *
    * @return a list of {@link View} instances.
+   *
    * @throws SQLException if the retrieval of views fails.
    */
   public List<View> getViews(Schema schema) throws SQLException;
 
   /**
    * Retrieves all triggers in the {@link Schema}.
-   * 
+   *
    * @param schema the {@link Schema} where to retrieve triggers.
+   *
    * @return a list of {@link Trigger} instances.
+   *
    * @throws SQLException if the retrieval of triggers fails.
    */
   public List<Trigger> getTriggers(Schema schema) throws SQLException;
 
-  // **************************************************************************
-  // Queries Matters
-  // **************************************************************************
   /**
    * Executes the query.
-   * 
+   *
    * @param query the SQL query.
+   *
    * @return the {@link ResultSet} holding the result.
+   *
    * @throws SQLException if the query fails.
    */
   public ResultSet executeQuery(String query) throws SQLException;
 
+  // **************************************************************************
+  // Queries Matters
+  // **************************************************************************
+
   /**
    * Retrieves all data from the table
-   * 
+   *
    * @param database the {@link Database}.
    * @param schema the {@link Schema}.
    * @param table the {@link Table}.
+   *
    * @return a {@link ResultSet} containing all data of the table.
+   *
    * @throws SQLException if something went wrong while retrieving data.
    */
   // TODO : why this method takes a database and a schema ??
-  public ResultSet getAllData(Database database, Schema schema, Table table)
-      throws SQLException;
+  public ResultSet getAllData(Database database, Schema schema, Table table) throws SQLException;
+
+  /** The various way DMBSs handle data. */
+  public enum DataHandlingType {
+    /** Data are handled remotely on a server. */
+    Server, /** Data are handled in a local file. */
+    File
+  }
 
 }

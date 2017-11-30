@@ -24,12 +24,14 @@ import java.sql.SQLException;
  * @author j.leroy
  */
 public class View extends DBComponent {
+
   public View(String name, Database database) {
     super(name, database);
   }
 
   /**
    * @return result set with all the data of the view
+   *
    * @throws SQLException
    */
   public ResultSet getAllData() throws SQLException {

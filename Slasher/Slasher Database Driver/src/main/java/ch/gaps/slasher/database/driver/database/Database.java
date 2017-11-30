@@ -49,9 +49,10 @@ public class Database implements DBObject, DBParent {
   // **************************************************************************
   // Constructors
   // **************************************************************************
+
   /**
    * Creates a new {@link Database} instance.
-   * 
+   *
    * @param driver the {@link Driver}.
    * @param name the name of the database.
    * @param server the {@link Server}.
@@ -63,15 +64,14 @@ public class Database implements DBObject, DBParent {
 
   /**
    * Creates a new {@link Database} instance.
-   * 
+   *
    * @param driver the {@link Driver}.
    * @param name the name of the database.
    * @param description the description of the database.
    * @param server the {@link Server}.
    * @param username the user name.
    */
-  public Database(Driver driver, String name, String description, Server server,
-      String username) {
+  public Database(Driver driver, String name, String description, Server server, String username) {
     this.driver = driver;
     this.name = name;
     this.server = server;
@@ -93,16 +93,16 @@ public class Database implements DBObject, DBParent {
   // **************************************************************************
   // Connection Matters
   // **************************************************************************
+
   /**
    * Connects to the database.
-   * 
+   *
    * @param password the password.
+   *
    * @throws SQLException if something went wrong while opening the connection.
-   * @throws ClassNotFoundException if the JDBC driver has not been founded in
-   *           the classpath.
+   * @throws ClassNotFoundException if the JDBC driver has not been founded in the classpath.
    */
-  public void connect(String password)
-      throws SQLException, ClassNotFoundException {
+  public void connect(String password) throws SQLException, ClassNotFoundException {
     if (!connectedProperty.getValue()) {
       driver.connect(server, username, password, name);
       connectedProperty.setValue(true);
@@ -111,7 +111,7 @@ public class Database implements DBObject, DBParent {
 
   /**
    * Closes the connection.
-   * 
+   *
    * @throws SQLException if the connection was already closed.
    */
   public void close() throws SQLException {
@@ -131,9 +131,9 @@ public class Database implements DBObject, DBParent {
   // **************************************************************************
   // Connection Matters
   // **************************************************************************
+
   /**
-   * @return {@code true} if this database handle schemas, otherwise
-   *         {@code false}.
+   * @return {@code true} if this database handle schemas, otherwise {@code false}.
    */
   public boolean hasSchemas() {
     return driver.hasSchema();
@@ -141,6 +141,7 @@ public class Database implements DBObject, DBParent {
 
   /**
    * @return a list of {@link Schema} instances.
+   *
    * @throws SQLException if something went wrong while retrieving the schemas.
    */
   public List<Schema> getSchemas() throws SQLException {
@@ -149,6 +150,7 @@ public class Database implements DBObject, DBParent {
 
   /**
    * @return talbe(s) list of the database
+   *
    * @throws SQLException
    */
   public List<Table> getTables() throws SQLException {
@@ -157,9 +159,11 @@ public class Database implements DBObject, DBParent {
 
   /**
    * If the database has a schema
-   * 
+   *
    * @param schema
+   *
    * @return talbe(s) list of the database
+   *
    * @throws SQLException
    */
   public List<Table> getTables(Schema schema) throws SQLException {
@@ -168,7 +172,9 @@ public class Database implements DBObject, DBParent {
 
   /**
    * Returns the views contained in the schema given.
+   *
    * @param schema The {@link Schema}.
+   *
    * @return view(s) list
    */
   public List<View> getViews(Schema schema) throws SQLException {
@@ -226,9 +232,11 @@ public class Database implements DBObject, DBParent {
 
   /**
    * To execute a query on the driver
-   * 
+   *
    * @param query
+   *
    * @return query result set
+   *
    * @throws SQLException
    */
   public ResultSet executeQuery(String query) throws SQLException {
@@ -237,10 +245,12 @@ public class Database implements DBObject, DBParent {
 
   /**
    * To get all the data of a table with a schema
-   * 
+   *
    * @param schema
    * @param table
+   *
    * @return the result set with all the data
+   *
    * @throws SQLException
    */
   public ResultSet getAllData(Schema schema, Table table) throws SQLException {
@@ -249,13 +259,14 @@ public class Database implements DBObject, DBParent {
 
   /**
    * Implementation of the DbParent method
-   * 
+   *
    * @param table
+   *
    * @return result set with all the talbe data
+   *
    * @throws SQLException
    */
-  @Override
-  public ResultSet getAllData(Table table) throws SQLException {
+  @Override public ResultSet getAllData(Table table) throws SQLException {
     return driver.getAllData(this, null, table);
   }
 }

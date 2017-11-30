@@ -19,7 +19,7 @@ package ch.gaps.slasher.tool;
 
 /**
  * {@code Tool} is the base interface for all tools that Slasher can handle.
- * 
+ *
  * @author Jérôme Varani
  */
 public interface Tool {

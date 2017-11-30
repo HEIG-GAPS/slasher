@@ -19,7 +19,7 @@ package ch.gaps.slasher.database.driver.database;
 
 /**
  * Representation of any elements composing a database.
- * 
+ *
  * @author Julien Leroy
  */
 public abstract class DBComponent implements DBObject {
@@ -37,9 +37,10 @@ public abstract class DBComponent implements DBObject {
   // **************************************************************************
   // Constructors
   // **************************************************************************
+
   /**
    * Creates a new {@link DBComponent}.
-   * 
+   *
    * @param name the name of the component.
    * @param database the {@link Database}.
    */
@@ -49,9 +50,8 @@ public abstract class DBComponent implements DBObject {
   }
 
   /**
-   * Creates a new {@link DBComponent} for any component held by any parent
-   * object.
-   * 
+   * Creates a new {@link DBComponent} for any component held by any parent object.
+   *
    * @param name the name of the component.
    * @param dbParent the {@link DBParent}.
    */
@@ -63,15 +63,16 @@ public abstract class DBComponent implements DBObject {
   // **************************************************************************
   // DBObject Overrides
   // **************************************************************************
+
   /** @return the name of this component. */
-  @Override
-  public String toString() {
+  @Override public String toString() {
     return name;
   }
 
   // **************************************************************************
   // Getters / Setters
   // **************************************************************************
+
   /** @return the name of this component. */
   public String name() {
     return name;

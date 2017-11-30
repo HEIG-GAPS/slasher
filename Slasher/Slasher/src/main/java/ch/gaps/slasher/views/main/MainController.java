@@ -54,27 +54,19 @@ import java.util.ResourceBundle;
  */
 public class MainController {
 
-  private static final ResourceBundle bundle = ResourceBundle
-                                                   .getBundle("Bundle", new Locale("en", "EN"));
+  private static final ResourceBundle bundle = ResourceBundle.getBundle("Bundle", new Locale("en", "EN"));
   private static MainController instance;
   private final Tab structureTab = new Tab("Struct");
   private final TreeItem<DBObject> rootTreeItem = new TreeItem<>();
   private final LinkedList<Server> servers = new LinkedList<>();
   private final LinkedList<EditorTab> tabs = new LinkedList<>();
-  @FXML
-  private MenuBar menu;
-  @FXML
-  private BorderPane borderPane;
-  @FXML
-  private TabPane tabPane;
-  @FXML
-  private TreeView<DBObject> treeView;
-  @FXML
-  private Menu closeServerButton;
-  @FXML
-  private MenuItem newEditorTab;
-  @FXML
-  private ListView<String> userCommunication;
+  @FXML private MenuBar menu;
+  @FXML private BorderPane borderPane;
+  @FXML private TabPane tabPane;
+  @FXML private TreeView<DBObject> treeView;
+  @FXML private Menu closeServerButton;
+  @FXML private MenuItem newEditorTab;
+  @FXML private ListView<String> userCommunication;
   private DatabaseTreeItem currentDatabaseTreeItem;
 
   public MainController() {
@@ -95,8 +87,7 @@ public class MainController {
    *
    * @throws IOException
    */
-  @FXML
-  private void initialize() throws IOException {
+  @FXML private void initialize() throws IOException {
     structureTab.setClosable(false);
     tabPane.getTabs().add(structureTab);
 
@@ -106,24 +97,23 @@ public class MainController {
     rootTreeItem.setExpanded(true);
     treeView.setCellFactory(param -> new DbObjectTreeCell());
 
-    treeView.getSelectionModel().selectedItemProperty()
-        .addListener((observable, oldValue, newValue) -> {
-          if (newValue != null) {
-            structureTab.setContent(null);
-            DbObjectTreeItem dbObjectTreeItem = (DbObjectTreeItem) newValue;
-            if (dbObjectTreeItem.getType() != TreeItemType.SERVER) {
-              newEditorTab.setDisable(false);
-            } else {
-              newEditorTab.setDisable(true);
-            }
+    treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+      if (newValue != null) {
+        structureTab.setContent(null);
+        DbObjectTreeItem dbObjectTreeItem = (DbObjectTreeItem) newValue;
+        if (dbObjectTreeItem.getType() != TreeItemType.SERVER) {
+          newEditorTab.setDisable(false);
+        } else {
+          newEditorTab.setDisable(true);
+        }
 
-            if (dbObjectTreeItem.getStructureTab() != null) {
-              structureTab.setContent(dbObjectTreeItem.getStructureTab());
+        if (dbObjectTreeItem.getStructureTab() != null) {
+          structureTab.setContent(dbObjectTreeItem.getStructureTab());
 
-            }
-          }
+        }
+      }
 
-        });
+    });
 
     readSave();
     refreshTreeView();
@@ -132,8 +122,7 @@ public class MainController {
   /**
    * Called by the UI to close the app
    */
-  @FXML
-  private void close() {
+  @FXML private void close() {
     Platform.exit();
   }
 
@@ -142,20 +131,17 @@ public class MainController {
    *
    * @throws IOException
    */
-  @FXML
-  public void newEditorTab() {
+  @FXML public void newEditorTab() {
 
     Database database;
-    DbObjectTreeItem dbObjectTreeItem = (DbObjectTreeItem) treeView
-                                                               .getSelectionModel().getSelectedItem();
+    DbObjectTreeItem dbObjectTreeItem = (DbObjectTreeItem) treeView.getSelectionModel().getSelectedItem();
 
     if (dbObjectTreeItem.getType() == TreeItemType.DATABASE) {
       database = (Database) dbObjectTreeItem.getValue();
     } else if (dbObjectTreeItem.getType() == TreeItemType.SCHEMA) {
       database = ((Schema) dbObjectTreeItem.getValue()).getDatabase();
     } else {
-      database = (Database) ((DbComponentTreeItem) dbObjectTreeItem)
-                                .getDatabase().getValue();
+      database = (Database) ((DbComponentTreeItem) dbObjectTreeItem).getDatabase().getValue();
     }
 
     try {
@@ -171,20 +157,18 @@ public class MainController {
    * Load the fxml of the SQL Editor
    *
    * @param database to link the query to
-   * @param content  to initialize the content of the editor
+   * @param content to initialize the content of the editor
+   *
    * @return Loaded Tab
+   *
    * @throws IOException
    */
-  private Tab loadEditorTab(Database database, String content)
-      throws IOException {
-    FXMLLoader loader = new FXMLLoader(
-                                          EditorController.class.getResource("EditorView.fxml"),
-                                          Slasher.getBundle());
+  private Tab loadEditorTab(Database database, String content) throws IOException {
+    FXMLLoader loader = new FXMLLoader(EditorController.class.getResource("EditorView.fxml"), Slasher.getBundle());
     Node node = loader.load();
     EditorController editorController = loader.getController();
 
-    EditorTab newTab = new EditorTab("Editor on " + database.getDescritpion(),
-                                        node, database, editorController);
+    EditorTab newTab = new EditorTab("Editor on " + database.getDescritpion(), node, database, editorController);
     newTab.setOnClosed(event -> tabs.remove(event.getSource()));
 
     if (content != null) {
@@ -204,12 +188,9 @@ public class MainController {
    *
    * @throws IOException
    */
-  @FXML
-  private void connectDB() {
+  @FXML private void connectDB() {
     Stage stage = new Stage();
-    FXMLLoader loader = new FXMLLoader(
-                                          ConnectServerController.class.getResource("ConnectServerView.fxml"),
-                                          bundle);
+    FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("ConnectServerView.fxml"), bundle);
     stage.setTitle("Open a database");
     Pane pane = null;
     try {
@@ -247,8 +228,7 @@ public class MainController {
       servers.remove(serverItem.getValue());
       serverItem.disconnect();
       closeServerButton.getItems()
-          .removeIf(menuItem -> ((ServerDisconnectItem) menuItem)
-                                    .getServerTreeItem() == serverItem);
+                       .removeIf(menuItem -> ((ServerDisconnectItem) menuItem).getServerTreeItem() == serverItem);
     } catch (SQLException e) {
       addToUserCommunication(e.getMessage());
     }
@@ -301,8 +281,7 @@ public class MainController {
    */
   public void saveState() {
     try {
-      BufferedWriter os = new BufferedWriter(
-                                                new OutputStreamWriter(new FileOutputStream("save.json")));
+      BufferedWriter os = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("save.json")));
       Gson jsonEngine = new GsonBuilder().setPrettyPrinting().create();
       JsonArray mainArray = new JsonArray();
 
@@ -332,8 +311,7 @@ public class MainController {
               JsonObject tabJson = new JsonObject();
               tabJson.addProperty("tabName", "name");
               tabJson.addProperty("moduleName", editorTab.getModuleName());
-              tabJson.addProperty("content",
-                  editorTab.getEditorController().getContent());
+              tabJson.addProperty("content", editorTab.getEditorController().getContent());
               tabsJson.add(tabJson);
             }
           });
@@ -382,9 +360,8 @@ public class MainController {
             }
           }
 
-          Server s = new Server(driver, server.get("serverHost").getAsString(),
-                                   server.get("serverPort").getAsInt(),
-                                   server.get("serverDescription").getAsString());
+          Server s = new Server(driver, server.get("serverHost").getAsString(), server.get("serverPort").getAsInt(),
+                                server.get("serverDescription").getAsString());
           ServerTreeItem serverTreeItem = new ServerTreeItem(s);
           servers.add(s);
 
@@ -397,10 +374,9 @@ public class MainController {
               }
               JsonObject database = d.getAsJsonObject();
 
-              Database db = new Database(driver,
-                                            database.get("databaseName").getAsString(),
-                                            database.get("databaseDescritpion").getAsString(), s,
-                                            database.get("databaseUsername").getAsString());
+              Database db = new Database(driver, database.get("databaseName").getAsString(),
+                                         database.get("databaseDescritpion").getAsString(), s,
+                                         database.get("databaseUsername").getAsString());
               s.addDatabase(db);
 
               if (serverDriver.equals("Sqlite")) {
@@ -427,7 +403,8 @@ public class MainController {
           rootTreeItem.getChildren().add(serverTreeItem);
         }
       }
-    } catch (IOException | IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
+    } catch (IOException | IllegalAccessException | InstantiationException | NoSuchMethodException |
+                       InvocationTargetException e) {
       addToUserCommunication(e.getMessage());
     }
   }

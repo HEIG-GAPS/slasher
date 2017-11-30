@@ -22,7 +22,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 /**
  * Representation of any elements of a DBMS.
- * 
+ *
  * @author Julien Leroy
  */
 public interface DBObject {

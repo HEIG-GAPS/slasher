@@ -21,17 +21,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Interface to generalize the super type of database and schema over tables,
- * views, triggers, etc.
- * 
+ * Interface to generalize the super type of database and schema over tables, views, triggers, etc.
+ *
  * @author Julien Leroy
  */
 public interface DBParent {
+
   /**
    * Retrieves all the data stored in the given table.
-   * 
+   *
    * @param table the {@link Table}.
+   *
    * @return a {@link ResultSet} containing all data stored in the table.
+   *
    * @throws SQLException if the retrieval fails.
    */
   public ResultSet getAllData(Table table) throws SQLException;

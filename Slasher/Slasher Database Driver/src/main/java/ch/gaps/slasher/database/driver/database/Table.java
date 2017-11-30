@@ -38,6 +38,7 @@ public class Table extends DBComponent {
 
   /**
    * @return result set with all the data of the table
+   *
    * @throws SQLException
    */
   public ResultSet getAllData() throws SQLException {

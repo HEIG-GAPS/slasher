@@ -36,6 +36,7 @@ public class Schema implements DBObject, DBParent {
 
   /**
    * @return talbe(s) list
+   *
    * @throws SQLException
    */
   public List<Table> getTables() throws SQLException {
@@ -72,13 +73,14 @@ public class Schema implements DBObject, DBParent {
 
   /**
    * Implementation of the DbParent method
-   * 
+   *
    * @param table
+   *
    * @return result set with all the talbe data
+   *
    * @throws SQLException
    */
-  @Override
-  public ResultSet getAllData(Table table) throws SQLException {
+  @Override public ResultSet getAllData(Table table) throws SQLException {
     return database.getAllData(this, table);
   }
 }

@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * This is the driver to connect to a SQLite database.
- * 
+ *
  * @author Julien Leroy
  */
 public class Sqlite implements Driver {
@@ -39,76 +39,63 @@ public class Sqlite implements Driver {
   // **************************************************************************
   // Object Overrides
   // **************************************************************************
-  @Override
-  public String toString() {
+  @Override public String toString() {
     return "Sqlite";
   }
 
   // **************************************************************************
   // Driver Overrides - Driver Parameters
   // **************************************************************************
-  @Override
-  public String id() {
+  @Override public String id() {
     return Sqlite.class.getName().toLowerCase();
   }
 
-  @Override
-  public DataHandlingType type() {
+  @Override public DataHandlingType type() {
     return DataHandlingType.File;
   }
 
-  @Override
-  public int getDefaultPort() {
+  @Override public int getDefaultPort() {
     return 0;
+  }
+
+  @Override public LinkedList<Database> getDatabases(Server server, String username, String password) {
+    return null;
   }
 
   // **************************************************************************
   // Driver Overrides - Connection Matters
   // **************************************************************************
-  @Override
-  public void connect(Server server, String username, String password,
-      String database) throws ClassNotFoundException, SQLException {
+  @Override public void connect(Server server, String username, String password, String database) throws
+    ClassNotFoundException, SQLException {
 
     Class.forName("org.sqlite.JDBC");
     connection = DriverManager.getConnection("jdbc:sqlite:" + server.getHost());
   }
 
-  @Override
-  public void close() {
-  }
-
-  @Override
-  public Boolean isConnected() {
-    return true;
+  @Override public void close() {
   }
 
   // **************************************************************************
   // Driver Overrides - Schema Matters
   // **************************************************************************
 
-  @Override
-  public LinkedList<Database> getDatabases(Server server, String username,
-      String password) {
-    return null;
+  @Override public Boolean isConnected() {
+    return true;
   }
 
-  @Override
-  public boolean hasSchema() {
+  @Override public boolean hasSchema() {
     return false;
   }
 
-  @Override
-  public List<Schema> getSchemas(Database database) {
+  @Override public List<Schema> getSchemas(Database database) {
     return null;
   }
 
-  @Override
-  public List<Table> getTables(Schema schema) {
+  @Override public List<Table> getTables(Schema schema) {
     LinkedList<Table> tables = new LinkedList<>();
     try {
       Statement statement = connection.createStatement();
-      ResultSet rs = statement
-          .executeQuery("SELECT name FROM sqlite_master WHERE type = 'table'");
+      ResultSet rs = statement.executeQuery("SELECT name FROM sqlite_master WHERE type = 'table'");
 
       while (rs.next()) {
         tables.add(new Table(rs.getString("name"), schema.getDatabase()));
@@ -121,13 +108,11 @@ public class Sqlite implements Driver {
     return tables;
   }
 
-  @Override
-  public List<View> getViews(Schema schema) {
+  @Override public List<View> getViews(Schema schema) {
     return null;
   }
 
-  @Override
-  public List<Trigger> getTriggers(Schema schema) {
+  @Override public List<Trigger> getTriggers(Schema schema) {
     return null;
   }
 
@@ -135,16 +120,13 @@ public class Sqlite implements Driver {
   // Driver Overrides - Queries Matters
   // **************************************************************************
 
-  @Override
-  public ResultSet executeQuery(String query) throws SQLException {
+  @Override public ResultSet executeQuery(String query) throws SQLException {
     return connection.createStatement().executeQuery(query);
   }
 
-  @Override
-  public ResultSet getAllData(Database database, Schema schema, Table table) {
+  @Override public ResultSet getAllData(Database database, Schema schema, Table table) {
     try {
-      return connection.createStatement()
-          .executeQuery("SELECT * FROM " + table);
+      return connection.createStatement().executeQuery("SELECT * FROM " + table);
     } catch (SQLException e) {
       e.printStackTrace();
     }
