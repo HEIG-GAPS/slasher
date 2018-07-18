@@ -1,1 +1,0 @@
-ch.gaps.slasher.sqleditor.SQLEditor
