@@ -36,7 +36,7 @@ import java.util.ResourceBundle;
 public class Slasher extends Application {
 
   private static final ResourceBundle bundle = ResourceBundle
-                                                   .getBundle("Bundle", new Locale("en", "EN"));
+                                                   .getBundle("Bundle", new Locale("en"));
   private Slasher instance;
 
   /** Creates new form Slasher */
