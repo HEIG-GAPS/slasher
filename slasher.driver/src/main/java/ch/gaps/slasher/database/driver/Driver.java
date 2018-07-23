@@ -33,7 +33,7 @@ public interface Driver {
   /**
    * @return the human readable name of this driver.
    */
-  public String toString();
+  String toString();
 
   // **************************************************************************
   // Object Overrides
@@ -42,17 +42,17 @@ public interface Driver {
   /**
    * @return the id of this driver. Can be the lower case name of the main class.
    */
-  public String id();
+  String id();
 
   // **************************************************************************
   // Driver Parameters
   // **************************************************************************
 
   /** @return the {@link DataHandlingType}. */
-  public DataHandlingType type();
+  DataHandlingType type();
 
   /** @return the default port used by the DBMS. */
-  public int getDefaultPort();
+  int getDefaultPort();
 
   /**
    * Use by the server to list the databases
@@ -66,7 +66,7 @@ public interface Driver {
    * @throws SQLException if the query to get databases fails.
    * @throws ClassNotFoundException the JDBC driver has not been founded in the classpath.
    */
-  public List<Database> getDatabases(Server server, String username, String password) throws SQLException,
+  List<Database> getDatabases(Server server, String username, String password) throws SQLException,
                                                                                                ClassNotFoundException;
 
   // **************************************************************************
@@ -82,9 +82,9 @@ public interface Driver {
    * @param database the name of the database.
    *
    * @throws SQLException a problem occurs while opening the connection.
-   * @throws ClassNotFoundException the JDBC driver has not been founded in the classpath.
+   * @throws ClassNotFoundException the JDBC driver has not been found in the classpath.
    */
-  public void connect(Server server, String username, String password, String database) throws SQLException,
+  void connect(Server server, String username, String password, String database) throws SQLException,
                                                                                                  ClassNotFoundException;
 
   /**
@@ -92,12 +92,12 @@ public interface Driver {
    *
    * @throws SQLException if the connection was already closed.
    */
-  public void close() throws SQLException;
+  void close() throws SQLException;
 
   /**
    * @return {@code true} if the connection to the database is opened, otherwise {@code false}.
    */
-  public Boolean isConnected();
+  Boolean isConnected();
 
   /**
    * @return {@code true} if the DBMS handle schemas, otherwise {@code false}.
@@ -117,7 +117,7 @@ public interface Driver {
    *
    * @throws SQLException if an error occurs while retrieving the schemas.
    */
-  public List<Schema> getSchemas(Database database) throws SQLException;
+  List<Schema> getSchemas(Database database) throws SQLException;
 
   /**
    * Retrieves all tables in the {@link Schema}.
@@ -128,7 +128,7 @@ public interface Driver {
    *
    * @throws SQLException if the retrieval of tables fails.
    */
-  public List<Table> getTables(Schema schema) throws SQLException;
+  List<Table> getTables(Schema schema) throws SQLException;
 
   /**
    * Retrieves all views in the {@link Schema}.
@@ -139,7 +139,7 @@ public interface Driver {
    *
    * @throws SQLException if the retrieval of views fails.
    */
-  public List<View> getViews(Schema schema) throws SQLException;
+  List<View> getViews(Schema schema) throws SQLException;
 
   /**
    * Retrieves all triggers in the {@link Schema}.
@@ -150,7 +150,7 @@ public interface Driver {
    *
    * @throws SQLException if the retrieval of triggers fails.
    */
-  public List<Trigger> getTriggers(Schema schema) throws SQLException;
+  List<Trigger> getTriggers(Schema schema) throws SQLException;
 
   /**
    * Executes the query.
@@ -161,7 +161,7 @@ public interface Driver {
    *
    * @throws SQLException if the query fails.
    */
-  public ResultSet executeQuery(String query) throws SQLException;
+  ResultSet executeQuery(String query) throws SQLException;
 
   // **************************************************************************
   // Queries Matters
@@ -179,13 +179,13 @@ public interface Driver {
    * @throws SQLException if something went wrong while retrieving data.
    */
   // TODO : why this method takes a database and a schema ??
-  public ResultSet getAllData(Database database, Schema schema, Table table) throws SQLException;
+  ResultSet getAllData(Database database, Schema schema, Table table) throws SQLException;
 
   /** The various way DMBSs handle data. */
-  public enum DataHandlingType {
+  enum DataHandlingType {
     /** Data are handled remotely on a server. */
-    Server, /** Data are handled in a local file. */
-    File
+    SERVER, /** Data are handled in a local file. */
+    FILE
   }
 
 }

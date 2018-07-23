@@ -45,7 +45,7 @@ public class MySql implements Driver {
 
   @Override
   public DataHandlingType type() {
-    return DataHandlingType.Server;
+    return DataHandlingType.SERVER;
   }
 
   @Override

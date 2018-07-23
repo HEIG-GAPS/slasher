@@ -114,7 +114,7 @@ public class DatabaseTreeItem extends DbObjectTreeItem {
     contextMenu.getItems().clear();
 
     //menu
-    if (((Database) getValue()).type() == Driver.DataHandlingType.Server) {
+    if (((Database) getValue()).type() == Driver.DataHandlingType.SERVER) {
       buildContextMenu();
     } else {
       buildFileContextMenu();

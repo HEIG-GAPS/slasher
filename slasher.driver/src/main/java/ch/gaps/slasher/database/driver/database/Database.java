@@ -219,6 +219,7 @@ public class Database implements DBObject, DBParent {
   /**
    * @return !connected
    */
+  @Override
   public boolean disabled() {
     return !connectedProperty.getValue();
   }
@@ -226,6 +227,7 @@ public class Database implements DBObject, DBParent {
   /**
    * @return enabled property
    */
+  @Override
   public BooleanProperty enabledProperty() {
     return connectedProperty;
   }

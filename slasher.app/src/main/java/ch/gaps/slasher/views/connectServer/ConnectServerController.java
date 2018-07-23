@@ -41,11 +41,15 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author j.leroy
  */
 public class ConnectServerController {
+  private static final Logger LOGGER = Logger.getLogger(ConnectServerController.class.getName());
+
   private final BooleanProperty nameOk = new SimpleBooleanProperty(false);
   private final BooleanProperty driverOk = new SimpleBooleanProperty(false);
   private final BooleanProperty otherDataOk = new SimpleBooleanProperty(false);
@@ -78,7 +82,7 @@ public class ConnectServerController {
     driversListCB.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
       mainPane.getChildren().remove(connectionPane);
       driverOk.set(true);
-      if (newValue.type() == Driver.DataHandlingType.Server) {
+      if (newValue.type() == Driver.DataHandlingType.SERVER) {
         try {
           displayLabel.setText(Slasher.getBundle().getString("connection.leave.blank.host"));
           FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("ServerServer.fxml"), Slasher.getBundle());
@@ -92,9 +96,9 @@ public class ConnectServerController {
           serverController.setDriver(newValue);
           otherDataOk.bind(serverController.getFieldValidation());
         } catch (IOException e) {
-          e.printStackTrace();
+          LOGGER.log(Level.SEVERE, e.getMessage());
         }
-      } else if (newValue.type() == Driver.DataHandlingType.File) {
+      } else if (newValue.type() == Driver.DataHandlingType.FILE) {
         try {
           displayLabel.setText(Slasher.getBundle().getString("connection.leave.blank.file"));
           FXMLLoader loader = new FXMLLoader(ConnectServerController.class.getResource("FileServer.fxml"), Slasher.getBundle());
@@ -108,7 +112,7 @@ public class ConnectServerController {
           serverController.setDriver(newValue);
           otherDataOk.bind(serverController.getFieldValidation());
         } catch (IOException e) {
-          e.printStackTrace();
+          LOGGER.log(Level.SEVERE, e.getMessage());
         }
       }
 

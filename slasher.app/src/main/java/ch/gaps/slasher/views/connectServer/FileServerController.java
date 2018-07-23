@@ -41,7 +41,7 @@ import java.sql.SQLException;
  *
  * @author j.leroy
  */
-public class FileServerController implements ServerController {
+public class           FileServerController implements ServerController {
   private final String[] connectionData = new String[1];
   private final BooleanProperty filedOk = new SimpleBooleanProperty(false);
   @FXML

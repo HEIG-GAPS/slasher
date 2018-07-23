@@ -51,7 +51,7 @@ public class Sqlite implements Driver {
   }
 
   @Override public DataHandlingType type() {
-    return DataHandlingType.File;
+    return DataHandlingType.FILE;
   }
 
   @Override public int getDefaultPort() {
@@ -70,6 +70,7 @@ public class Sqlite implements Driver {
 
     Class.forName("org.sqlite.JDBC");
     connection = DriverManager.getConnection("jdbc:sqlite:" + server.getHost());
+    //connection.getMetaData().getSQLKeywords()
   }
 
   @Override public void close() {
