@@ -32,7 +32,7 @@ public interface Highlighter {
      * @throws IOException if the problem occured while reading the content of the file containing the keywords
      */
     static List<String> getKeywords() throws URISyntaxException, IOException {
-        return Files.readAllLines(Paths.get(Highlighter.class.getResource("keywords_sql_standard.txt").toURI()));
+        return Files.readAllLines(Paths.get(Highlighter.class.getResource("sql2003_keywords.txt").toURI()));
     }
 
     /**
