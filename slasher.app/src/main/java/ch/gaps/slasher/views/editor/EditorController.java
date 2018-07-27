@@ -96,7 +96,7 @@ public class EditorController {
     request.setParagraphGraphicFactory(LineNumberFactory.get(request));
 
     Subscription cleanupWhenDone = request.multiPlainChanges()
-            .successionEnds(Duration.ofMillis(500))
+            .successionEnds(Duration.ofMillis(100))
             .supplyTask(this::computeHighlightingAsync)
             .awaitLatest(request.multiPlainChanges())
             .filterMap(t -> {
