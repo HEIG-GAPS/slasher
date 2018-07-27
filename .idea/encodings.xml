@@ -8,6 +8,11 @@
     <file url="file://$PROJECT_DIR$/slasher.driver.postgres93" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/slasher.driver.postgres94" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/slasher.driver.sqlite" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/slasher.highlighter" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/slasher.highlighter.sqlite" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/slasher.highliter" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/slasher.highliter.sqlight" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/slasher.highliter.sqlite" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/slasher.tool" charset="UTF-8" />
   </component>
 </project>

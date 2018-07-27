@@ -18,7 +18,10 @@
 package ch.gaps.slasher.database.driver;
 
 import ch.gaps.slasher.database.driver.database.*;
+import ch.gaps.slasher.highliter.Highlighter;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -163,6 +166,12 @@ public class PostgreSQL94 implements Driver {
     } catch (SQLException e) {
       e.printStackTrace();
     }
+    return null;
+  }
+
+  // TODO: implement the PostgreSQL94 method and this method
+  @Override
+  public Highlighter getHighlighter() {
     return null;
   }
 

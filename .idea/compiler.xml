@@ -12,6 +12,8 @@
         <module name="slasher.driver.postgres93" />
         <module name="slasher.driver.postgres94" />
         <module name="slasher.driver.sqlite" />
+        <module name="slasher.highlighter" />
+        <module name="slasher.highlighter.sqlite" />
         <module name="slasher.tool" />
       </profile>
     </annotationProcessing>
@@ -23,6 +25,9 @@
       <module name="slasher.driver.postgres93" target="1.8" />
       <module name="slasher.driver.postgres94" target="1.8" />
       <module name="slasher.driver.sqlite" target="1.8" />
+      <module name="slasher.highlighter" target="1.8" />
+      <module name="slasher.highlighter.sqlite" target="1.8" />
+      <module name="slasher.highliter.sqlite" target="1.8" />
       <module name="slasher.tool" target="1.8" />
     </bytecodeTargetLevel>
   </component>

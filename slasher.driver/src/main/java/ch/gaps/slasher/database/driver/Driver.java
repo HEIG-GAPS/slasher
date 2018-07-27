@@ -18,6 +18,7 @@
 package ch.gaps.slasher.database.driver;
 
 import ch.gaps.slasher.database.driver.database.*;
+import ch.gaps.slasher.highliter.Highlighter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -102,7 +103,7 @@ public interface Driver {
   /**
    * @return {@code true} if the DBMS handle schemas, otherwise {@code false}.
    */
-  public boolean hasSchema();
+  boolean hasSchema();
 
   // **************************************************************************
   // Schema Matters
@@ -188,4 +189,5 @@ public interface Driver {
     FILE
   }
 
+  Highlighter getHighlighter();
 }

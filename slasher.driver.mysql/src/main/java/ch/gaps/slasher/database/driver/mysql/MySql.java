@@ -19,7 +19,10 @@ package ch.gaps.slasher.database.driver.mysql;
 
 import ch.gaps.slasher.database.driver.Driver;
 import ch.gaps.slasher.database.driver.database.*;
+import ch.gaps.slasher.highliter.Highlighter;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -161,6 +164,12 @@ public class MySql implements Driver {
   public ResultSet getAllData(Database database, Schema schema, Table table)
       throws SQLException {
     return connection.createStatement().executeQuery("SELECT * FROM " + table);
+  }
+
+  // TODO: implement the MySql highliter and this method
+  @Override
+  public Highlighter getHighlighter() {
+    return null;
   }
 
   @Override
