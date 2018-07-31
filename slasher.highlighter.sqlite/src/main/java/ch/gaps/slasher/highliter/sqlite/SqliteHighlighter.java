@@ -1,15 +1,12 @@
 package ch.gaps.slasher.highliter.sqlite;
 
 import ch.gaps.slasher.highliter.Highlighter;
-import org.fxmisc.richtext.model.StyleSpans;
-import org.fxmisc.richtext.model.StyleSpansBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -33,21 +30,9 @@ public class SqliteHighlighter implements Highlighter {
     private String keywordPattern;
     private Pattern pattern;
 
-    private static final String[] STYLE_CLASSES = {
-            "keyword",
-            "semicolon",
-            "paren",
-            "bracket",
-            "brace",
-            "string",
-            "comment",
-            "quoteid",
-            "bracketid"
-    };
-
     public SqliteHighlighter() throws IOException, URISyntaxException {
         keywords = getKeywords();
-        keywordPattern = keywordPattern = "\\b(" + String.join("|", keywords) + ")\\b";
+        keywordPattern = "\\b(" + String.join("|", keywords) + ")\\b";
         String regex = "(?<" + KEYWORD_GROUP_NAME + ">"+ keywordPattern + ")"
                 + "|(?<" + STRING_GROUP_NAME + ">" + STRING_PATTERN + ")"
                 + "|(?<" + PAREN_GROUP_NAME + ">" + PAREN_PATTERN + ")"
@@ -82,28 +67,4 @@ public class SqliteHighlighter implements Highlighter {
     public Pattern getPattern() {
         return pattern;
     }
-
-//    @Override
-//    public StyleSpans<Collection<String>> computeHighlighting(String text) {
-//        Matcher matcher = pattern.matcher(text);
-//        int lastKwEnd = 0;
-//        StyleSpansBuilder<Collection<String>> spansBuilder
-//                = new StyleSpansBuilder<>();
-//        while(matcher.find()) {
-//            String styleClass =
-//                    matcher.group(KEYWORD_GROUP_NAME) != null ? "keyword" :
-//                            matcher.group(PAREN_GROUP_NAME) != null ? "paren" :
-//                                    matcher.group(STRING_GROUP_NAME) != null ? "string" :
-//                                            matcher.group(SEMICOLON_GROUP_NAME) != null ? "semicolon" :
-//                                                    matcher.group(COMMENT_GROUP_NAME) != null ? "comment" :
-//                                                            matcher.group(QUOTE_ID_GROUP_NAME) != null ? "quote_id" :
-//                                                                    matcher.group(BRACKET_ID_GROUP_NAME) != null ? "bracket_id" :
-//                                                                            null; /* never happens */ assert styleClass != null;
-//            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
-//            spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
-//            lastKwEnd = matcher.end();
-//        }
-//        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
-//        return spansBuilder.create();
-//    }
 }
