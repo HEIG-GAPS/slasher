@@ -41,11 +41,4 @@ public interface Highlighter {
      * @return the StyleSpans object containing the highlighting of the text
      */
     StyleSpans<Collection<String>> computeHighlighting(String text);
-
-    /**
-     * Returns the string representation of the css
-     * @return the content of the file containing the css data.
-     * If the file does not exist or the problem occurred while reading this file, returns an empty string
-     */
-    String getCss();
 }

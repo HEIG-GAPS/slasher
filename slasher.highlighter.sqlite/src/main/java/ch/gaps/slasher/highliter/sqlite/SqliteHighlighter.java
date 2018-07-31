@@ -90,18 +90,4 @@ public class SqliteHighlighter implements Highlighter {
         spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
         return spansBuilder.create();
     }
-
-    @Override
-    public String getCss() {
-        try {
-            String css = String.join("\n", Files.readAllLines(Paths.get(SqliteHighlighter.class.getResource("/sqlite-highlighting.css").toURI())));
-            return css;
-        } catch (IOException e) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getMessage());
-            return "";
-        } catch (URISyntaxException e) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getMessage());
-            return "";
-        }
-    }
 }

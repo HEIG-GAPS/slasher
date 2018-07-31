@@ -179,35 +179,7 @@ public class EditorController {
   public void setDatabase(Database database) {
     this.database = database;
     execute.disableProperty().bind(database.enabledProperty().not());
-    loadCss();
     request.getStylesheets().add(EditorController.class.getResource("highlighting.css").toExternalForm());
-  }
-
-  /**
-   * Copies the content of the highligter's css to the class resource file
-   */
-  private void loadCss() {
-      File highlighting = null;
-      highlighting = new File(EditorController.class.getResource("highlighting.css").getPath());
-      String css = database.getHighliter().getCss();
-      BufferedOutputStream out = null;
-      try {
-          out = new BufferedOutputStream(new FileOutputStream(highlighting));
-          out.write(css.getBytes(), 0, css.length());
-          out.flush();
-      } catch (FileNotFoundException e) {
-          Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, e.getMessage());
-      } catch (IOException e) {
-          Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, e.getMessage());
-      } finally {
-          if ( out != null) {
-              try {
-                  out.close();
-              } catch (IOException e) {
-                  Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, e.getMessage());
-              }
-          }
-      }
   }
 
   public String getContent() {
