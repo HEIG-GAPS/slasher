@@ -40,6 +40,7 @@ import javafx.scene.layout.Pane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.reactfx.Subscription;
 
 import java.io.*;
@@ -47,11 +48,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.regex.Matcher;
 
 /**
  * @author j.leroy
@@ -119,7 +121,7 @@ public class EditorController {
     Task<StyleSpans<Collection<String>>> task = new Task<StyleSpans<Collection<String>>>() {
       @Override
       protected StyleSpans<Collection<String>> call() throws Exception {
-        return database.getHighliter().computeHighlighting(text);
+        return computeHighlighting(text);
       }
     };
     executor.execute(task);
@@ -189,4 +191,26 @@ public class EditorController {
   public void setContent(String content) {
     request.replaceText(content);
   }
+
+    public StyleSpans<Collection<String>> computeHighlighting(String text) {
+        List<String> groupNames = database.getHighliter().getMatcherGroupNames();
+        Matcher matcher = database.getHighliter().getPattern().matcher(text);
+        int lastKwEnd = 0;
+        StyleSpansBuilder<Collection<String>> spansBuilder
+                = new StyleSpansBuilder<>();
+        while (matcher.find()) {
+            String styleClass = null;
+            for (String gn : groupNames) {
+                if (matcher.group(gn) != null) {
+                    styleClass = gn.toLowerCase();
+                    break;
+                }
+            }
+            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
+            spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
+            lastKwEnd = matcher.end();
+        }
+        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
+        return spansBuilder.create();
+    }
 }

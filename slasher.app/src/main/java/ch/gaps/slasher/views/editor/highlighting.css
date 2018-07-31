@@ -25,12 +25,12 @@
     -fx-fill: cadetblue;
 }
 
-.quote_id {
+.quoteid {
     -fx-fill: indianred;
     -fx-font-weight: bold;
 }
 
-.bracket_id {
+.bracketid {
     -fx-fill: indianred;
     -fx-font-weight: bold;
 }

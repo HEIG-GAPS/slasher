@@ -6,8 +6,11 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * This interface represents the highlighter for a CodeArea (RichTextFX class)
@@ -23,7 +26,7 @@ public interface Highlighter {
     String STRING_GROUP_NAME = "STRING";
     String SEMICOLON_GROUP_NAME = "SEMICOLON";
     String COMMENT_GROUP_NAME = "COMMENT";
-    String KEYWIORD_GROUP_NAME = "KEYWORD";
+    String KEYWORD_GROUP_NAME = "KEYWORD";
 
     /**
      * Returns the list of the sql keywords
@@ -35,10 +38,7 @@ public interface Highlighter {
         return Files.readAllLines(Paths.get(Highlighter.class.getResource("sql2003_keywords.txt").toURI()));
     }
 
-    /**
-     * Computes the highlighting of the text
-     * @param text the string to which the highlighting is applied
-     * @return the StyleSpans object containing the highlighting of the text
-     */
-    StyleSpans<Collection<String>> computeHighlighting(String text);
+    List<String> getMatcherGroupNames();
+
+    Pattern getPattern();
 }
