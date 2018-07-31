@@ -35,20 +35,32 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
+import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.reactfx.Subscription;
 
-import java.io.IOException;
+import java.io.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
 
 /**
  * @author j.leroy
  */
 public class EditorController {
   @FXML
-  private TextArea request;
+  private CodeArea request;
   @FXML
   private AnchorPane tableViewPane;
   @FXML
@@ -60,11 +72,14 @@ public class EditorController {
 
   private DataTableController dataTableController;
 
+  // used for the asynchronous code highlighting
+  private Executor executor;
+
 
   @FXML
   private void initialize() {
     progress.setVisible(false);
-
+    String path = DataTableController.class.getResource("DataTableView.fxml").toExternalForm();
     FXMLLoader loader = new FXMLLoader(DataTableController.class.getResource("DataTableView.fxml"), Slasher.getBundle());
     try {
       Pane pane = loader.load();
@@ -79,12 +94,42 @@ public class EditorController {
       e.printStackTrace();
     }
 
+    executor = Executors.newSingleThreadExecutor();
+    request.setParagraphGraphicFactory(LineNumberFactory.get(request));
+
+    Subscription cleanupWhenDone = request.multiPlainChanges()
+            .successionEnds(Duration.ofMillis(100))
+            .supplyTask(this::computeHighlightingAsync)
+            .awaitLatest(request.multiPlainChanges())
+            .filterMap(t -> {
+              if (t.isSuccess()) {
+                return Optional.of(t.get());
+              } else {
+                t.getFailure().printStackTrace();
+                return Optional.empty();
+              }
+            })
+            .subscribe(this::applyHighlighting);
+  }
+
+  private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
+    request.setStyleSpans(0, highlighting);
+  }
+
+  private Task<StyleSpans<Collection<String>>> computeHighlightingAsync() {
+    String text = request.getText();
+    Task<StyleSpans<Collection<String>>> task = new Task<StyleSpans<Collection<String>>>() {
+      @Override
+      protected StyleSpans<Collection<String>> call() throws Exception {
+        return computeHighlighting(text);
+      }
+    };
+    executor.execute(task);
+    return task;
   }
 
   @FXML
   private void execute() {
-
-
     MainController.getInstance().saveState();
 
     dataTableController.clear();
@@ -136,6 +181,7 @@ public class EditorController {
   public void setDatabase(Database database) {
     this.database = database;
     execute.disableProperty().bind(database.enabledProperty().not());
+    request.getStylesheets().add(EditorController.class.getResource("highlighting.css").toExternalForm());
   }
 
   public String getContent() {
@@ -143,6 +189,28 @@ public class EditorController {
   }
 
   public void setContent(String content) {
-    request.setText(content);
+    request.replaceText(content);
   }
+
+    public StyleSpans<Collection<String>> computeHighlighting(String text) {
+        List<String> groupNames = database.getHighliter().getMatcherGroupNames();
+        Matcher matcher = database.getHighliter().getPattern().matcher(text);
+        int lastKwEnd = 0;
+        StyleSpansBuilder<Collection<String>> spansBuilder
+                = new StyleSpansBuilder<>();
+        while (matcher.find()) {
+            String styleClass = null;
+            for (String gn : groupNames) {
+                if (matcher.group(gn) != null) {
+                    styleClass = gn.toLowerCase();
+                    break;
+                }
+            }
+            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
+            spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
+            lastKwEnd = matcher.end();
+        }
+        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
+        return spansBuilder.create();
+    }
 }

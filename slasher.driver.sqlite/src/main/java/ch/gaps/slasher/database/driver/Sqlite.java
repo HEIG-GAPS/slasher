@@ -18,10 +18,16 @@
 package ch.gaps.slasher.database.driver;
 
 import ch.gaps.slasher.database.driver.database.*;
+import ch.gaps.slasher.highliter.Highlighter;
+import ch.gaps.slasher.highliter.sqlite.SqliteHighlighter;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This is the driver to connect to a SQLite database.
@@ -35,6 +41,8 @@ public class Sqlite implements Driver {
   // **************************************************************************
   /** the {@link Connection} on the database. */
   private Connection connection;
+
+  private Highlighter highlighter = null;
 
   // **************************************************************************
   // Object Overrides
@@ -51,7 +59,7 @@ public class Sqlite implements Driver {
   }
 
   @Override public DataHandlingType type() {
-    return DataHandlingType.File;
+    return DataHandlingType.FILE;
   }
 
   @Override public int getDefaultPort() {
@@ -70,6 +78,7 @@ public class Sqlite implements Driver {
 
     Class.forName("org.sqlite.JDBC");
     connection = DriverManager.getConnection("jdbc:sqlite:" + server.getHost());
+    //connection.getMetaData().getSQLKeywords()
   }
 
   @Override public void close() {
@@ -132,4 +141,20 @@ public class Sqlite implements Driver {
     }
     return null;
   }
+
+  @Override
+  public Highlighter getHighlighter() {
+    return highlighter;
+  }
+
+  public Sqlite() {
+    try {
+      highlighter = new SqliteHighlighter();
+    } catch (IOException e) {
+      Logger.getLogger(Sqlite.class.getName()).log(Level.SEVERE, e.getMessage());
+    } catch (URISyntaxException e) {
+      Logger.getLogger(Sqlite.class.getName()).log(Level.SEVERE, e.getMessage());
+    }
+  }
+
 }

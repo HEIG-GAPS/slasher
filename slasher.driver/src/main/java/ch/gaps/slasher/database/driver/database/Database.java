@@ -18,9 +18,12 @@
 package ch.gaps.slasher.database.driver.database;
 
 import ch.gaps.slasher.database.driver.Driver;
+import ch.gaps.slasher.highliter.Highlighter;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -219,6 +222,7 @@ public class Database implements DBObject, DBParent {
   /**
    * @return !connected
    */
+  @Override
   public boolean disabled() {
     return !connectedProperty.getValue();
   }
@@ -226,6 +230,7 @@ public class Database implements DBObject, DBParent {
   /**
    * @return enabled property
    */
+  @Override
   public BooleanProperty enabledProperty() {
     return connectedProperty;
   }
@@ -269,4 +274,9 @@ public class Database implements DBObject, DBParent {
   @Override public ResultSet getAllData(Table table) throws SQLException {
     return driver.getAllData(this, null, table);
   }
+
+  public Highlighter getHighliter() {
+    return driver.getHighlighter();
+  }
+
 }

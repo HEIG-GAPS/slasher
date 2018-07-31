@@ -63,7 +63,6 @@ public class Slasher extends Application {
   }
 
   private void loadDrivers() {
-    LinkedList<Driver> drivers = DriverService.instance().getAll();
     for (Driver d : DriverService.instance().getAll())
       System.out.println(d);
   }

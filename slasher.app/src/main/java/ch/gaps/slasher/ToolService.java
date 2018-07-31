@@ -20,6 +20,7 @@ package ch.gaps.slasher;
 import ch.gaps.slasher.tool.Tool;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.logging.Level;
@@ -42,7 +43,7 @@ public final class ToolService {
     return service;
   }
 
-  public LinkedList<Tool> getAll() {
+  public List<Tool> getAll() {
     LinkedList<Tool> l = new LinkedList<>();
     try {
       for (Tool t : loader) l.add(t);

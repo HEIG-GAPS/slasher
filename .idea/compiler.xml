@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="slasher.app" />
+        <module name="slasher.driver" />
+        <module name="slasher.driver.mysql" />
+        <module name="slasher.driver.postgres93" />
+        <module name="slasher.driver.postgres94" />
+        <module name="slasher.driver.sqlite" />
+        <module name="slasher.highlighter" />
+        <module name="slasher.highlighter.sqlite" />
+        <module name="slasher.tool" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel target="1.8">
+      <module name="slasher" target="1.8" />
+      <module name="slasher.app" target="1.8" />
+      <module name="slasher.driver" target="1.8" />
+      <module name="slasher.driver.mysql" target="1.8" />
+      <module name="slasher.driver.postgres93" target="1.8" />
+      <module name="slasher.driver.postgres94" target="1.8" />
+      <module name="slasher.driver.sqlite" target="1.8" />
+      <module name="slasher.highlighter" target="1.8" />
+      <module name="slasher.highlighter.sqlite" target="1.8" />
+      <module name="slasher.highliter.sqlite" target="1.8" />
+      <module name="slasher.tool" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

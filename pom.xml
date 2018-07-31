@@ -19,6 +19,9 @@
         <module>slasher.driver.mysql</module>
         <module>slasher.driver.postgres93</module>
         <module>slasher.driver.postgres94</module>
+        <module>slasher.highlighter</module>
+        <module>slasher.highlighter.sqlite</module>
+
     </modules>
 
     <!--  As it is not a plugin, the prerequisites tag should not be used. But it is a workaround of a bug in
