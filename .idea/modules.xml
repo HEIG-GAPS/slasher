@@ -10,7 +10,6 @@
       <module fileurl="file://$PROJECT_DIR$/slasher.driver.postgres94/slasher.driver.postgres94.iml" filepath="$PROJECT_DIR$/slasher.driver.postgres94/slasher.driver.postgres94.iml" />
       <module fileurl="file://$PROJECT_DIR$/slasher.driver.sqlite/slasher.driver.sqlite.iml" filepath="$PROJECT_DIR$/slasher.driver.sqlite/slasher.driver.sqlite.iml" />
       <module fileurl="file://$PROJECT_DIR$/slasher.highlighter/slasher.highlighter.iml" filepath="$PROJECT_DIR$/slasher.highlighter/slasher.highlighter.iml" />
-      <module fileurl="file://$PROJECT_DIR$/slasher.highlighter.sqlite/slasher.highlighter.sqlite.iml" filepath="$PROJECT_DIR$/slasher.highlighter.sqlite/slasher.highlighter.sqlite.iml" />
       <module fileurl="file://$PROJECT_DIR$/slasher.tool/slasher.tool.iml" filepath="$PROJECT_DIR$/slasher.tool/slasher.tool.iml" />
     </modules>
   </component>

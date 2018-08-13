@@ -12,6 +12,7 @@
     <artifactId>slasher.driver.sqlite</artifactId>
 
     <dependencies>
+
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>slasher.driver</artifactId>
@@ -23,12 +24,7 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.7.2</version>
         </dependency>
-        <dependency>
-            <groupId>ch.heig-vd.gaps.slasher</groupId>
-            <artifactId>slasher.highlighter.sqlite</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
+
     </dependencies>
 
     <build>

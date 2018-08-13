@@ -20,7 +20,6 @@
         <module>slasher.driver.postgres93</module>
         <module>slasher.driver.postgres94</module>
         <module>slasher.highlighter</module>
-        <module>slasher.highlighter.sqlite</module>
 
     </modules>
 

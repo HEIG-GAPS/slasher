@@ -15,11 +15,11 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-package ch.gaps.slasher.database.driver;
+package ch.gaps.slasher.driver.sqlite;
 
+import ch.gaps.slasher.database.driver.Driver;
 import ch.gaps.slasher.database.driver.database.*;
 import ch.gaps.slasher.highliter.Highlighter;
-import ch.gaps.slasher.highliter.sqlite.SqliteHighlighter;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -102,14 +102,13 @@ public class Sqlite implements Driver {
 
   @Override public List<Table> getTables(Schema schema) {
     LinkedList<Table> tables = new LinkedList<>();
-    try {
-      Statement statement = connection.createStatement();
-      ResultSet rs = statement.executeQuery("SELECT name FROM sqlite_master WHERE type = 'table'");
+    try(Statement statement = connection.createStatement()) {
+      try (ResultSet rs = statement.executeQuery("SELECT name FROM sqlite_master WHERE type = 'table'")) {
 
-      while (rs.next()) {
-        tables.add(new Table(rs.getString("name"), /*schema.getDatabase()*/ null));
+        while (rs.next()) {
+          tables.add(new Table(rs.getString("name"), /*schema.getDatabase()*/ null));
+        }
       }
-
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -130,12 +129,14 @@ public class Sqlite implements Driver {
   // **************************************************************************
 
   @Override public ResultSet executeQuery(String query) throws SQLException {
-    return connection.createStatement().executeQuery(query);
+    try(Statement statement = connection.createStatement()) {
+      return statement.executeQuery(query);
+    }
   }
 
   @Override public ResultSet getAllData(Database database, Schema schema, Table table) {
-    try {
-      return connection.createStatement().executeQuery("SELECT * FROM " + table);
+    try(Statement statement = connection.createStatement()) {
+      return statement.executeQuery("SELECT * FROM " + table);
     } catch (SQLException e) {
       e.printStackTrace();
     }

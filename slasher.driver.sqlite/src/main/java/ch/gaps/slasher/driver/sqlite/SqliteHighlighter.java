@@ -1,4 +1,4 @@
-package ch.gaps.slasher.highliter.sqlite;
+package ch.gaps.slasher.driver.sqlite;
 
 import ch.gaps.slasher.highliter.Highlighter;
 
@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -44,9 +46,10 @@ public class SqliteHighlighter implements Highlighter {
         pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
     }
 
-    static List<String> getKeywords() throws URISyntaxException, IOException {
-
-        return Files.readAllLines(Paths.get(SqliteHighlighter.class.getResource("/keywords_sqlite.txt").toURI()));
+    @Override
+    public List<String> getKeywords() throws URISyntaxException, IOException {
+        return Files.readAllLines(Paths.get(
+          SqliteHighlighter.class.getResource("/keywords_sqlite.txt").toURI()));
     }
 
     public List<String> getMatcherGroupNames() {
