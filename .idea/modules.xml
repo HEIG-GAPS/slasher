@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/slasher.iml" filepath="$PROJECT_DIR$/slasher.iml" />
       <module fileurl="file://$PROJECT_DIR$/slasher.app/slasher.app.iml" filepath="$PROJECT_DIR$/slasher.app/slasher.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/slasher.corrector/slasher.corrector.iml" filepath="$PROJECT_DIR$/slasher.corrector/slasher.corrector.iml" />
       <module fileurl="file://$PROJECT_DIR$/slasher.driver/slasher.driver.iml" filepath="$PROJECT_DIR$/slasher.driver/slasher.driver.iml" />
       <module fileurl="file://$PROJECT_DIR$/slasher.driver.mysql/slasher.driver.mysql.iml" filepath="$PROJECT_DIR$/slasher.driver.mysql/slasher.driver.mysql.iml" />
       <module fileurl="file://$PROJECT_DIR$/slasher.driver.postgres93/slasher.driver.postgres93.iml" filepath="$PROJECT_DIR$/slasher.driver.postgres93/slasher.driver.postgres93.iml" />

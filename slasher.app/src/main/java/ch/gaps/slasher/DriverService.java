@@ -20,6 +20,7 @@ package ch.gaps.slasher;
 import ch.gaps.slasher.database.driver.Driver;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.logging.Level;
@@ -60,8 +61,8 @@ public final class DriverService {
   /**
    * @return all {@link Driver}s that have been loaded by this service.
    */
-  public LinkedList<Driver> getAll() {
-    LinkedList<Driver> l = new LinkedList<>();
+  public List<Driver> getAll() {
+    List<Driver> l = new LinkedList<>();
     try {
       for (Driver d : loader) l.add(d);
     } catch (ServiceConfigurationError serviceError) {
