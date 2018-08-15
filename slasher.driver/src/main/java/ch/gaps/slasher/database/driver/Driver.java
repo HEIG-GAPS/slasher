@@ -17,6 +17,7 @@
  */
 package ch.gaps.slasher.database.driver;
 
+import ch.gaps.slasher.corrector.Corrector;
 import ch.gaps.slasher.database.driver.database.*;
 import ch.gaps.slasher.highliter.Highlighter;
 
@@ -189,5 +190,15 @@ public interface Driver {
     FILE
   }
 
+  /**
+   * Getter
+   * @return the {@link Highlighter} for the given {@link Driver}
+   */
   Highlighter getHighlighter();
+
+  /**
+   * Getter
+   * @return the {@link Corrector} for the given {@link Driver}
+   */
+  Corrector getCorrector();
 }

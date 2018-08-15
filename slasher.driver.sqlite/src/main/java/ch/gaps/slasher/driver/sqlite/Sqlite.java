@@ -17,6 +17,7 @@
  */
 package ch.gaps.slasher.driver.sqlite;
 
+import ch.gaps.slasher.corrector.Corrector;
 import ch.gaps.slasher.database.driver.Driver;
 import ch.gaps.slasher.database.driver.database.*;
 import ch.gaps.slasher.highliter.Highlighter;
@@ -43,6 +44,7 @@ public class Sqlite implements Driver {
   private Connection connection;
 
   private Highlighter highlighter = null;
+  private Corrector corrector = null;
 
   // **************************************************************************
   // Object Overrides
@@ -148,9 +150,15 @@ public class Sqlite implements Driver {
     return highlighter;
   }
 
+  @Override
+  public Corrector getCorrector() {
+    return corrector;
+  }
+
   public Sqlite() {
     try {
       highlighter = new SqliteHighlighter();
+      corrector = new SQLiteCorrector();
     } catch (IOException e) {
       Logger.getLogger(Sqlite.class.getName()).log(Level.SEVERE, e.getMessage());
     } catch (URISyntaxException e) {

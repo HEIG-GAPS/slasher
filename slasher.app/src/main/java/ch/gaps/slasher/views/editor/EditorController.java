@@ -24,6 +24,7 @@
 package ch.gaps.slasher.views.editor;
 
 import ch.gaps.slasher.Slasher;
+import ch.gaps.slasher.corrector.SyntaxError;
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.views.dataTableView.DataTableController;
 import ch.gaps.slasher.views.main.MainController;
@@ -46,6 +47,7 @@ import org.reactfx.Subscription;
 import java.io.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.BreakIterator;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,6 +55,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
 /**
@@ -79,7 +83,6 @@ public class EditorController {
   @FXML
   private void initialize() {
     progress.setVisible(false);
-    String path = DataTableController.class.getResource("DataTableView.fxml").toExternalForm();
     FXMLLoader loader = new FXMLLoader(DataTableController.class.getResource("DataTableView.fxml"), Slasher.getBundle());
     try {
       Pane pane = loader.load();
@@ -91,13 +94,15 @@ public class EditorController {
 
       tableViewPane.getChildren().add(pane);
     } catch (IOException e) {
-      e.printStackTrace();
+      Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, e.getMessage());
     }
 
+
+    // text highlighting
     executor = Executors.newSingleThreadExecutor();
     request.setParagraphGraphicFactory(LineNumberFactory.get(request));
 
-    Subscription cleanupWhenDone = request.multiPlainChanges()
+    request.multiPlainChanges()
             .successionEnds(Duration.ofMillis(100))
             .supplyTask(this::computeHighlightingAsync)
             .awaitLatest(request.multiPlainChanges())
@@ -110,6 +115,29 @@ public class EditorController {
               }
             })
             .subscribe(this::applyHighlighting);
+
+    // spell check
+    request.multiPlainChanges()
+            .successionEnds(Duration.ofMillis(500))
+            .subscribe(change -> {
+              request.setStyleSpans(0, computeSpellCheck(request.getText()));
+            });
+  }
+
+  private StyleSpans<Collection<String>> computeSpellCheck(String text) {
+    List<SyntaxError> syntaxErrors = database.getCorrector().check(text);
+    StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+    BreakIterator wb = BreakIterator.getWordInstance();
+    wb.setText(text);
+    int lastKwEnd = 0;
+    if (syntaxErrors != null) {
+      for (SyntaxError e : syntaxErrors) {
+        spansBuilder.add(Collections.emptyList(), e.getCharPositionInLine() - lastKwEnd);
+        spansBuilder.add(Collections.singleton("underlined"), e.getLastErrorPosition() - e.getCharPositionInLine());
+        lastKwEnd = e.getLastErrorPosition();
+      }
+    }
+    return spansBuilder.create();
   }
 
   private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {

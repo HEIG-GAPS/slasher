@@ -5,6 +5,7 @@
  */
 package ch.gaps.slasher.database.driver.postgres93;
 
+import ch.gaps.slasher.corrector.Corrector;
 import ch.gaps.slasher.database.driver.Driver;
 import ch.gaps.slasher.database.driver.database.*;
 import ch.gaps.slasher.highliter.Highlighter;
@@ -100,7 +101,13 @@ public class PostgreSQL93 implements Driver {
   // TODO: implement the PostgreSQL94 highlighter and implement the method
   @Override
   public Highlighter getHighlighter() {
-    return null;
+    throw new UnsupportedOperationException("implement the Highlighter for PostgreSQL93");
+  }
+
+  // TODO : implement
+  @Override
+  public Corrector getCorrector() {
+      throw new UnsupportedOperationException("implement a Corrector for PostgreSQL93");
   }
 
 }
