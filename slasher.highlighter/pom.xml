@@ -18,13 +18,5 @@
             </resource>
         </resources>
     </build>
-    <dependencies>
-        <dependency>
-            <groupId>org.fxmisc.richtext</groupId>
-            <artifactId>richtextfx</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
 
 </project>
