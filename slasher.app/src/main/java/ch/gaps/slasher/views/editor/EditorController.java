@@ -136,9 +136,8 @@ public class EditorController {
     Task<Void> task = new Task<Void>() {
       @Override
       protected Void call() {
-        ResultSet rs = null;
-        try {
-          rs = database.executeQuery(request.getText());
+
+        try(ResultSet rs = database.executeQuery(request.getText())) {
 
           int columnCount = rs.getMetaData().getColumnCount();
           String columnName[] = new String[columnCount];
@@ -159,11 +158,9 @@ public class EditorController {
             data.add(row);
           }
 
-
           Platform.runLater(() -> dataTableController.display(data, columnName));
 
-
-        } catch (SQLException e) {
+        } catch (Exception e) {
           Platform.runLater(() -> MainController.getInstance().addToUserCommunication(e.getMessage()));
         }
         return null;
