@@ -104,7 +104,7 @@ public class Sqlite implements Driver {
 
   @Override public List<Table> getTables(Schema schema) {
     LinkedList<Table> tables = new LinkedList<>();
-    try(Statement statement = connection.createStatement()) {
+    try (Statement statement = connection.createStatement()) {
       try (ResultSet rs = statement.executeQuery("SELECT name FROM sqlite_master WHERE type = 'table'")) {
 
         while (rs.next()) {
@@ -131,22 +131,19 @@ public class Sqlite implements Driver {
   // **************************************************************************
 
   @Override public ResultSet executeQuery(String query) throws SQLException {
-    try(Statement statement = connection.createStatement()) {
-      return statement.executeQuery(query);
-    }
+    return connection.createStatement().executeQuery(query);
   }
 
   @Override public ResultSet getAllData(Database database, Schema schema, Table table) {
-    try(Statement statement = connection.createStatement()) {
-      return statement.executeQuery("SELECT * FROM " + table);
+    try {
+      return connection.createStatement().executeQuery("SELECT * FROM " + table);
     } catch (SQLException e) {
       e.printStackTrace();
     }
     return null;
   }
 
-  @Override
-  public Highlighter getHighlighter() {
+  @Override public Highlighter getHighlighter() {
     return highlighter;
   }
 

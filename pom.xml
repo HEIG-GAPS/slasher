@@ -27,9 +27,9 @@
     maven-version-plugin where it uses this tag to get the plugin versions to use according to the Maven version. More
     information can be founded at
     https://web.archive.org/web/20150514123930/http://jira.codehaus.org/browse/MVERSIONS-272 -->
-    <prerequisites>
+    <!--<prerequisites>
         <maven>3</maven>
-    </prerequisites>
+    </prerequisites>-->
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -157,6 +157,9 @@
                         </goals>
                         <configuration>
                             <failOnWarning>true</failOnWarning>
+                            <ignoredDependencies>
+                                <ignoredDependency>ch.heig-vd.gaps.slasher:slasher.driver.*</ignoredDependency>
+                            </ignoredDependencies>
                         </configuration>
                     </execution>
                 </executions>
@@ -171,44 +174,24 @@
                         <goals>
                             <goal>display-dependency-updates</goal>
                         </goals>
-                        <phase>validate</phase>
-                        <!--<configuration>
-
-                            <failOnWarning>true</failOnWarning>
-                        </configuration>-->
                     </execution>
-                    <execution>
+                    <!--<execution>
                         <id>versions-plugins</id>
                         <goals>
                             <goal>display-plugin-updates</goal>
                         </goals>
-                        <phase>validate</phase>
-                        <!--<configuration>
-
-                            <failOnWarning>true</failOnWarning>
-                        </configuration>-->
-                    </execution>
+                    </execution>-->
                     <execution>
                         <id>versions-properties</id>
                         <goals>
                             <goal>display-property-updates</goal>
                         </goals>
-                        <phase>validate</phase>
-                        <!--<configuration>
-
-                            <failOnWarning>true</failOnWarning>
-                        </configuration>-->
                     </execution>
                     <execution>
                         <id>versions-parent</id>
                         <goals>
                             <goal>display-parent-updates</goal>
                         </goals>
-                        <phase>validate</phase>
-                        <!--<configuration>
-
-                            <failOnWarning>true</failOnWarning>
-                        </configuration>-->
                     </execution>
                 </executions>
             </plugin>

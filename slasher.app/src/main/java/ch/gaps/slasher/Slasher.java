@@ -26,7 +26,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.util.LinkedList;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -35,8 +34,7 @@ import java.util.ResourceBundle;
  */
 public class Slasher extends Application {
 
-  private static final ResourceBundle bundle = ResourceBundle
-                                                   .getBundle("Bundle", new Locale("en"));
+  private static final ResourceBundle bundle = ResourceBundle.getBundle("Bundle", new Locale("en"));
   private Slasher instance;
 
   /** Creates new form Slasher */
@@ -57,8 +55,7 @@ public class Slasher extends Application {
   }
 
   public Slasher instance() {
-    if (instance == null)
-      instance = new Slasher();
+    if (instance == null) instance = new Slasher();
     return instance;
   }
 
@@ -72,16 +69,14 @@ public class Slasher extends Application {
       System.out.println(t.name());
   }
 
-  @Override
-  public void start(Stage primaryStage) throws Exception {
+  @Override public void start(Stage primaryStage) throws Exception {
     primaryStage.setTitle("Slasher");
     Parent root = FXMLLoader.load(MainController.class.getResource("MainView.fxml"), bundle);
     primaryStage.setScene(new Scene(root));
     primaryStage.show();
   }
 
-  @Override
-  public void stop() {
+  @Override public void stop() {
     MainController.getInstance().saveState();
   }
 
