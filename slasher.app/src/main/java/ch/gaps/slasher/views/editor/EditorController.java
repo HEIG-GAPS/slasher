@@ -24,35 +24,37 @@
 package ch.gaps.slasher.views.editor;
 
 import ch.gaps.slasher.Slasher;
-import ch.gaps.slasher.corrector.SyntaxError;
 import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.views.dataTableView.DataTableController;
 import ch.gaps.slasher.views.main.MainController;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
-import javafx.scene.control.ProgressIndicator;
+import javafx.geometry.Bounds;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
-import org.reactfx.Subscription;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.BreakIterator;
 import java.time.Duration;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -71,6 +73,8 @@ public class EditorController {
   private Button execute;
   @FXML
   private ProgressIndicator progress;
+  @FXML
+  private AnchorPane textPane;
 
   private Database database;
 
@@ -79,6 +83,17 @@ public class EditorController {
   // used for the asynchronous code highlighting
   private Executor executor;
 
+  // text completion popup menu
+  private HBox popupHbox;
+
+  Map<String, String> entryDescription;
+
+  private SortedSet<String> entries;
+
+  private ScrollPane entriesPane;
+  private ScrollPane descriptionPane;
+  private VBox entriesVbox;
+  private TextArea descriptionArea;
 
   @FXML
   private void initialize() {
@@ -103,7 +118,7 @@ public class EditorController {
     request.setParagraphGraphicFactory(LineNumberFactory.get(request));
 
     request.multiPlainChanges()
-            .successionEnds(Duration.ofMillis(100))
+            .successionEnds(Duration.ofMillis(500))
             .supplyTask(this::computeHighlightingAsync)
             .awaitLatest(request.multiPlainChanges())
             .filterMap(t -> {
@@ -117,27 +132,113 @@ public class EditorController {
             .subscribe(this::applyHighlighting);
 
     // spell check
-    request.multiPlainChanges()
-            .successionEnds(Duration.ofMillis(500))
-            .subscribe(change -> {
-              request.setStyleSpans(0, computeSpellCheck(request.getText()));
-            });
+//    request.multiPlainChanges()
+//            .successionEnds(Duration.ofMillis(500))
+//            .supplyTask(this::computeSpellCheckAsync)
+//            .awaitLatest(request.multiPlainChanges())
+//            .filterMap(t -> {
+//              if (t.isSuccess()) {
+//                return Optional.of(t.get());
+//              } else {
+//                t.getFailure().printStackTrace();
+//                return Optional.empty();
+//              }
+//            })
+//            .subscribe(this::applyHighlighting);
+
+    // text completion popup
+    entries = new TreeSet<>();
+    entryDescription = new HashMap<>();
+
+    loader = new FXMLLoader(getClass().getResource("PopupPane.fxml"));
+    try {
+      popupHbox = loader.load();
+    } catch (IOException e) {
+      Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, e.getMessage());
+    }
+    textPane.getChildren().add(popupHbox);
+    popupHbox.setVisible(false);
+
+    entriesPane = (ScrollPane) findChildById(popupHbox, "entriesPane");
+    descriptionPane = (ScrollPane) findChildById(popupHbox, "descriptionPane");
+    entriesVbox = (VBox) entriesPane.getContent();
+    descriptionArea = (TextArea) descriptionPane.getContent();
+
+    request.textProperty().addListener((observable, oldValue, newValue) -> {
+      String lastWord = getLastWord();
+      if (lastWord.length() == 0) {
+        popupHbox.setVisible(false);
+      } else {
+        LinkedList<String> searchResult = new LinkedList<>();
+        searchResult.addAll(entries.subSet(lastWord, lastWord + Character.MAX_VALUE));
+        if (!searchResult.isEmpty()) {
+          populatePopup(searchResult);
+          if (!popupHbox.isVisible() && request.getCaretBounds().isPresent()) {
+            Bounds localBounds = request.screenToLocal(request.getCaretBounds().get());
+            double popupX = localBounds.getMaxX();
+            double popupY = localBounds.getMaxY();
+            popupHbox.setLayoutX(popupX);
+            popupHbox.setLayoutY(popupY);
+            popupHbox.setVisible(true);
+            descriptionPane.setVisible(false);
+          }
+        } else {
+          popupHbox.setVisible(false);
+        }
+      }
+    });
   }
 
-  private StyleSpans<Collection<String>> computeSpellCheck(String text) {
-    List<SyntaxError> syntaxErrors = database.getCorrector().check(text);
-    StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
-    BreakIterator wb = BreakIterator.getWordInstance();
-    wb.setText(text);
-    int lastKwEnd = 0;
-    if (syntaxErrors != null) {
-      for (SyntaxError e : syntaxErrors) {
-        spansBuilder.add(Collections.emptyList(), e.getCharPositionInLine() - lastKwEnd);
-        spansBuilder.add(Collections.singleton("underlined"), e.getLastErrorPosition() - e.getCharPositionInLine());
-        lastKwEnd = e.getLastErrorPosition();
+  private void populatePopup(LinkedList<String> searchResult) {
+    ListView<Label> listView = new ListView<>();
+    for (int i = 0; i < searchResult.size(); i++) {
+      final String result = searchResult.get(i);
+      Label label = new Label(result);
+      listView.getItems().add(label);
+    }
+    listView.setOnMouseClicked(event -> {
+      descriptionArea.setText(entryDescription.get(listView.getSelectionModel().getSelectedItem().getText()));
+      descriptionPane.setVisible(true);
+
+      if(event.getButton().equals(MouseButton.PRIMARY)){
+        if(event.getClickCount() == 2){
+          replaceLastWord(listView.getSelectionModel().getSelectedItem().getText());
+          popupHbox.setVisible(false);
+        }
+      }
+    });
+    entriesPane.setContent(listView);
+  }
+
+  private void replaceLastWord(String word) {
+    String lastWord = getLastWord();
+    if (!lastWord.isEmpty()) {
+      request.replaceText(request.getText().substring(0, request.getText().length() - lastWord.length()) + word);
+    }
+  }
+
+  private String getLastWord() {
+    if (request.getText().isEmpty()) {
+      return "";
+    }
+    String[] words = request.getText().split("[^\\w]+");
+    if (words.length == 0) {
+      return "";
+    }
+    char lastChar = request.getText().charAt(request.getText().length()-1);
+    if (Character.isLetterOrDigit(lastChar) || lastChar == '_')
+      return words[words.length-1];
+    return "";
+  }
+
+  private Node findChildById(Parent parent, String id) {
+    for (Node child : parent.getChildrenUnmodifiable()) {
+      if (child.getId().equals(id)) {
+        System.out.println("Node " + id + " found");
+        return child;
       }
     }
-    return spansBuilder.create();
+    return null;
   }
 
   private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
@@ -156,6 +257,18 @@ public class EditorController {
     return task;
   }
 
+//  private Task<StyleSpans<Collection<String>>> computeSpellCheckAsync() {
+//    String text =  request.getText();
+//    Task<StyleSpans<Collection<String>>> task = new Task<StyleSpans<Collection<String>>>() {
+//      @Override
+//      protected StyleSpans<Collection<String>> call() throws Exception {
+//        return computeSpellCheck(text);
+//      }
+//    };
+//    executor.execute(task);
+//    return task;
+//  }
+
   @FXML
   private void execute() {
     MainController.getInstance().saveState();
@@ -169,7 +282,7 @@ public class EditorController {
           rs = database.executeQuery(request.getText());
 
           int columnCount = rs.getMetaData().getColumnCount();
-          String columnName[] = new String[columnCount];
+          String[] columnName = new String[columnCount];
 
           for (int i = 0; i < columnCount; ++i) {
             columnName[i] = rs.getMetaData().getColumnName(i + 1);
@@ -210,6 +323,17 @@ public class EditorController {
     this.database = database;
     execute.disableProperty().bind(database.enabledProperty().not());
     request.getStylesheets().add(EditorController.class.getResource("highlighting.css").toExternalForm());
+    // data structures for text completion popup
+    try {
+      entries.addAll(database.getHighliter().getKeywords());
+    } catch (URISyntaxException e) {
+      Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, e.getMessage());
+    } catch (IOException e) {
+      Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, e.getMessage());
+    }
+    entries.forEach(s -> {
+      entryDescription.put(s, s + ": keyword");
+    });
   }
 
   public String getContent() {
@@ -220,25 +344,88 @@ public class EditorController {
     request.replaceText(content);
   }
 
-    public StyleSpans<Collection<String>> computeHighlighting(String text) {
-        List<String> groupNames = database.getHighliter().getMatcherGroupNames();
-        Matcher matcher = database.getHighliter().getPattern().matcher(text);
-        int lastKwEnd = 0;
-        StyleSpansBuilder<Collection<String>> spansBuilder
-                = new StyleSpansBuilder<>();
-        while (matcher.find()) {
-            String styleClass = null;
-            for (String gn : groupNames) {
-                if (matcher.group(gn) != null) {
-                    styleClass = gn.toLowerCase();
-                    break;
-                }
-            }
-            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
-            spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
-            lastKwEnd = matcher.end();
+  private StyleSpans<Collection<String>> computeHighlighting(String text) {
+    // highlighting of the Highlighter (keywords, string literals, etc.)
+    List<String> groupNames = database.getHighliter().getMatcherGroupNames();
+    Matcher matcher = database.getHighliter().getPattern().matcher(text);
+    int lastKwEnd = 0;
+    StyleSpansBuilder<Collection<String>> spansBuilder
+            = new StyleSpansBuilder<>();
+    while (matcher.find()) {
+      /**
+       * Convention : CSS style class is the matcher group name in lower case
+       */
+      String styleClass = null;
+      for (String gn : groupNames) {
+        if (matcher.group(gn) != null) {
+          styleClass = gn.toLowerCase();
+          break;
         }
-        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
-        return spansBuilder.create();
+      }
+      spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
+      spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
+      lastKwEnd = matcher.end();
     }
+    spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
+
+    // highlighting for the Corrector (syntax errors underlined)
+//    List<SyntaxError> syntaxErrors = database.getCorrector().check(text);
+//    BreakIterator wb = BreakIterator.getWordInstance();
+//    int lastIndex = wb.first();
+//    lastKwEnd = 0;
+//    int lineSize = 0;
+//    if (syntaxErrors != null) {
+//      System.out.println("size :" + syntaxErrors.size());
+//      for (SyntaxError e : syntaxErrors) {
+//        int[] lineIndexes = Utils.getLineIndexes(text, e.getLine());
+//        if (lineIndexes[0] != lineIndexes[1]-1) {
+//          System.out.println("line index : "+lineIndexes[0]);
+//          System.out.println("last index : "+lineIndexes[1]);
+//          //spansBuilder.add(Collections.emptyList(), lineIndexes[0] - lastKwEnd);
+//          spansBuilder.add(Collections.singleton("underlined"), lineIndexes[1]-1 );
+//          spansBuilder.add(Collections.singleton("underlined"), lineIndexes[1]-1 /*lineIndexes[0]*/0);
+//          lastKwEnd =  lineSize = lineIndexes[1]-1;
+//        }
+//      }
+//    }
+//    spansBuilder.add(Collections.emptyList(), lineSize);
+
+    return spansBuilder.create();
+  }
+
+
+//  private StyleSpans<Collection<String>> computeSpellCheck(String text) {
+//    List<SyntaxError> syntaxErrors = database.getCorrector().check(text);
+//    StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+//    BreakIterator wb = BreakIterator.getWordInstance();
+//    wb.setText(text);
+//    int lastKwEnd = 0;
+//    if (syntaxErrors != null) {
+//      for (SyntaxError e : syntaxErrors) {
+//        // underline the whole line containing the syntax error
+//        int errorLine = e.getLine();
+//        int line = 0;
+//        int charIndex = 0;
+//        char curChar = text.charAt(charIndex);
+//        while (charIndex < text.length() && line < errorLine) {
+//          curChar = text.charAt(charIndex);
+//          if (curChar == '\n') {
+//            line++;
+//          }
+//          charIndex++;
+//        }
+//        int fromIndex = charIndex;
+//        while (charIndex < text.length() && curChar != '\n') {
+//          curChar = text.charAt(charIndex);
+//          charIndex++;
+//        }
+//        int toIndex = charIndex;
+//        spansBuilder.add(Collections.emptyList(), fromIndex - lastKwEnd);
+//        spansBuilder.add(Collections.singleton("underlined"), toIndex - fromIndex);
+//        lastKwEnd = toIndex;
+//      }
+//    }
+//    return spansBuilder.create();
+//  }
+
 }

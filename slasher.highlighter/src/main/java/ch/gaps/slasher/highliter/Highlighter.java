@@ -33,7 +33,16 @@ public interface Highlighter {
         return Files.readAllLines(Paths.get(Highlighter.class.getResource("sql2003_keywords.txt").toURI()));
     }
 
+    /**
+     * Return the
+     * Important note: CSS style class is the matcher group name in lower case
+     * @return the matcher group names
+     */
     List<String> getMatcherGroupNames();
 
+    /**
+     * String Pattern fot the given SQL syntax
+     * @return
+     */
     Pattern getPattern();
 }
