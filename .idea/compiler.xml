@@ -22,6 +22,7 @@
       <module name="slasher" target="1.8" />
       <module name="slasher.app" target="1.8" />
       <module name="slasher.corrector" target="1.8" />
+      <module name="slasher.corrector.sqlite" target="1.8" />
       <module name="slasher.driver" target="1.8" />
       <module name="slasher.driver.mysql" target="1.8" />
       <module name="slasher.driver.postgres93" target="1.8" />

@@ -33,17 +33,21 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import org.fxmisc.richtext.Caret;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.model.StyleSpans;
@@ -147,7 +151,7 @@ public class EditorController {
 //            .subscribe(this::applyHighlighting);
 
     // text completion popup
-    entries = new TreeSet<>();
+    entries = new TreeSet<>(String::compareToIgnoreCase);
     entryDescription = new HashMap<>();
 
     loader = new FXMLLoader(getClass().getResource("PopupPane.fxml"));
@@ -187,7 +191,37 @@ public class EditorController {
         }
       }
     });
+
+    request.setFocusTraversable(true);
   }
+
+  private enum Direction {
+    DOWN, UP;
+  }
+
+  // TODO: does not work as expected
+//  private void selectNextItem(Direction direction, ListView<Label> listView) {
+//    if (listView.getItems().isEmpty()) {
+//      return;
+//    }
+//    int selectionIndex = listView.getSelectionModel().getSelectedIndex();
+//    switch (direction) {
+//      case UP:
+//        if (selectionIndex == 0) {
+//          listView.getSelectionModel().select(listView.getItems().size()-1);
+//          System.out.println("next selection : " + listView.getItems().get(listView.getItems().size()-1).getText());
+//        }
+//        break;
+//      case DOWN:
+//        if (selectionIndex == listView.getItems().size()-1) {
+//          listView.getSelectionModel().select(0);
+//          System.out.println("next selection : " + listView.getItems().get(0).getText());
+//        }
+//        break;
+//      default:
+//        Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, "Unknown arrow direction");
+//    }
+//  }
 
   private void populatePopup(LinkedList<String> searchResult) {
     ListView<Label> listView = new ListView<>();
@@ -196,18 +230,50 @@ public class EditorController {
       Label label = new Label(result);
       listView.getItems().add(label);
     }
+
+    if (!listView.getItems().isEmpty() && listView.getSelectionModel().getSelectedItem() == null) {
+      listView.getSelectionModel().select(0);
+      listView.getFocusModel().focus(0);
+    }
     listView.setOnMouseClicked(event -> {
+      if (listView.getSelectionModel().getSelectedItem() == null) {
+        return;
+      }
       descriptionArea.setText(entryDescription.get(listView.getSelectionModel().getSelectedItem().getText()));
       descriptionPane.setVisible(true);
 
       if(event.getButton().equals(MouseButton.PRIMARY)){
         if(event.getClickCount() == 2){
-          replaceLastWord(listView.getSelectionModel().getSelectedItem().getText());
-          popupHbox.setVisible(false);
+          itemFromCompletionPopupSelected(listView.getSelectionModel().getSelectedItem());
+        }
+      }
+    });
+
+    listView.setOnKeyPressed(event -> {
+      KeyCode keyCode = event.getCode();
+      if (keyCode == KeyCode.ENTER) {
+        final Label selectedItem = listView.getSelectionModel().getSelectedItem();
+        if (selectedItem != null) {
+          itemFromCompletionPopupSelected(listView.getSelectionModel().getSelectedItem());
         }
       }
     });
     entriesPane.setContent(listView);
+  }
+
+  /**
+   * Replaces the last word of the {@link CodeArea} with the item
+   * from the completion popup.
+   * Used while double click/ENTER button pressed.
+   * Note: if nothing is selected, nothing happens
+   * @param selectedItem the item from the viewList selected by the user
+   */
+  private void itemFromCompletionPopupSelected(Label selectedItem) {
+    if (selectedItem != null) {
+      replaceLastWord(selectedItem.getText());
+      popupHbox.setVisible(false);
+      request.requestFocus();
+    }
   }
 
   private void replaceLastWord(String word) {
