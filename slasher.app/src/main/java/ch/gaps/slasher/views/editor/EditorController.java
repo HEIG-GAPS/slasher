@@ -24,16 +24,15 @@
 package ch.gaps.slasher.views.editor;
 
 import ch.gaps.slasher.Slasher;
+import ch.gaps.slasher.corrector.SyntaxError;
 import ch.gaps.slasher.database.driver.database.Database;
+import ch.gaps.slasher.utils.Utils;
 import ch.gaps.slasher.views.dataTableView.DataTableController;
 import ch.gaps.slasher.views.main.MainController;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
@@ -41,13 +40,10 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-import org.fxmisc.richtext.Caret;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.model.StyleSpans;
@@ -56,7 +52,7 @@ import org.fxmisc.richtext.model.StyleSpansBuilder;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.text.BreakIterator;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -96,11 +92,14 @@ public class EditorController {
 
   private ScrollPane entriesPane;
   private ScrollPane descriptionPane;
-  private VBox entriesVbox;
   private TextArea descriptionArea;
+  private ListView<Label> codeCompletionListView;
+
+  private int fontSize = 14;
 
   @FXML
   private void initialize() {
+    request.setStyle("-fx-font-size: " + fontSize);
     progress.setVisible(false);
     FXMLLoader loader = new FXMLLoader(DataTableController.class.getResource("DataTableView.fxml"), Slasher.getBundle());
     try {
@@ -116,29 +115,13 @@ public class EditorController {
       Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, e.getMessage());
     }
 
-
     // text highlighting
     executor = Executors.newSingleThreadExecutor();
     request.setParagraphGraphicFactory(LineNumberFactory.get(request));
 
-    request.multiPlainChanges()
-            .successionEnds(Duration.ofMillis(500))
-            .supplyTask(this::computeHighlightingAsync)
-            .awaitLatest(request.multiPlainChanges())
-            .filterMap(t -> {
-              if (t.isSuccess()) {
-                return Optional.of(t.get());
-              } else {
-                t.getFailure().printStackTrace();
-                return Optional.empty();
-              }
-            })
-            .subscribe(this::applyHighlighting);
-
-    // spell check
 //    request.multiPlainChanges()
 //            .successionEnds(Duration.ofMillis(500))
-//            .supplyTask(this::computeSpellCheckAsync)
+//            .supplyTask(this::computeHighlightingAsync)
 //            .awaitLatest(request.multiPlainChanges())
 //            .filterMap(t -> {
 //              if (t.isSuccess()) {
@@ -165,7 +148,6 @@ public class EditorController {
 
     entriesPane = (ScrollPane) findChildById(popupHbox, "entriesPane");
     descriptionPane = (ScrollPane) findChildById(popupHbox, "descriptionPane");
-    entriesVbox = (VBox) entriesPane.getContent();
     descriptionArea = (TextArea) descriptionPane.getContent();
 
     request.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -182,7 +164,7 @@ public class EditorController {
             double popupX = localBounds.getMaxX();
             double popupY = localBounds.getMaxY();
             popupHbox.setLayoutX(popupX);
-            popupHbox.setLayoutY(popupY);
+            popupHbox.setLayoutY(popupY + fontSize);
             popupHbox.setVisible(true);
             descriptionPane.setVisible(false);
           }
@@ -192,30 +174,49 @@ public class EditorController {
       }
     });
 
-    request.setFocusTraversable(true);
-  }
+    // focus management
+    // if the user clicks the CodeArea, popup menu disapears
+    request.setOnMouseClicked(event -> popupHbox.setVisible(false));
 
-  private enum Direction {
-    DOWN, UP;
+    // to select an item from the popup menu, user has to press the down arrow button
+    request.setOnKeyPressed(event -> {
+      KeyCode keyCode = event.getCode();
+      if (popupHbox.isVisible() && keyCode.equals(KeyCode.DOWN)) {
+        codeCompletionListView.requestFocus();
+      } else {
+        request.requestFocus();
+      }
+    });
   }
 
   // TODO: does not work as expected
-//  private void selectNextItem(Direction direction, ListView<Label> listView) {
-//    if (listView.getItems().isEmpty()) {
+//  private enum Direction {
+//    DOWN, UP;
+//  }
+//
+//
+//  /**
+//   * This function makes the rotation over the items from the popup menu.
+//   * For example, if the last item from the menu is selected and the user presses
+//   * down arrow keyboard key, the first item is selected
+//   * @param direction the direction of an arrow keyboard key
+//   */
+//  private void selectNextItem(Direction direction) {
+//    if (codeCompletionListView.getItems().isEmpty()) {
 //      return;
 //    }
-//    int selectionIndex = listView.getSelectionModel().getSelectedIndex();
+//    int selectionIndex = codeCompletionListView.getSelectionModel().getSelectedIndex();
 //    switch (direction) {
 //      case UP:
 //        if (selectionIndex == 0) {
-//          listView.getSelectionModel().select(listView.getItems().size()-1);
-//          System.out.println("next selection : " + listView.getItems().get(listView.getItems().size()-1).getText());
+//          codeCompletionListView.getSelectionModel().select(codeCompletionListView.getItems().size()-1);
+//          System.out.println("next selection : " + codeCompletionListView.getItems().get(codeCompletionListView.getItems().size()-1).getText());
 //        }
 //        break;
 //      case DOWN:
-//        if (selectionIndex == listView.getItems().size()-1) {
-//          listView.getSelectionModel().select(0);
-//          System.out.println("next selection : " + listView.getItems().get(0).getText());
+//        if (selectionIndex == codeCompletionListView.getItems().size()-1) {
+//          codeCompletionListView.getSelectionModel().select(0);
+//          System.out.println("next selection : " + codeCompletionListView.getItems().get(0).getText());
 //        }
 //        break;
 //      default:
@@ -224,41 +225,53 @@ public class EditorController {
 //  }
 
   private void populatePopup(LinkedList<String> searchResult) {
-    ListView<Label> listView = new ListView<>();
+    codeCompletionListView = new ListView<>();
     for (int i = 0; i < searchResult.size(); i++) {
       final String result = searchResult.get(i);
       Label label = new Label(result);
-      listView.getItems().add(label);
+      codeCompletionListView.getItems().add(label);
     }
 
-    if (!listView.getItems().isEmpty() && listView.getSelectionModel().getSelectedItem() == null) {
-      listView.getSelectionModel().select(0);
-      listView.getFocusModel().focus(0);
+    if (!codeCompletionListView.getItems().isEmpty() && codeCompletionListView.getSelectionModel().getSelectedItem() == null) {
+      codeCompletionListView.getSelectionModel().select(0);
+      codeCompletionListView.getFocusModel().focus(0);
+      codeCompletionListView.requestFocus();
     }
-    listView.setOnMouseClicked(event -> {
-      if (listView.getSelectionModel().getSelectedItem() == null) {
+    codeCompletionListView.setOnMouseClicked(event -> {
+      if (codeCompletionListView.getSelectionModel().getSelectedItem() == null) {
         return;
       }
-      descriptionArea.setText(entryDescription.get(listView.getSelectionModel().getSelectedItem().getText()));
+      descriptionArea.setText(entryDescription.get(codeCompletionListView.getSelectionModel().getSelectedItem().getText()));
       descriptionPane.setVisible(true);
 
       if(event.getButton().equals(MouseButton.PRIMARY)){
         if(event.getClickCount() == 2){
-          itemFromCompletionPopupSelected(listView.getSelectionModel().getSelectedItem());
+          itemFromCompletionPopupSelected(codeCompletionListView.getSelectionModel().getSelectedItem());
         }
       }
     });
 
-    listView.setOnKeyPressed(event -> {
+    codeCompletionListView.setOnKeyPressed(event -> {
       KeyCode keyCode = event.getCode();
-      if (keyCode == KeyCode.ENTER) {
-        final Label selectedItem = listView.getSelectionModel().getSelectedItem();
+      if (keyCode.equals(KeyCode.ENTER)) {
+        final Label selectedItem = codeCompletionListView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
-          itemFromCompletionPopupSelected(listView.getSelectionModel().getSelectedItem());
+          itemFromCompletionPopupSelected(codeCompletionListView.getSelectionModel().getSelectedItem());
         }
+      } else if (keyCode.equals(keyCode.ESCAPE)) {
+        if (popupHbox.isVisible()) {
+          popupHbox.setVisible(false);
+        }
+          request.requestFocus();
+      } else {
+          if (!keyCode.equals(KeyCode.UP) && !keyCode.equals(KeyCode.DOWN)) {
+              popupHbox.setVisible(false);
+              request.fireEvent(event);
+              request.requestFocus();
+          }
       }
     });
-    entriesPane.setContent(listView);
+    entriesPane.setContent(codeCompletionListView);
   }
 
   /**
@@ -300,7 +313,6 @@ public class EditorController {
   private Node findChildById(Parent parent, String id) {
     for (Node child : parent.getChildrenUnmodifiable()) {
       if (child.getId().equals(id)) {
-        System.out.println("Node " + id + " found");
         return child;
       }
     }
@@ -322,18 +334,6 @@ public class EditorController {
     executor.execute(task);
     return task;
   }
-
-//  private Task<StyleSpans<Collection<String>>> computeSpellCheckAsync() {
-//    String text =  request.getText();
-//    Task<StyleSpans<Collection<String>>> task = new Task<StyleSpans<Collection<String>>>() {
-//      @Override
-//      protected StyleSpans<Collection<String>> call() throws Exception {
-//        return computeSpellCheck(text);
-//      }
-//    };
-//    executor.execute(task);
-//    return task;
-//  }
 
   @FXML
   private void execute() {
@@ -389,14 +389,10 @@ public class EditorController {
     // data structures for text completion popup
     try {
       entries.addAll(database.getHighliter().getKeywords());
-    } catch (URISyntaxException e) {
-      Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, e.getMessage());
-    } catch (IOException e) {
-      Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, e.getMessage());
+    } catch (URISyntaxException|IOException e) {
+        Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, e.getMessage());
     }
-    entries.forEach(s -> {
-      entryDescription.put(s, s + ": keyword");
-    });
+    entries.forEach(s -> entryDescription.put(s, s + ": keyword"));
   }
 
   public String getContent() {
@@ -432,63 +428,23 @@ public class EditorController {
     spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
 
     // highlighting for the Corrector (syntax errors underlined)
-//    List<SyntaxError> syntaxErrors = database.getCorrector().check(text);
-//    BreakIterator wb = BreakIterator.getWordInstance();
-//    int lastIndex = wb.first();
-//    lastKwEnd = 0;
-//    int lineSize = 0;
-//    if (syntaxErrors != null) {
-//      System.out.println("size :" + syntaxErrors.size());
-//      for (SyntaxError e : syntaxErrors) {
-//        int[] lineIndexes = Utils.getLineIndexes(text, e.getLine());
-//        if (lineIndexes[0] != lineIndexes[1]-1) {
-//          System.out.println("line index : "+lineIndexes[0]);
-//          System.out.println("last index : "+lineIndexes[1]);
-//          //spansBuilder.add(Collections.emptyList(), lineIndexes[0] - lastKwEnd);
-//          spansBuilder.add(Collections.singleton("underlined"), lineIndexes[1]-1 );
-//          spansBuilder.add(Collections.singleton("underlined"), lineIndexes[1]-1 /*lineIndexes[0]*/0);
-//          lastKwEnd =  lineSize = lineIndexes[1]-1;
-//        }
-//      }
-//    }
-//    spansBuilder.add(Collections.emptyList(), lineSize);
+    List<SyntaxError> syntaxErrors = database.getCorrector().check(text);
+    BreakIterator wb = BreakIterator.getWordInstance();
+    wb.setText(text);
+    lastKwEnd = 0;
+    if (syntaxErrors != null) {
+      for (SyntaxError e : syntaxErrors) {
+        int[] lineIndexes = Utils.getLineIndexes(text, e.getLine());
+        if (lineIndexes[0] != lineIndexes[1]-1) {
+          System.out.println("line index : "+lineIndexes[0]);
+          System.out.println("last index : "+lineIndexes[1]);
+          spansBuilder.add(Collections.emptyList(), lineIndexes[0]-lastKwEnd);
+          spansBuilder.add(Collections.singleton("underlined"), lineIndexes[1]-1 - lineIndexes[0]);
+          lastKwEnd = lineIndexes[1]-1;
+        }
+      }
+    }
 
     return spansBuilder.create();
   }
-
-
-//  private StyleSpans<Collection<String>> computeSpellCheck(String text) {
-//    List<SyntaxError> syntaxErrors = database.getCorrector().check(text);
-//    StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
-//    BreakIterator wb = BreakIterator.getWordInstance();
-//    wb.setText(text);
-//    int lastKwEnd = 0;
-//    if (syntaxErrors != null) {
-//      for (SyntaxError e : syntaxErrors) {
-//        // underline the whole line containing the syntax error
-//        int errorLine = e.getLine();
-//        int line = 0;
-//        int charIndex = 0;
-//        char curChar = text.charAt(charIndex);
-//        while (charIndex < text.length() && line < errorLine) {
-//          curChar = text.charAt(charIndex);
-//          if (curChar == '\n') {
-//            line++;
-//          }
-//          charIndex++;
-//        }
-//        int fromIndex = charIndex;
-//        while (charIndex < text.length() && curChar != '\n') {
-//          curChar = text.charAt(charIndex);
-//          charIndex++;
-//        }
-//        int toIndex = charIndex;
-//        spansBuilder.add(Collections.emptyList(), fromIndex - lastKwEnd);
-//        spansBuilder.add(Collections.singleton("underlined"), toIndex - fromIndex);
-//        lastKwEnd = toIndex;
-//      }
-//    }
-//    return spansBuilder.create();
-//  }
-
 }
