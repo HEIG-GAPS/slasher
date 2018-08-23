@@ -29,10 +29,14 @@ import ch.gaps.slasher.database.driver.database.Database;
 import ch.gaps.slasher.utils.Utils;
 import ch.gaps.slasher.views.dataTableView.DataTableController;
 import ch.gaps.slasher.views.main.MainController;
+import ch.gaps.slasher.views.popupMenu.PopupMenu;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
@@ -40,9 +44,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -53,7 +55,6 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.sql.ResultSet;
 import java.text.BreakIterator;
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -84,16 +85,17 @@ public class EditorController {
   private Executor executor;
 
   // text completion popup menu
-  private HBox popupHbox;
-
-  Map<String, String> entryDescription;
-
-  private SortedSet<String> entries;
-
-  private ScrollPane entriesPane;
-  private ScrollPane descriptionPane;
-  private TextArea descriptionArea;
-  private ListView<Label> codeCompletionListView;
+  private PopupMenu popupMenu;
+//  private HBox popupHbox;
+//
+//  Map<String, String> entryDescription;
+//
+//  private SortedSet<String> entries;
+//
+//  private ScrollPane entriesPane;
+//  private ScrollPane descriptionPane;
+//  private TextArea descriptionArea;
+//  private ListView<Label> codeCompletionListView;
 
   private int fontSize = 14;
 
@@ -134,56 +136,92 @@ public class EditorController {
 //            .subscribe(this::applyHighlighting);
 
     // text completion popup
-    entries = new TreeSet<>(String::compareToIgnoreCase);
-    entryDescription = new HashMap<>();
+//    entries = new TreeSet<>(String::compareToIgnoreCase);
+//    entryDescription = new HashMap<>();
 
-    loader = new FXMLLoader(getClass().getResource("PopupPane.fxml"));
-    try {
-      popupHbox = loader.load();
-    } catch (IOException e) {
-      Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, e.getMessage());
-    }
-    textPane.getChildren().add(popupHbox);
-    popupHbox.setVisible(false);
+//    loader = new FXMLLoader(getClass().getResource("PopupMenu.fxml"));
+//    try {
+//      popupHbox = loader.load();
+//    } catch (IOException e) {
+//      Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, e.getMessage());
+//    }
+//    textPane.getChildren().add(popupHbox);
+//    popupHbox.setVisible(false);
+//
+//    entriesPane = (ScrollPane) findChildById(popupHbox, "entriesPane");
+//    descriptionPane = (ScrollPane) findChildById(popupHbox, "descriptionPane");
+//    descriptionArea = (TextArea) descriptionPane.getContent();
+//
+//    request.textProperty().addListener((observable, oldValue, newValue) -> {
+//      String lastWord = getLastWord();
+//      if (lastWord.length() == 0) {
+//        popupHbox.setVisible(false);
+//      } else {
+//        LinkedList<String> searchResult = new LinkedList<>();
+//        searchResult.addAll(entries.subSet(lastWord, lastWord + Character.MAX_VALUE));
+//        if (!searchResult.isEmpty()) {
+//          populatePopup(searchResult);
+//          if (!popupHbox.isVisible() && request.getCaretBounds().isPresent()) {
+//            Bounds localBounds = request.screenToLocal(request.getCaretBounds().get());
+//            double popupX = localBounds.getMaxX();
+//            double popupY = localBounds.getMaxY();
+//            popupHbox.setLayoutX(popupX);
+//            popupHbox.setLayoutY(popupY + fontSize);
+//            popupHbox.setVisible(true);
+//            descriptionPane.setVisible(false);
+//          }
+//        } else {
+//          popupHbox.setVisible(false);
+//        }
+//      }
+//    });
+//
+//    // focus management
+//    // if the user clicks the CodeArea, popup menu disapears
+//    request.setOnMouseClicked(event -> popupHbox.setVisible(false));
+//
 
-    entriesPane = (ScrollPane) findChildById(popupHbox, "entriesPane");
-    descriptionPane = (ScrollPane) findChildById(popupHbox, "descriptionPane");
-    descriptionArea = (TextArea) descriptionPane.getContent();
-
-    request.textProperty().addListener((observable, oldValue, newValue) -> {
-      String lastWord = getLastWord();
-      if (lastWord.length() == 0) {
-        popupHbox.setVisible(false);
-      } else {
-        LinkedList<String> searchResult = new LinkedList<>();
-        searchResult.addAll(entries.subSet(lastWord, lastWord + Character.MAX_VALUE));
-        if (!searchResult.isEmpty()) {
-          populatePopup(searchResult);
-          if (!popupHbox.isVisible() && request.getCaretBounds().isPresent()) {
-            Bounds localBounds = request.screenToLocal(request.getCaretBounds().get());
-            double popupX = localBounds.getMaxX();
-            double popupY = localBounds.getMaxY();
-            popupHbox.setLayoutX(popupX);
-            popupHbox.setLayoutY(popupY + fontSize);
-            popupHbox.setVisible(true);
-            descriptionPane.setVisible(false);
-          }
+     popupMenu = new PopupMenu();
+     textPane.getChildren().add(popupMenu);
+     request.textProperty().addListener((observable, oldValue, newValue) -> {
+        String lastWord = getLastWord();
+        if (lastWord.length() == 0) {
+          popupMenu.setVisible(false);
         } else {
-          popupHbox.setVisible(false);
+          popupMenu.wordCompletion(lastWord);
+          if (!popupMenu.isEmpty()) {
+            if (!popupMenu.isVisible() && request.getCaretBounds().isPresent()) {
+              Bounds localBounds = request.screenToLocal(request.getCaretBounds().get());
+              double popupX = localBounds.getMaxX();
+              double popupY = localBounds.getMaxY();
+              popupMenu.setLayoutX(popupX);
+              popupMenu.setLayoutY(popupY + fontSize);
+              popupMenu.setVisible(true);
+            }
+          } else {
+            popupMenu.setVisible(false);
+          }
         }
-      }
-    });
+     });
 
     // focus management
-    // if the user clicks the CodeArea, popup menu disapears
-    request.setOnMouseClicked(event -> popupHbox.setVisible(false));
+    // if the user clicks the CodeArea, popup menu disappears
+    request.setOnMouseClicked(event -> popupMenu.setVisible(false));
 
-    // to select an item from the popup menu, user has to press the down arrow button
-    request.setOnKeyPressed(event -> {
-      KeyCode keyCode = event.getCode();
-      if (popupHbox.isVisible() && keyCode.equals(KeyCode.DOWN)) {
-        codeCompletionListView.requestFocus();
-      } else {
+    // replace the word by the item selected from the popup menu if the user validates it
+    popupMenu.addEventHandler(PopupMenu.ValidatingEvent.ITEM_CHOSEN, event -> {
+      replaceLastWord(event.getResult());
+    });
+
+    // if the user presses the key that concerns the code area while the popup menu is in focus,
+    // the focus is set to the code area and the event associated with the key is transmitted to the code area
+    popupMenu.addEventHandler(PopupMenu.EventTransmittingEvent.TRANSMIT_EVENT, event ->  {
+      request.fireEvent(event.getEvent());
+    });
+
+    // when the popup menu disappears, the focus is set to the code area
+    popupMenu.visibleProperty().addListener((observable, oldValue, newValue) -> {
+      if (newValue.booleanValue() == false) {
         request.requestFocus();
       }
     });
@@ -224,71 +262,75 @@ public class EditorController {
 //    }
 //  }
 
-  private void populatePopup(LinkedList<String> searchResult) {
-    codeCompletionListView = new ListView<>();
-    for (int i = 0; i < searchResult.size(); i++) {
-      final String result = searchResult.get(i);
-      Label label = new Label(result);
-      codeCompletionListView.getItems().add(label);
-    }
+//  private void populatePopup(LinkedList<String> searchResult) {
+//    codeCompletionListView = new ListView<>();
+//    for (int i = 0; i < searchResult.size(); i++) {
+//      final String result = searchResult.get(i);
+//      Label label = new Label(result);
+//      codeCompletionListView.getItems().add(label);
+//    }
+//
+//    if (!codeCompletionListView.getItems().isEmpty() && codeCompletionListView.getSelectionModel().getSelectedItem() == null) {
+//      codeCompletionListView.getSelectionModel().select(0);
+//      codeCompletionListView.getFocusModel().focus(0);
+//      codeCompletionListView.requestFocus();
+//    }
+//    codeCompletionListView.setOnMouseClicked(event -> {
+//      if (codeCompletionListView.getSelectionModel().getSelectedItem() == null) {
+//        return;
+//      }
+//      descriptionArea.setText(entryDescription.get(codeCompletionListView.getSelectionModel().getSelectedItem().getText()));
+//      descriptionPane.setVisible(true);
+//
+//      if(event.getButton().equals(MouseButton.PRIMARY)){
+//        if(event.getClickCount() == 2){
+//          itemFromCompletionPopupSelected(codeCompletionListView.getSelectionModel().getSelectedItem());
+//        }
+//      }
+//    });
+//
+//    codeCompletionListView.setOnKeyPressed(event -> {
+//      KeyCode keyCode = event.getCode();
+//      if (keyCode.equals(KeyCode.ENTER)) {
+//        final Label selectedItem = codeCompletionListView.getSelectionModel().getSelectedItem();
+//        if (selectedItem != null) {
+//          itemFromCompletionPopupSelected(codeCompletionListView.getSelectionModel().getSelectedItem());
+//        }
+//      } else if (keyCode.equals(keyCode.ESCAPE)) {
+//        if (popupHbox.isVisible()) {
+//          popupHbox.setVisible(false);
+//        }
+//          request.requestFocus();
+//      } else {
+//          if (!keyCode.equals(KeyCode.UP) && !keyCode.equals(KeyCode.DOWN)) {
+//              popupHbox.setVisible(false);
+//              request.fireEvent(event);
+//              request.requestFocus();
+//          }
+//      }
+//    });
+//    entriesPane.setContent(codeCompletionListView);
+//  }
 
-    if (!codeCompletionListView.getItems().isEmpty() && codeCompletionListView.getSelectionModel().getSelectedItem() == null) {
-      codeCompletionListView.getSelectionModel().select(0);
-      codeCompletionListView.getFocusModel().focus(0);
-      codeCompletionListView.requestFocus();
-    }
-    codeCompletionListView.setOnMouseClicked(event -> {
-      if (codeCompletionListView.getSelectionModel().getSelectedItem() == null) {
-        return;
-      }
-      descriptionArea.setText(entryDescription.get(codeCompletionListView.getSelectionModel().getSelectedItem().getText()));
-      descriptionPane.setVisible(true);
-
-      if(event.getButton().equals(MouseButton.PRIMARY)){
-        if(event.getClickCount() == 2){
-          itemFromCompletionPopupSelected(codeCompletionListView.getSelectionModel().getSelectedItem());
-        }
-      }
-    });
-
-    codeCompletionListView.setOnKeyPressed(event -> {
-      KeyCode keyCode = event.getCode();
-      if (keyCode.equals(KeyCode.ENTER)) {
-        final Label selectedItem = codeCompletionListView.getSelectionModel().getSelectedItem();
-        if (selectedItem != null) {
-          itemFromCompletionPopupSelected(codeCompletionListView.getSelectionModel().getSelectedItem());
-        }
-      } else if (keyCode.equals(keyCode.ESCAPE)) {
-        if (popupHbox.isVisible()) {
-          popupHbox.setVisible(false);
-        }
-          request.requestFocus();
-      } else {
-          if (!keyCode.equals(KeyCode.UP) && !keyCode.equals(KeyCode.DOWN)) {
-              popupHbox.setVisible(false);
-              request.fireEvent(event);
-              request.requestFocus();
-          }
-      }
-    });
-    entriesPane.setContent(codeCompletionListView);
-  }
+//  /**
+//   * Replaces the last word of the {@link CodeArea} with the item
+//   * from the completion popup.
+//   * Used while double click/ENTER button pressed.
+//   * Note: if nothing is selected, nothing happens
+//   * @param selectedItem the item from the viewList selected by the user
+//   */
+//  private void itemFromCompletionPopupSelected(Label selectedItem) {
+//    if (selectedItem != null) {
+//      replaceLastWord(selectedItem.getText());
+//      popupHbox.setVisible(false);
+//      request.requestFocus();
+//    }
+//  }
 
   /**
-   * Replaces the last word of the {@link CodeArea} with the item
-   * from the completion popup.
-   * Used while double click/ENTER button pressed.
-   * Note: if nothing is selected, nothing happens
-   * @param selectedItem the item from the viewList selected by the user
+   * Replaces the last word in the {@link CodeArea} with a word passed as a parameter
+   * @param word the word to replace
    */
-  private void itemFromCompletionPopupSelected(Label selectedItem) {
-    if (selectedItem != null) {
-      replaceLastWord(selectedItem.getText());
-      popupHbox.setVisible(false);
-      request.requestFocus();
-    }
-  }
-
   private void replaceLastWord(String word) {
     String lastWord = getLastWord();
     if (!lastWord.isEmpty()) {
@@ -296,6 +338,10 @@ public class EditorController {
     }
   }
 
+   /**
+    * Retrieves the last word written in the {@link CodeArea}
+    * @return the last word written in the text area
+    */
   private String getLastWord() {
     if (request.getText().isEmpty()) {
       return "";
@@ -387,12 +433,11 @@ public class EditorController {
     execute.disableProperty().bind(database.enabledProperty().not());
     request.getStylesheets().add(EditorController.class.getResource("highlighting.css").toExternalForm());
     // data structures for text completion popup
-    try {
-      entries.addAll(database.getHighliter().getKeywords());
-    } catch (URISyntaxException|IOException e) {
-        Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, e.getMessage());
-    }
-    entries.forEach(s -> entryDescription.put(s, s + ": keyword"));
+      try {
+          popupMenu.addEntries(database.getHighliter().getKeywords(), "keyword");
+      } catch (URISyntaxException|IOException e) {
+          Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getMessage());
+      }
   }
 
   public String getContent() {
