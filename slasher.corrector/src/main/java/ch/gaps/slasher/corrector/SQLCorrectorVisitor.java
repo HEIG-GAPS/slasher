@@ -17,4 +17,8 @@ public class SQLCorrectorVisitor extends SQLParserBaseVisitor<List<SyntaxError>>
         }
         return null;
     }
+
+    public List<SyntaxError> getErrors() {
+        return errors;
+    }
 }

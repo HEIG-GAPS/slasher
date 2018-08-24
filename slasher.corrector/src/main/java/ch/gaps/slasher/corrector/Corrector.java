@@ -13,6 +13,7 @@ public interface Corrector {
 
         ParseTree parseTree = parser.sql();
         SQLCorrectorVisitor visitor = new SQLCorrectorVisitor();
-        return visitor.visit(parseTree);
+        List<SyntaxError> errors = visitor.visit(parseTree);
+        return visitor.getErrors();
     }
 }

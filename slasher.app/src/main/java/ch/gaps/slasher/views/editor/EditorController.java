@@ -31,19 +31,13 @@ import ch.gaps.slasher.views.dataTableView.DataTableController;
 import ch.gaps.slasher.views.main.MainController;
 import ch.gaps.slasher.views.popupMenu.PopupMenu;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import org.fxmisc.richtext.CodeArea;
@@ -54,7 +48,7 @@ import org.fxmisc.richtext.model.StyleSpansBuilder;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.sql.ResultSet;
-import java.text.BreakIterator;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -82,20 +76,10 @@ public class EditorController {
   private DataTableController dataTableController;
 
   // used for the asynchronous code highlighting
-  private Executor executor;
+  private Executor highlightingExecutor;
 
   // text completion popup menu
   private PopupMenu popupMenu;
-//  private HBox popupHbox;
-//
-//  Map<String, String> entryDescription;
-//
-//  private SortedSet<String> entries;
-//
-//  private ScrollPane entriesPane;
-//  private ScrollPane descriptionPane;
-//  private TextArea descriptionArea;
-//  private ListView<Label> codeCompletionListView;
 
   private int fontSize = 14;
 
@@ -118,214 +102,67 @@ public class EditorController {
     }
 
     // text highlighting
-    executor = Executors.newSingleThreadExecutor();
+    highlightingExecutor = Executors.newSingleThreadExecutor();
     request.setParagraphGraphicFactory(LineNumberFactory.get(request));
 
-//    request.multiPlainChanges()
-//            .successionEnds(Duration.ofMillis(500))
-//            .supplyTask(this::computeHighlightingAsync)
-//            .awaitLatest(request.multiPlainChanges())
-//            .filterMap(t -> {
-//              if (t.isSuccess()) {
-//                return Optional.of(t.get());
-//              } else {
-//                t.getFailure().printStackTrace();
-//                return Optional.empty();
-//              }
-//            })
-//            .subscribe(this::applyHighlighting);
+    request.multiPlainChanges()
+            .successionEnds(Duration.ofMillis(500))
+            .supplyTask(this::computeStylesAsync)
+            .awaitLatest(request.multiPlainChanges())
+            .filterMap(t -> {
+              if (t.isSuccess()) {
+                return Optional.of(t.get());
+              } else {
+                t.getFailure().printStackTrace();
+                return Optional.empty();
+              }
+            })
+            .subscribe(this::applyStyles);
 
-    // text completion popup
-//    entries = new TreeSet<>(String::compareToIgnoreCase);
-//    entryDescription = new HashMap<>();
-
-//    loader = new FXMLLoader(getClass().getResource("PopupMenu.fxml"));
-//    try {
-//      popupHbox = loader.load();
-//    } catch (IOException e) {
-//      Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, e.getMessage());
-//    }
-//    textPane.getChildren().add(popupHbox);
-//    popupHbox.setVisible(false);
-//
-//    entriesPane = (ScrollPane) findChildById(popupHbox, "entriesPane");
-//    descriptionPane = (ScrollPane) findChildById(popupHbox, "descriptionPane");
-//    descriptionArea = (TextArea) descriptionPane.getContent();
-//
-//    request.textProperty().addListener((observable, oldValue, newValue) -> {
-//      String lastWord = getLastWord();
-//      if (lastWord.length() == 0) {
-//        popupHbox.setVisible(false);
-//      } else {
-//        LinkedList<String> searchResult = new LinkedList<>();
-//        searchResult.addAll(entries.subSet(lastWord, lastWord + Character.MAX_VALUE));
-//        if (!searchResult.isEmpty()) {
-//          populatePopup(searchResult);
-//          if (!popupHbox.isVisible() && request.getCaretBounds().isPresent()) {
-//            Bounds localBounds = request.screenToLocal(request.getCaretBounds().get());
-//            double popupX = localBounds.getMaxX();
-//            double popupY = localBounds.getMaxY();
-//            popupHbox.setLayoutX(popupX);
-//            popupHbox.setLayoutY(popupY + fontSize);
-//            popupHbox.setVisible(true);
-//            descriptionPane.setVisible(false);
-//          }
-//        } else {
-//          popupHbox.setVisible(false);
-//        }
-//      }
-//    });
-//
-//    // focus management
-//    // if the user clicks the CodeArea, popup menu disapears
-//    request.setOnMouseClicked(event -> popupHbox.setVisible(false));
-//
-
-     popupMenu = new PopupMenu();
-     textPane.getChildren().add(popupMenu);
-     request.textProperty().addListener((observable, oldValue, newValue) -> {
-        String lastWord = getLastWord();
-        if (lastWord.length() == 0) {
-          popupMenu.setVisible(false);
-        } else {
-          popupMenu.wordCompletion(lastWord);
-          if (!popupMenu.isEmpty()) {
-            if (!popupMenu.isVisible() && request.getCaretBounds().isPresent()) {
-              Bounds localBounds = request.screenToLocal(request.getCaretBounds().get());
-              double popupX = localBounds.getMaxX();
-              double popupY = localBounds.getMaxY();
-              popupMenu.setLayoutX(popupX);
-              popupMenu.setLayoutY(popupY + fontSize);
-              popupMenu.setVisible(true);
-            }
-          } else {
-            popupMenu.setVisible(false);
+    // code completion popup menu
+    popupMenu = new PopupMenu();
+    textPane.getChildren().add(popupMenu);
+    request.textProperty().addListener((observable, oldValue, newValue) -> {
+      String lastWord = getLastWord();
+      if (lastWord.length() == 0) {
+        popupMenu.setVisible(false);
+      } else {
+        popupMenu.wordCompletion(lastWord);
+        if (!popupMenu.isEmpty()) {
+          if (!popupMenu.isVisible() && request.getCaretBounds().isPresent()) {
+            Bounds localBounds = request.screenToLocal(request.getCaretBounds().get());
+            double popupX = localBounds.getMaxX();
+            double popupY = localBounds.getMaxY();
+            popupMenu.setLayoutX(popupX);
+            popupMenu.setLayoutY(popupY + fontSize);
+            popupMenu.setVisible(true);
           }
+        } else {
+          popupMenu.setVisible(false);
         }
-     });
+      }
+    });
 
     // focus management
     // if the user clicks the CodeArea, popup menu disappears
     request.setOnMouseClicked(event -> popupMenu.setVisible(false));
 
     // replace the word by the item selected from the popup menu if the user validates it
-    popupMenu.addEventHandler(PopupMenu.ValidatingEvent.ITEM_CHOSEN, event -> {
-      replaceLastWord(event.getResult());
-    });
+    popupMenu.addEventHandler(PopupMenu.ValidatingEvent.ITEM_CHOSEN, event ->
+            replaceLastWord(event.getResult()));
 
     // if the user presses the key that concerns the code area while the popup menu is in focus,
     // the focus is set to the code area and the event associated with the key is transmitted to the code area
-    popupMenu.addEventHandler(PopupMenu.EventTransmittingEvent.TRANSMIT_EVENT, event ->  {
-      request.fireEvent(event.getEvent());
-    });
+    popupMenu.addEventHandler(PopupMenu.EventTransmittingEvent.TRANSMIT_EVENT, event ->
+            request.fireEvent(event.getEvent()));
 
     // when the popup menu disappears, the focus is set to the code area
     popupMenu.visibleProperty().addListener((observable, oldValue, newValue) -> {
-      if (newValue.booleanValue() == false) {
+      if (!newValue) {
         request.requestFocus();
       }
     });
   }
-
-  // TODO: does not work as expected
-//  private enum Direction {
-//    DOWN, UP;
-//  }
-//
-//
-//  /**
-//   * This function makes the rotation over the items from the popup menu.
-//   * For example, if the last item from the menu is selected and the user presses
-//   * down arrow keyboard key, the first item is selected
-//   * @param direction the direction of an arrow keyboard key
-//   */
-//  private void selectNextItem(Direction direction) {
-//    if (codeCompletionListView.getItems().isEmpty()) {
-//      return;
-//    }
-//    int selectionIndex = codeCompletionListView.getSelectionModel().getSelectedIndex();
-//    switch (direction) {
-//      case UP:
-//        if (selectionIndex == 0) {
-//          codeCompletionListView.getSelectionModel().select(codeCompletionListView.getItems().size()-1);
-//          System.out.println("next selection : " + codeCompletionListView.getItems().get(codeCompletionListView.getItems().size()-1).getText());
-//        }
-//        break;
-//      case DOWN:
-//        if (selectionIndex == codeCompletionListView.getItems().size()-1) {
-//          codeCompletionListView.getSelectionModel().select(0);
-//          System.out.println("next selection : " + codeCompletionListView.getItems().get(0).getText());
-//        }
-//        break;
-//      default:
-//        Logger.getLogger(EditorController.class.getName()).log(Level.SEVERE, "Unknown arrow direction");
-//    }
-//  }
-
-//  private void populatePopup(LinkedList<String> searchResult) {
-//    codeCompletionListView = new ListView<>();
-//    for (int i = 0; i < searchResult.size(); i++) {
-//      final String result = searchResult.get(i);
-//      Label label = new Label(result);
-//      codeCompletionListView.getItems().add(label);
-//    }
-//
-//    if (!codeCompletionListView.getItems().isEmpty() && codeCompletionListView.getSelectionModel().getSelectedItem() == null) {
-//      codeCompletionListView.getSelectionModel().select(0);
-//      codeCompletionListView.getFocusModel().focus(0);
-//      codeCompletionListView.requestFocus();
-//    }
-//    codeCompletionListView.setOnMouseClicked(event -> {
-//      if (codeCompletionListView.getSelectionModel().getSelectedItem() == null) {
-//        return;
-//      }
-//      descriptionArea.setText(entryDescription.get(codeCompletionListView.getSelectionModel().getSelectedItem().getText()));
-//      descriptionPane.setVisible(true);
-//
-//      if(event.getButton().equals(MouseButton.PRIMARY)){
-//        if(event.getClickCount() == 2){
-//          itemFromCompletionPopupSelected(codeCompletionListView.getSelectionModel().getSelectedItem());
-//        }
-//      }
-//    });
-//
-//    codeCompletionListView.setOnKeyPressed(event -> {
-//      KeyCode keyCode = event.getCode();
-//      if (keyCode.equals(KeyCode.ENTER)) {
-//        final Label selectedItem = codeCompletionListView.getSelectionModel().getSelectedItem();
-//        if (selectedItem != null) {
-//          itemFromCompletionPopupSelected(codeCompletionListView.getSelectionModel().getSelectedItem());
-//        }
-//      } else if (keyCode.equals(keyCode.ESCAPE)) {
-//        if (popupHbox.isVisible()) {
-//          popupHbox.setVisible(false);
-//        }
-//          request.requestFocus();
-//      } else {
-//          if (!keyCode.equals(KeyCode.UP) && !keyCode.equals(KeyCode.DOWN)) {
-//              popupHbox.setVisible(false);
-//              request.fireEvent(event);
-//              request.requestFocus();
-//          }
-//      }
-//    });
-//    entriesPane.setContent(codeCompletionListView);
-//  }
-
-//  /**
-//   * Replaces the last word of the {@link CodeArea} with the item
-//   * from the completion popup.
-//   * Used while double click/ENTER button pressed.
-//   * Note: if nothing is selected, nothing happens
-//   * @param selectedItem the item from the viewList selected by the user
-//   */
-//  private void itemFromCompletionPopupSelected(Label selectedItem) {
-//    if (selectedItem != null) {
-//      replaceLastWord(selectedItem.getText());
-//      popupHbox.setVisible(false);
-//      request.requestFocus();
-//    }
-//  }
 
   /**
    * Replaces the last word in the {@link CodeArea} with a word passed as a parameter
@@ -356,28 +193,27 @@ public class EditorController {
     return "";
   }
 
-  private Node findChildById(Parent parent, String id) {
-    for (Node child : parent.getChildrenUnmodifiable()) {
-      if (child.getId().equals(id)) {
-        return child;
-      }
-    }
-    return null;
-  }
-
-  private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
+  /**
+   * Applies the highlighting to the {@link CodeArea}
+   * @param highlighting the {@link StyleSpans} object containing the highlighting to apply
+   */
+  private void applyStyles(StyleSpans<Collection<String>> highlighting) {
     request.setStyleSpans(0, highlighting);
   }
 
-  private Task<StyleSpans<Collection<String>>> computeHighlightingAsync() {
+  /**
+   * Executes the highlighting in the separate {@link Executor} to make it asynchronous
+   * @return the {@link Task} executed in the {@link Executor}
+   */
+  private Task<StyleSpans<Collection<String>>> computeStylesAsync() {
     String text = request.getText();
     Task<StyleSpans<Collection<String>>> task = new Task<StyleSpans<Collection<String>>>() {
       @Override
       protected StyleSpans<Collection<String>> call() throws Exception {
-        return computeHighlighting(text);
+        return computeStyles(text);
       }
     };
-    executor.execute(task);
+    highlightingExecutor.execute(task);
     return task;
   }
 
@@ -448,6 +284,21 @@ public class EditorController {
     request.replaceText(content);
   }
 
+  private StyleSpans<Collection<String>> computeStyles(String text) {
+    return computeSpellCheck(text).overlay(computeHighlighting(text), (bottomSpan, list) -> {
+      List<String> l = new ArrayList<>(bottomSpan.size() + list.size());
+      l.addAll(bottomSpan);
+      l.addAll(list);
+      return l;
+    });
+  }
+
+  /**
+   * Computes the {@link StyleSpans} for highlighting of the text
+   * accordong to {@link ch.gaps.slasher.highliter.Highlighter}'s matcher group names
+   * @param text the text to which we want to apply the highlighting
+   * @return {@link StyleSpans} for the highlighting of the text
+   */
   private StyleSpans<Collection<String>> computeHighlighting(String text) {
     // highlighting of the Highlighter (keywords, string literals, etc.)
     List<String> groupNames = database.getHighliter().getMatcherGroupNames();
@@ -472,24 +323,29 @@ public class EditorController {
     }
     spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
 
+    return spansBuilder.create();
+  }
+
+  /**
+   * Computes the {@link StyleSpans} for the syntax errors highlighting
+   * @param text the text to check for syntax errors
+   * @return {@link StyleSpans} for the syntax errors highlighting
+   */
+  private StyleSpans<Collection<String>> computeSpellCheck(String text) {
     // highlighting for the Corrector (syntax errors underlined)
+    StyleSpansBuilder<Collection<String>> spansBuilder
+            = new StyleSpansBuilder<>();
     List<SyntaxError> syntaxErrors = database.getCorrector().check(text);
-    BreakIterator wb = BreakIterator.getWordInstance();
-    wb.setText(text);
-    lastKwEnd = 0;
-    if (syntaxErrors != null) {
-      for (SyntaxError e : syntaxErrors) {
-        int[] lineIndexes = Utils.getLineIndexes(text, e.getLine());
-        if (lineIndexes[0] != lineIndexes[1]-1) {
-          System.out.println("line index : "+lineIndexes[0]);
-          System.out.println("last index : "+lineIndexes[1]);
-          spansBuilder.add(Collections.emptyList(), lineIndexes[0]-lastKwEnd);
-          spansBuilder.add(Collections.singleton("underlined"), lineIndexes[1]-1 - lineIndexes[0]);
-          lastKwEnd = lineIndexes[1]-1;
-        }
+    int lastErrEnds = 0;
+    for (SyntaxError e : syntaxErrors) {
+      int[] lineIndexes = Utils.getLineIndexes(text, e.getLine());
+      if (lineIndexes[0] != lineIndexes[1]-1) {
+        spansBuilder.add(Collections.emptyList(), lineIndexes[0]-lastErrEnds);
+        spansBuilder.add(Collections.singleton("underlined"), lineIndexes[1]-1 - lineIndexes[0]);
+        lastErrEnds = lineIndexes[1]-1;
       }
     }
-
+    spansBuilder.add(Collections.emptyList(), text.length() - lastErrEnds);
     return spansBuilder.create();
   }
 }
