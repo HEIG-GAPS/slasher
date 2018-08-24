@@ -40,7 +40,7 @@ public class Utils {
             curIndex++;
         }
         if (curIndex == text.length()) {
-            return null;
+            return lineIndexes;
         }
         lineIndexes[0] = curIndex;
         curChar = text.charAt(curIndex);

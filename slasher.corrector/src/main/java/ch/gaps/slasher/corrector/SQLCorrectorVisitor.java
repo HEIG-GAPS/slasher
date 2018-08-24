@@ -1,8 +1,11 @@
 package ch.gaps.slasher.corrector;
 
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class SQLCorrectorVisitor extends SQLParserBaseVisitor<List<SyntaxError>> {
@@ -13,9 +16,64 @@ public class SQLCorrectorVisitor extends SQLParserBaseVisitor<List<SyntaxError>>
         RecognitionException ex = ctx.exception;
         if (ex != null) {
             errors.add(new SyntaxError(ctx.exception, "syntax error"));
-            return errors;
         }
-        return null;
+        visitChildren(ctx);
+        return errors;
+    }
+
+    public List<SyntaxError> visitStatement(SQLParser.StatementContext ctx) {
+        visitChildren(ctx);
+        return errors;
+    }
+
+    public List<SyntaxError> visitData_statement(SQLParser.Data_statementContext ctx) {
+        visitChildren(ctx);
+        return errors;
+    }
+
+    public List<SyntaxError> visitQuery_expression(SQLParser.Query_expressionContext ctx) {
+        visitChildren(ctx);
+        return errors;
+    }
+
+    public List<SyntaxError> visitQuery_expression_body(SQLParser.Query_expression_bodyContext ctx) {
+        visitChildren(ctx);
+        return errors;
+    }
+
+    public List<SyntaxError> visitNon_join_query_expression(SQLParser.Non_join_query_expressionContext ctx) {
+        visitChildren(ctx);
+        return errors;
+    }
+
+    public List<SyntaxError> visitNon_join_query_term(SQLParser.Non_join_query_termContext ctx) {
+        visitChildren(ctx);
+        return errors;
+    }
+
+    public List<SyntaxError> visitNon_join_query_primary(SQLParser.Non_join_query_primaryContext ctx) {
+        visitChildren(ctx);
+        return errors;
+    }
+
+    public List<SyntaxError> visitSimple_table(SQLParser.Simple_tableContext ctx) {
+        visitChildren(ctx);
+        return errors;
+    }
+
+    public List<SyntaxError> visitQuery_specification(SQLParser.Query_specificationContext ctx) {
+        if(ctx.SELECT() != null) {
+            if (ctx.exception == null) {
+                System.out.println("exception null");
+            }
+            if (ctx.table_expression() != null) {
+                if (ctx.table_expression().from_clause() == null) {
+                    errors.add(new SyntaxError(ctx.exception, "FROM clause missing"));
+                }
+            }
+        }
+        visitChildren(ctx);
+        return errors;
     }
 
     public List<SyntaxError> getErrors() {

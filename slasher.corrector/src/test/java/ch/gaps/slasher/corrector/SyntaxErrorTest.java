@@ -29,4 +29,11 @@ class SyntaxErrorTest {
         String token = errors.get(0).getOffendingToken().getText();
         assertEquals("FRO", token);
     }
+
+    @Test
+    public void selectClauseTest1() {
+        String stmt = "SELECT a";
+        Corrector corrector =  new SQLiteCorrector();
+        List<SyntaxError> errors = corrector.check(stmt);
+    }
 }

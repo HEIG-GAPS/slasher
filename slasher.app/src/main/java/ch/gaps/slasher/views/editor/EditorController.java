@@ -339,7 +339,7 @@ public class EditorController {
     int lastErrEnds = 0;
     for (SyntaxError e : syntaxErrors) {
       int[] lineIndexes = Utils.getLineIndexes(text, e.getLine());
-      if (lineIndexes[0] != lineIndexes[1]-1) {
+      if (lineIndexes[0] < lineIndexes[1]-1) {
         spansBuilder.add(Collections.emptyList(), lineIndexes[0]-lastErrEnds);
         spansBuilder.add(Collections.singleton("underlined"), lineIndexes[1]-1 - lineIndexes[0]);
         lastErrEnds = lineIndexes[1]-1;
