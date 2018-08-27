@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -88,6 +89,14 @@ public class PopupMenu extends HBox {
                         fireEvent(new EventTransmittingEvent(this, entriesListView, event));
                         setVisible(false);
                     }
+                }
+            }
+        });
+
+        entriesListView.setOnMouseClicked(event -> {
+            if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
+                if (entriesListView.getSelectionModel().getSelectedItem() != null) {
+                    itemChosen();
                 }
             }
         });
