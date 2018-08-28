@@ -42,7 +42,7 @@ public interface Highlighter {
 
     /**
      * String Pattern fot the given SQL syntax
-     * @return
+     * @return the complete {@link Pattern} containing all the groups we want to highlight
      */
     Pattern getPattern();
 }
