@@ -17,6 +17,7 @@
  */
 package ch.gaps.slasher.database.driver.mysql;
 
+import ch.gaps.slasher.corrector.Corrector;
 import ch.gaps.slasher.database.driver.Driver;
 import ch.gaps.slasher.database.driver.database.*;
 import ch.gaps.slasher.highliter.Highlighter;
@@ -169,7 +170,12 @@ public class MySql implements Driver {
   // TODO: implement the MySql highliter and this method
   @Override
   public Highlighter getHighlighter() {
-    return null;
+    throw new UnsupportedOperationException("implement a Highlighter for MySql");
+  }
+
+  @Override
+  public Corrector getCorrector() {
+    throw new UnsupportedOperationException("implement a Corrector for MySql");
   }
 
   @Override

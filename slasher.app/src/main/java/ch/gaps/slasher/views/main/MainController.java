@@ -19,6 +19,7 @@ package ch.gaps.slasher.views.main;
 
 import ch.gaps.slasher.DriverService;
 import ch.gaps.slasher.Slasher;
+import ch.gaps.slasher.corrector.Corrector;
 import ch.gaps.slasher.database.driver.Driver;
 import ch.gaps.slasher.database.driver.database.DBObject;
 import ch.gaps.slasher.database.driver.database.Database;
@@ -46,6 +47,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -344,7 +346,7 @@ public class MainController {
       JsonReader reader = new JsonReader(new FileReader("save.json"));
       JsonArray mainArray = gson.fromJson(reader, JsonArray.class);
 
-      LinkedList<Driver> drivers = DriverService.instance().getAll();
+      List<Driver> drivers = DriverService.instance().getAll();
 
       if (mainArray != null) {
         for (JsonElement e : mainArray) {

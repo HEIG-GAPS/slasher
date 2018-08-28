@@ -17,6 +17,7 @@
  */
 package ch.gaps.slasher.database.driver.database;
 
+import ch.gaps.slasher.corrector.Corrector;
 import ch.gaps.slasher.database.driver.Driver;
 import ch.gaps.slasher.highliter.Highlighter;
 import javafx.beans.property.BooleanProperty;
@@ -275,8 +276,19 @@ public class Database implements DBObject, DBParent {
     return driver.getAllData(this, null, table);
   }
 
+  /**
+   * Getter
+   * @return the {@link Highlighter} of the database's {@link Driver}
+   */
   public Highlighter getHighliter() {
     return driver.getHighlighter();
   }
 
+  /**
+   * Getter
+   * @return the {@link Corrector} of the database's {@link Driver}
+   */
+  public Corrector getCorrector() {
+    return driver.getCorrector();
+  }
 }

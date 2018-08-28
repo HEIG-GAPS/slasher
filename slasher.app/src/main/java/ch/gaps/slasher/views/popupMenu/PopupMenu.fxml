@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<fx:root type="javafx.scene.layout.HBox" xmlns:fx="http://javafx.com/fxml">
+    <children>
+        <ScrollPane fx:id="entriesPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="298.0" HBox.hgrow="ALWAYS">
+            <content>
+                <VBox fx:id="entriesVbox" prefHeight="200.0" prefWidth="100.0" spacing="2.0">
+               <children>
+                  <ListView fx:id="entriesListView" prefHeight="200.0" prefWidth="200.0" />
+               </children></VBox>
+            </content>
+        </ScrollPane>
+        <ScrollPane fx:id="descriptionPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+            <content>
+                <TextArea fx:id="descriptionTextArea" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="200.0" wrapText="true" />
+            </content>
+        </ScrollPane>
+    </children>
+</fx:root>
